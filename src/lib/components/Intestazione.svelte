@@ -2,6 +2,7 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import Avatar from './Avatar.svelte';
+	import Notifiche from './Notifiche.svelte';
 </script>
 
 <header class="testata">
@@ -15,6 +16,7 @@
 		{/if}
 
 		<div class="testata__dx">
+			<Notifiche />
 			<span class="saldo t-num">✦ {profilo.saldo}</span>
 			<a class="testata__io" href="/chi-sei" aria-label="Cambia profilo">
 				<Avatar utente={profilo.io} dimensione="sm" />

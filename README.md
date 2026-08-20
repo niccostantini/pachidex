@@ -36,6 +36,8 @@ npm run dev
    - `0008` e `0009` — azzeramento del gioco, compatibile con `safeupdate`
    - `0010_foto_gps.sql` — i posti diventano `foto_gps` e contestabili
    - `0011_tag.sql` — @menzioni: una foto vale per piu' giocatori
+   - `0012_push.sql` — iscrizioni push e posizioni in classifica
+   - `0013_cron_notifiche.sql` — podio serale e promemoria voto via pg_cron
 3. Da **Project Settings > API** copia URL e `anon` key dentro `.env`:
 
 ```
@@ -97,12 +99,56 @@ nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng
 Le righe valide entrano anche se altre sono rotte: gli errori sono segnalati
 riga per riga.
 
+### Notifiche push
+
+Le chiavi VAPID si generano una volta sola e vanno in `.env` e su Vercel:
+
+```bash
+node -e "console.log(require('web-push').generateVAPIDKeys())"
+```
+
+Poi va detto al database dove sta l'app e con quale segreto bussare, perche'
+le notifiche a orario partono da pg_cron dentro Supabase. Dal **SQL Editor**,
+una volta sola:
+
+```sql
+update push_config set valore = 'https://tuo-progetto.vercel.app' where chiave = 'app_url';
+update push_config set valore = 'lo-stesso-CRON_SECRET-che-sta-su-vercel' where chiave = 'cron_secret';
+```
+
+`push_config` ha le RLS attive e nessuna policy: nessun client puo' leggerla,
+il segreto resta dentro il database.
+
+> **Su iPhone le notifiche arrivano solo se la PWA e' installata sulla
+> schermata Home.** In Safari come scheda normale l'API non esiste proprio —
+> non e' un permesso negato, e' assente. Serve iOS 16.4+ e ognuno dei sei deve
+> fare "Aggiungi a schermata Home", altrimenti non riceve niente e non capisce
+> perche'. L'app se ne accorge e lo spiega, invece di dire "non supportato".
+
+Cosa fa suonare il telefono:
+
+| Quando | A chi |
+|---|---|
+| Qualcuno cattura qualcosa | A tutti gli altri, accorpate: le catture ravvicinate si sovrascrivono invece di impilarsi |
+| Ti taggano in una foto | Solo a te, e sostituisce quella generica |
+| Ti contestano | Al contestato |
+| C'e' da votare | A tutti tranne contestato e contestante |
+| La contestazione si chiude | A tutti, con l'esito |
+| Mancano 2 ore al voto | Solo a chi non ha ancora votato |
+| Ricevi Croquembouche | A chi li riceve |
+| Ti superano in classifica | A chi viene superato |
+| Ogni sera alle 22:30 | Il podio, con la posizione di ciascuno |
+
+Il testo dei messaggi si compone **lato server leggendo dal database**: il
+client dice solo "e' successa la cosa X", cosi' nessuno puo' far arrivare agli
+altri una notifica che dice quello che gli pare.
+
 ## Deploy su Vercel
 
 Importa il repo su Vercel: rileva SvelteKit da solo, non serve configurare
 build command o output directory.
 
-Poi, in **Settings > Environment Variables**, incolla tutte e otto le
+Poi, in **Settings > Environment Variables**, incolla tutte e dodici le
 variabili di `.env.example` con i valori veri (Production, Preview e
 Development). Da li' in poi ogni push su `main` fa il deploy.
 

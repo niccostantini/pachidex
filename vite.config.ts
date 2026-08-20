@@ -1,18 +1,17 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 
-export default defineConfig(({ mode }) => {
-	// R2_PUBLIC_BASE_URL non e' prefissata PUBLIC_ (e' un dettaglio di
-	// infrastruttura, non un segreto, ma non ha senso nel bundle): va letta
-	// qui via loadEnv, che gira in Node in fase di build, non nel browser.
-	const env = loadEnv(mode, process.cwd(), '');
-	const r2Host = env.R2_PUBLIC_BASE_URL?.replace(/^https?:\/\//, '').replace(/\/$/, '');
-
+export default defineConfig(() => {
 	return {
 		plugins: [
 			sveltekit(),
 			SvelteKitPWA({
+				// injectManifest invece di generateSW: un service worker generato
+				// non puo' ricevere i push, il gestore va scritto a mano.
+				strategies: 'injectManifest',
+				srcDir: 'src',
+				filename: 'service-worker.ts',
 				registerType: 'autoUpdate',
 				manifest: {
 					name: 'Pachino Express',
@@ -31,36 +30,8 @@ export default defineConfig(({ mode }) => {
 						{ src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
 					]
 				},
-				workbox: {
-					globPatterns: ['**/*.{js,css,html,woff2,png,svg}'],
-					// Le foto delle catture: cache runtime, non precache.
-					runtimeCaching: [
-						...(r2Host
-							? [
-									{
-										urlPattern: new RegExp(
-											`^https://${r2Host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/catture/.*`,
-											'i'
-										),
-										handler: 'CacheFirst' as const,
-										options: {
-											cacheName: 'catture',
-											expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 30 },
-											cacheableResponse: { statuses: [0, 200] }
-										}
-									}
-								]
-							: []),
-						{
-							urlPattern: /^https:\/\/[a-z]\.tile\.openstreetmap\.org\/.*/i,
-							handler: 'CacheFirst',
-							options: {
-								cacheName: 'osm-tiles',
-								expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 30 },
-								cacheableResponse: { statuses: [0, 200] }
-							}
-						}
-					]
+				injectManifest: {
+					globPatterns: ['**/*.{js,css,html,woff2,png,svg}']
 				}
 			})
 		]

@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { del, get, keys, set } from 'idb-keyval';
 import { supabase } from '$lib/supabase';
 import { idUnico } from '$lib/id';
+import { notificaEvento } from '$lib/notifica';
 
 /**
  * Coda di upload per quando il segnale non c'e' (succedera', vicino a
@@ -124,7 +125,7 @@ class StatoCoda {
 		});
 		if (!rispPut.ok) throw new Error(`Upload della foto rifiutato (${rispPut.status})`);
 
-		const { error: errRpc } = await supabase.rpc('registra_cattura', {
+		const { data: captureId, error: errRpc } = await supabase.rpc('registra_cattura', {
 			p_user: voce.userId,
 			p_item: voce.itemId,
 			p_foto: publicUrl,
@@ -139,6 +140,8 @@ class StatoCoda {
 			const retedown = /fetch|network|timeout/i.test(errRpc.message);
 			throw retedown ? new Error(errRpc.message) : new ErroreDefinitivo(errRpc.message);
 		}
+
+		if (captureId) notificaEvento('cattura', captureId as string);
 	}
 
 	async scarta(id: string) {
