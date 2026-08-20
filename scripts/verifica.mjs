@@ -8,9 +8,13 @@
  * quello che ha creato. Non tocca i dati di gioco esistenti: lavora su un
  * elemento temporaneo riconoscibile e lo rimuove alla fine.
  *
- * Serve un .env riempito con URL e anon key.
+ * Serve un .env riempito con URL e anon key di Supabase. Se ci sono anche le
+ * credenziali R2 vere (non i placeholder xxxx...), collauda pure upload e
+ * lettura pubblica delle foto con la stessa firma che usa l'app; altrimenti
+ * salta quella parte e usa un URL finto solo per non bloccare il resto.
  */
 import { createClient } from '@supabase/supabase-js';
+import { AwsClient } from 'aws4fetch';
 import { readFileSync } from 'node:fs';
 
 /* --- ambiente ------------------------------------------------------------ */
@@ -35,6 +39,28 @@ if (!url || !key || url.includes('xxxx')) {
 const db = createClient(url, key, {
 	auth: { persistSession: false, autoRefreshToken: false }
 });
+
+const r2Pronto =
+	env.R2_ACCOUNT_ID &&
+	env.R2_ACCESS_KEY_ID &&
+	env.R2_SECRET_ACCESS_KEY &&
+	env.R2_BUCKET &&
+	env.R2_PUBLIC_BASE_URL &&
+	!env.R2_ACCOUNT_ID.startsWith('xxxx');
+
+// La stessa identica firma che fa src/routes/api/upload-url/+server.ts:
+// se questa funziona, l'endpoint funziona.
+const r2 = r2Pronto
+	? new AwsClient({
+			accessKeyId: env.R2_ACCESS_KEY_ID,
+			secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+			service: 's3',
+			region: 'auto'
+		})
+	: null;
+
+const r2Endpoint = (chiave) =>
+	new URL(`https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${env.R2_BUCKET}/${chiave}`);
 
 /* --- strumenti ----------------------------------------------------------- */
 let passati = 0;
@@ -131,20 +157,45 @@ try {
 	creato.itemId = item.id;
 	ok('elemento di prova creato');
 
-	// Foto vera su Storage: cosi' si collauda anche il bucket e i permessi.
-	const png = readFileSync('static/favicon.png');
-	creato.file = `collaudo/${Date.now()}.png`;
-	const { error: errS } = await db.storage
-		.from('catture')
-		.upload(creato.file, png, { contentType: 'image/png', upsert: true });
-	errS ? ko('upload su Storage', errS.message) : ok('upload su Storage');
+	// Foto vera su R2, con la stessa firma SigV4 che usa l'endpoint server:
+	// se il caricamento e la lettura pubblica funzionano qui, funzionano
+	// anche nell'app.
+	let fotoUrl = `https://esempio.invalid/collaudo.png`; // ripiego se R2 non e' configurato
+	if (r2Pronto) {
+		const png = readFileSync('static/favicon.png');
+		creato.file = `collaudo/${Date.now()}.png`;
+		const endpoint = r2Endpoint(creato.file);
+		endpoint.searchParams.set('X-Amz-Expires', '60');
 
-	const { data: pub } = db.storage.from('catture').getPublicUrl(creato.file);
+		const firmata = await r2.sign(endpoint, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'image/png' },
+			aws: { signQuery: true }
+		});
+		const rispPut = await fetch(firmata.url, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'image/png' },
+			body: png
+		});
+		verifica('upload su R2', rispPut.ok, `HTTP ${rispPut.status}`);
+
+		fotoUrl = `${env.R2_PUBLIC_BASE_URL}/${creato.file}`;
+		const rispGet = await fetch(fotoUrl);
+		verifica(
+			'la foto si legge dal dominio pubblico',
+			rispGet.ok,
+			rispGet.ok ? fotoUrl : `HTTP ${rispGet.status} — dominio custom configurato?`
+		);
+	} else {
+		console.log(
+			'  \x1b[2m· R2 non configurato nel .env: salto upload e lettura, uso un URL finto\x1b[0m'
+		);
+	}
 
 	const { data: capId, error: errC } = await db.rpc('registra_cattura', {
 		p_user: autore.id,
 		p_item: item.id,
-		p_foto: pub.publicUrl,
+		p_foto: fotoUrl,
 		p_nota: 'collaudo automatico',
 		p_lat: null,
 		p_lng: null
@@ -163,7 +214,7 @@ try {
 	const { error: errDoppio } = await db.rpc('registra_cattura', {
 		p_user: autore.id,
 		p_item: item.id,
-		p_foto: pub.publicUrl,
+		p_foto: fotoUrl,
 		p_nota: null,
 		p_lat: null,
 		p_lng: null
@@ -201,7 +252,7 @@ try {
 		? ko('vista PachiDex', errDex.message)
 		: verifica(
 				'il PachiDex mostra la prima foto del gruppo',
-				dex?.[0]?.prima_foto === pub.publicUrl,
+				dex?.[0]?.prima_foto === fotoUrl,
 				dex?.[0]?.prima_foto ? 'foto collegata' : 'nessuna foto'
 			);
 
@@ -347,9 +398,11 @@ try {
 		await db.from('items').delete().eq('id', creato.itemId);
 		ok('elemento di prova rimosso (con cattura e contestazione)');
 	}
-	if (creato.file) {
-		await db.storage.from('catture').remove([creato.file]);
-		ok('foto di prova rimossa');
+	if (creato.file && r2) {
+		const endpoint = r2Endpoint(creato.file);
+		const firmata = await r2.sign(endpoint, { method: 'DELETE', aws: { signQuery: true } });
+		await fetch(firmata.url, { method: 'DELETE' });
+		ok('foto di prova rimossa da R2');
 	}
 
 	console.log(

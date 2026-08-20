@@ -10,8 +10,9 @@ come Bluesky, cronologico e senza algoritmo.
 ## Cosa serve
 
 - Node 20+
-- Un progetto Supabase (piano free)
-- Niente altro: la mappa e' OpenStreetMap, l'hosting e' statico
+- Un progetto Supabase (piano free) — database, realtime, avatar
+- Un bucket Cloudflare R2 con un dominio personalizzato — le foto delle catture
+- Niente altro: la mappa e' OpenStreetMap
 
 ## Avvio
 
@@ -30,6 +31,8 @@ npm run dev
    - `0003_rls_storage.sql` — permessi, bucket immagini, realtime
    - `0004_seed.sql` — i sei giocatori e la configurazione iniziale
    - `0005_cron.sql` — **opzionale**, chiude le contestazioni scadute da sole
+   - `0006_indurimento.sql` — chiude gli avvisi del linter di sicurezza
+   - `0007_r2_migrazione.sql` — restringe Storage al solo bucket `avatar`
 3. Da **Project Settings > API** copia URL e `anon` key dentro `.env`:
 
 ```
@@ -38,6 +41,31 @@ PUBLIC_SUPABASE_ANON_KEY="eyJ..."
 ```
 
 In alternativa, con la CLI: `supabase db push`.
+
+### Configurare Cloudflare R2
+
+Le foto delle catture stanno su R2, non su Supabase Storage: non consumano la
+quota del piano free e costano meno a crescere.
+
+1. **Crea il bucket** — Cloudflare dashboard > R2 > Create bucket. Il nome che
+   scegli va in `R2_BUCKET`.
+2. **Collega il dominio** — nel bucket, Settings > Custom Domains > Connect
+   Domain (es. `cdn.tuodominio.it`; serve un dominio gia' su Cloudflare DNS).
+   Va in `R2_PUBLIC_BASE_URL`, senza slash finale. E' da qui che il feed legge
+   le foto, quindi il bucket resta privato in scrittura ma pubblico in lettura
+   solo attraverso questo dominio.
+3. **Crea il token** — R2 > Manage API Tokens > Create API Token, permessi
+   *Object Read & Write* ristretti a quel bucket. Ti da' Access Key ID e
+   Secret Access Key, che vanno in `R2_ACCESS_KEY_ID` e
+   `R2_SECRET_ACCESS_KEY`. La secret la vedi una volta sola.
+4. **Account ID** — e' nella barra laterale della dashboard Cloudflare, va in
+   `R2_ACCOUNT_ID`.
+
+Il browser non parla mai direttamente con R2 usando queste chiavi: chiede un
+URL di upload temporaneo a `/api/upload-url`, che lo firma lato server e vale
+cinque minuti. Le variabili R2 **non** sono prefissate `PUBLIC_` proprio per
+questo — SvelteKit rifiuta di compilare se qualcuno prova a importarle in un
+file client.
 
 ### Caricare il PachiDex
 
@@ -59,20 +87,23 @@ nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng
 Le righe valide entrano anche se altre sono rotte: gli errori sono segnalati
 riga per riga.
 
-## Deploy
+## Deploy su Vercel
 
-Build statica, gira ovunque:
+Importa il repo su Vercel: rileva SvelteKit da solo, non serve configurare
+build command o output directory.
 
-```bash
-npm run build     # esce in build/
-```
+Poi, in **Settings > Environment Variables**, incolla tutte e sette le
+variabili di `.env.example` con i valori veri (Production, Preview e
+Development). Da li' in poi ogni push su `main` fa il deploy.
 
-- **Vercel**: importa il repo, framework SvelteKit, aggiungi le due variabili
-  d'ambiente. Nient'altro.
-- **Netlify**: publish directory `build`, stesse variabili.
+Quasi tutta l'app viene pubblicata come file statici — 13 pagine
+prerenderizzate — e resta **una sola funzione serverless**, `/api/upload-url`,
+che esiste solo per firmare gli upload verso R2.
 
-Le variabili sono `PUBLIC_*`, quindi finiscono nel bundle: e' voluto, la anon
-key e' pensata per stare nel client.
+Le due variabili `PUBLIC_*` finiscono nel bundle client: e' voluto, la anon key
+di Supabase e' pensata per stare li' ed e' protetta dalle RLS. Le cinque `R2_*`
+no: restano solo lato server, e la secret key di R2 in particolare va trattata
+come una credenziale vera, perche' chi la ottiene puo' svuotare il bucket.
 
 ## Regole del gioco
 
@@ -104,20 +135,25 @@ manuale · giocatori e sprite avatar · annullamento scambi.
 
 ## Note tecniche
 
-- **SPA statica** (`adapter-static` con fallback): nessun server, nessun cold
-  start, stesso artefatto su qualsiasi host.
+- **Quasi tutto statico** (`adapter-vercel` con `ssr:false` e `prerender:true`):
+  le pagine sono file, non funzioni, quindi niente cold start sul percorso che
+  usano i giocatori. L'unica funzione serverless e' `/api/upload-url`.
 - **Realtime** su catture, contestazioni, voti, reazioni e scambi: un solo
   canale, niente polling.
 - **Offline**: le catture finiscono in coda su IndexedDB e ripartono da sole
   quando la rete torna. Serve, dalle parti di Vendicari.
-- **Foto** ridimensionate e ricompresse nel browser prima dell'upload; il
-  service worker le tiene in cache.
-- **Leaflet** e' in un chunk a parte (~42 KB gz): lo scarica solo chi apre la
+- **Foto** ridimensionate e ricompresse nel browser prima dell'upload, poi
+  caricate su R2 con un URL firmato valido cinque minuti; il service worker le
+  tiene in cache. L'URL si richiede a ogni tentativo, cosi' una coda rimasta
+  ferma per ore senza rete non resta bloccata su una firma scaduta.
+- **Leaflet** e' in un chunk a parte (~43 KB gz): lo scarica solo chi apre la
   mappa.
 - **Niente autenticazione**: il profilo si sceglie da una lista e resta in
-  localStorage. Chiunque abbia la anon key puo' scrivere. E' un gioco fra sei
-  amici, il rischio e' proporzionato; se un giorno servisse davvero, la strada
-  e' Supabase Auth con magic link e policy su `auth.uid()`.
+  localStorage. Chiunque abbia la anon key puo' scrivere sul database. E' un
+  gioco fra sei amici, il rischio e' proporzionato; se un giorno servisse
+  davvero, la strada e' Supabase Auth con magic link e policy su `auth.uid()`.
+  Le credenziali R2 sono un discorso diverso e stanno solo lato server: una
+  chiave di scrittura su un bucket e' un rischio di tutt'altro peso.
 
 ## Icone
 

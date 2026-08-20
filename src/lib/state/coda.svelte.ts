@@ -102,18 +102,29 @@ class StatoCoda {
 	}
 
 	private async spedisci(voce: CatturaInCoda) {
-		const percorso = `${voce.userId}/${voce.id}.${voce.estensione}`;
-		const { error: errUp } = await supabase.storage
-			.from('catture')
-			.upload(percorso, voce.blob, { contentType: voce.blob.type, upsert: true });
-		if (errUp) throw errUp;
+		// La foto va su R2, con un URL firmato dal server e valido 5 minuti:
+		// si chiede un URL fresco a ogni tentativo, cosi' una firma scaduta
+		// (coda rimasta ferma per ore senza rete) si risolve da sola al
+		// prossimo giro invece di restare bloccata per sempre.
+		const risp = await fetch('/api/upload-url', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ userId: voce.userId, estensione: voce.estensione })
+		});
+		if (!risp.ok) throw new Error(`Non riesco a preparare l'upload (${risp.status})`);
+		const { uploadUrl, contentType, publicUrl } = await risp.json();
 
-		const { data } = supabase.storage.from('catture').getPublicUrl(percorso);
+		const rispPut = await fetch(uploadUrl, {
+			method: 'PUT',
+			headers: { 'Content-Type': contentType },
+			body: voce.blob
+		});
+		if (!rispPut.ok) throw new Error(`Upload della foto rifiutato (${rispPut.status})`);
 
 		const { error: errRpc } = await supabase.rpc('registra_cattura', {
 			p_user: voce.userId,
 			p_item: voce.itemId,
-			p_foto: data.publicUrl,
+			p_foto: publicUrl,
 			p_nota: voce.nota,
 			p_lat: voce.lat,
 			p_lng: voce.lng
