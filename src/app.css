@@ -1,0 +1,620 @@
+/* ==========================================================================
+   Pachino Express — design system
+   Pixel art fine + chrome finestra retro. Palette dal riferimento.
+   ========================================================================== */
+
+@import '@fontsource/pixelify-sans/latin-400.css';
+@import '@fontsource/pixelify-sans/latin-700.css';
+
+:root {
+	/* --- palette ------------------------------------------------------- */
+	--cream: #e7ddc6;
+	--paper: #f7f3e8;
+	--navy: #161b3d;
+	--navy-soft: #4a5578;
+	--orange: #f0552b;
+	--orange-dark: #c93f1c;
+	--blue: #2b5ed0;
+	--blue-dark: #1c408f;
+	--yellow: #f5c518;
+	--green: #35b79a;
+	--red: #d93b32;
+
+	/* --- rarita' -------------------------------------------------------- */
+	--rarity-comune: var(--navy-soft);
+	--rarity-raro: var(--blue);
+	--rarity-leggendario: var(--yellow);
+
+	/* --- categorie ------------------------------------------------------ */
+	--cat-posto: var(--blue);
+	--cat-pietanza: var(--orange);
+	--cat-animale: var(--green);
+	--cat-attivita: #8b5cf6;
+
+	/* --- struttura ------------------------------------------------------ */
+	--border: 3px;
+	--border-thin: 2px;
+	--shadow: 4px 4px 0 var(--navy);
+	--shadow-sm: 3px 3px 0 var(--navy);
+	--bar-h: 56px;
+
+	/* Nessun raggio: il pixel non ha angoli tondi. */
+	--radius: 0;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 24px;
+	--space-6: 32px;
+
+	color-scheme: light only;
+}
+
+/* --- reset -------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 16px;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	background: var(--cream);
+	color: var(--navy);
+	font-family: 'Pixelify Sans', 'Courier New', monospace;
+	font-weight: 400;
+	line-height: 1.45;
+	min-height: 100dvh;
+	overscroll-behavior-y: none;
+	/* Trama a puntini appena percettibile, come la carta del riferimento. */
+	background-image: radial-gradient(var(--navy) 0.5px, transparent 0.5px);
+	background-size: 8px 8px;
+	background-blend-mode: soft-light;
+}
+
+img,
+svg,
+canvas {
+	display: block;
+	max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	color: inherit;
+}
+
+a {
+	color: var(--blue);
+	text-underline-offset: 3px;
+}
+
+ul,
+ol {
+	list-style: none;
+}
+
+/* --- tipografia --------------------------------------------------------- */
+h1,
+h2,
+h3 {
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: 0.02em;
+}
+
+h1 {
+	font-size: 1.75rem;
+}
+h2 {
+	font-size: 1.25rem;
+}
+h3 {
+	font-size: 1rem;
+}
+
+.t-label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.t-small {
+	font-size: 0.8125rem;
+}
+
+.t-muted {
+	color: var(--navy-soft);
+}
+
+.t-num {
+	font-variant-numeric: tabular-nums;
+}
+
+/* --- finestra (il mattone di tutta la UI) ------------------------------- */
+.win {
+	background: var(--paper);
+	border: var(--border) solid var(--navy);
+	box-shadow: var(--shadow);
+}
+
+.win--flat {
+	box-shadow: none;
+}
+
+.win__bar {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	background: var(--orange);
+	border-bottom: var(--border) solid var(--navy);
+	padding: 3px var(--space-2);
+	min-height: 26px;
+	color: var(--paper);
+}
+
+.win__bar--blue {
+	background: var(--blue);
+}
+.win__bar--navy {
+	background: var(--navy);
+}
+.win__bar--green {
+	background: var(--green);
+}
+
+.win__title {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.win__btns {
+	display: flex;
+	gap: 3px;
+	margin-left: auto;
+	flex-shrink: 0;
+}
+
+.win__btn {
+	width: 15px;
+	height: 15px;
+	background: var(--paper);
+	border: var(--border-thin) solid var(--navy);
+	display: grid;
+	place-items: center;
+	font-size: 9px;
+	line-height: 1;
+	font-weight: 700;
+	color: var(--navy);
+	cursor: default;
+}
+
+.win__btn[data-action] {
+	cursor: pointer;
+}
+
+.win__btn[data-action]:active {
+	background: var(--navy);
+	color: var(--paper);
+}
+
+.win__body {
+	padding: var(--space-3);
+}
+
+.win__body--flush {
+	padding: 0;
+}
+
+/* --- bottoni ------------------------------------------------------------ */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	padding: 10px var(--space-4);
+	background: var(--paper);
+	border: var(--border) solid var(--navy);
+	box-shadow: var(--shadow-sm);
+	font-weight: 700;
+	font-size: 0.9375rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	cursor: pointer;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	transition: none;
+}
+
+.btn:active:not(:disabled) {
+	transform: translate(3px, 3px);
+	box-shadow: none;
+}
+
+.btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	box-shadow: none;
+	transform: translate(3px, 3px);
+}
+
+.btn--primary {
+	background: var(--orange);
+	color: var(--paper);
+}
+
+.btn--blue {
+	background: var(--blue);
+	color: var(--paper);
+}
+
+.btn--danger {
+	background: var(--red);
+	color: var(--paper);
+}
+
+.btn--ok {
+	background: var(--green);
+	color: var(--paper);
+}
+
+.btn--ghost {
+	box-shadow: none;
+	background: transparent;
+}
+
+.btn--block {
+	width: 100%;
+}
+
+.btn--lg {
+	padding: var(--space-4);
+	font-size: 1.0625rem;
+}
+
+.btn--sm {
+	padding: 5px 10px;
+	font-size: 0.75rem;
+	box-shadow: 2px 2px 0 var(--navy);
+	border-width: var(--border-thin);
+}
+
+.btn--sm:active:not(:disabled) {
+	transform: translate(2px, 2px);
+}
+
+/* --- campi -------------------------------------------------------------- */
+.field {
+	display: block;
+	width: 100%;
+	padding: 9px var(--space-3);
+	background: var(--paper);
+	border: var(--border) solid var(--navy);
+	box-shadow: inset 2px 2px 0 rgba(22, 27, 61, 0.12);
+	font-size: 1rem;
+	outline: none;
+}
+
+.field:focus-visible {
+	background: #fffdf5;
+	box-shadow:
+		inset 2px 2px 0 rgba(22, 27, 61, 0.12),
+		0 0 0 3px var(--orange);
+}
+
+.field-label {
+	display: block;
+	margin-bottom: var(--space-1);
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--navy-soft);
+}
+
+.field-row {
+	margin-bottom: var(--space-3);
+}
+
+select.field {
+	appearance: none;
+	background-image: linear-gradient(45deg, transparent 50%, var(--navy) 50%),
+		linear-gradient(135deg, var(--navy) 50%, transparent 50%);
+	background-size:
+		6px 6px,
+		6px 6px;
+	background-position:
+		calc(100% - 16px) 50%,
+		calc(100% - 10px) 50%;
+	background-repeat: no-repeat;
+	padding-right: 34px;
+}
+
+/* --- badge / rarita' ---------------------------------------------------- */
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 6px;
+	border: var(--border-thin) solid var(--navy);
+	background: var(--paper);
+	font-size: 0.6875rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	white-space: nowrap;
+}
+
+.badge--comune {
+	background: var(--rarity-comune);
+	color: var(--paper);
+}
+
+.badge--raro {
+	background: var(--rarity-raro);
+	color: var(--paper);
+}
+
+.badge--leggendario {
+	background: var(--rarity-leggendario);
+	color: var(--navy);
+}
+
+/* Bordo olografico animato: solo per i leggendari, ~1KB, steps() per
+   mantenere lo scatto pixel invece di uno scorrimento fluido. */
+.holo {
+	position: relative;
+	isolation: isolate;
+}
+
+.holo::before {
+	content: '';
+	position: absolute;
+	inset: calc(var(--border) * -1);
+	z-index: -1;
+	background: repeating-linear-gradient(
+		45deg,
+		var(--yellow) 0 4px,
+		#fff3b0 4px 8px,
+		var(--orange) 8px 12px,
+		#fff3b0 12px 16px
+	);
+	background-size: 22.7px 22.7px;
+	animation: holo-scroll 700ms steps(4, end) infinite;
+}
+
+@keyframes holo-scroll {
+	to {
+		background-position: 22.7px 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.holo::before {
+		animation: none;
+	}
+}
+
+/* --- blocco "?" stile Mario --------------------------------------------- */
+.qblock {
+	position: relative;
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1;
+	width: 100%;
+	background: var(--rarity, var(--navy-soft));
+	border: var(--border) solid var(--navy);
+	box-shadow:
+		inset -5px -5px 0 rgba(22, 27, 61, 0.28),
+		inset 5px 5px 0 rgba(255, 255, 255, 0.22);
+	/* I quattro rivetti agli angoli, in puro CSS. */
+	background-image: linear-gradient(var(--navy) 0 0), linear-gradient(var(--navy) 0 0),
+		linear-gradient(var(--navy) 0 0), linear-gradient(var(--navy) 0 0);
+	background-size: 5px 5px;
+	background-position:
+		6px 6px,
+		calc(100% - 6px) 6px,
+		6px calc(100% - 6px),
+		calc(100% - 6px) calc(100% - 6px);
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.qblock__mark {
+	font-size: clamp(1.75rem, 12vw, 2.75rem);
+	font-weight: 700;
+	color: var(--paper);
+	text-shadow: 3px 3px 0 rgba(22, 27, 61, 0.55);
+	user-select: none;
+}
+
+.qblock--bump {
+	animation: bump 320ms steps(1, end);
+}
+
+@keyframes bump {
+	0% {
+		transform: translateY(0);
+	}
+	25% {
+		transform: translateY(-7px);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+	75% {
+		transform: translateY(-4px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.qblock--bump {
+		animation: none;
+	}
+}
+
+/* --- immagini ----------------------------------------------------------- */
+/* Gli sprite degli avatar sono pixel art: mai interpolati. */
+.pixel {
+	image-rendering: pixelated;
+}
+
+/* Le foto delle catture restano nitide: e' il contrasto voluto. */
+.photo {
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	background: var(--cream);
+	border: var(--border) solid var(--navy);
+}
+
+.avatar {
+	width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+	border: var(--border-thin) solid var(--navy);
+	background: var(--cream);
+	object-fit: cover;
+	image-rendering: pixelated;
+}
+
+.avatar--lg {
+	width: 56px;
+	height: 56px;
+	border-width: var(--border);
+}
+
+.avatar--sm {
+	width: 24px;
+	height: 24px;
+}
+
+/* Ripiego quando l'admin non ha ancora caricato lo sprite. */
+.avatar--initials {
+	display: grid;
+	place-items: center;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: var(--paper);
+	text-transform: uppercase;
+}
+
+/* --- layout ------------------------------------------------------------- */
+.app {
+	max-width: 640px;
+	margin: 0 auto;
+	min-height: 100dvh;
+	padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom) + var(--space-4));
+}
+
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.stack--tight {
+	gap: var(--space-2);
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+.pad {
+	padding: var(--space-3);
+}
+
+.grow {
+	flex: 1;
+	min-width: 0;
+}
+
+/* --- divisori ----------------------------------------------------------- */
+.hr {
+	height: var(--border-thin);
+	background: var(--navy);
+	opacity: 0.25;
+	border: 0;
+}
+
+/* --- pill Croquembouche ------------------------------------------------- */
+.croq {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.croq__icon {
+	font-size: 0.9em;
+	line-height: 1;
+}
+
+.croq--pos {
+	color: var(--green);
+}
+.croq--neg {
+	color: var(--red);
+}
+
+/* --- stati -------------------------------------------------------------- */
+.skeleton {
+	background: repeating-linear-gradient(
+		90deg,
+		rgba(22, 27, 61, 0.09) 0 8px,
+		rgba(22, 27, 61, 0.04) 8px 16px
+	);
+	animation: skel 900ms steps(2, end) infinite alternate;
+}
+
+@keyframes skel {
+	to {
+		opacity: 0.55;
+	}
+}
+
+.empty {
+	padding: var(--space-6) var(--space-4);
+	text-align: center;
+	color: var(--navy-soft);
+}
+
+/* --- accessibilita' ----------------------------------------------------- */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+:focus-visible {
+	outline: 3px solid var(--orange);
+	outline-offset: 2px;
+}
