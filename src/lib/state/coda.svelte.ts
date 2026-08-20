@@ -16,6 +16,8 @@ export interface CatturaInCoda {
 	blob: Blob;
 	estensione: string;
 	nota: string | null;
+	/** Gli id dei giocatori taggati nella didascalia. */
+	taggati: string[];
 	lat: number | null;
 	lng: number | null;
 	creata: number;
@@ -128,7 +130,8 @@ class StatoCoda {
 			p_foto: publicUrl,
 			p_nota: voce.nota,
 			p_lat: voce.lat,
-			p_lng: voce.lng
+			p_lng: voce.lng,
+			p_taggati: voce.taggati?.length ? voce.taggati : null
 		});
 		if (errRpc) {
 			// Il database ha detto no per una regola (doppione, troppo lontano):

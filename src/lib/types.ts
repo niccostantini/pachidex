@@ -62,6 +62,13 @@ export interface Vote {
 	created_at: string;
 }
 
+export interface CaptureTag {
+	id: string;
+	capture_id: string;
+	user_id: string;
+	created_at: string;
+}
+
 export interface Reaction {
 	id: string;
 	capture_id: string;
@@ -120,6 +127,8 @@ export interface PostCattura extends Capture {
 	autore: User;
 	likes: number;
 	ho_messo_like: boolean;
+	/** Chi altro prende i Croquembouche di questa foto. */
+	taggati: User[];
 	contestazione: Contest | null;
 	at: string;
 }

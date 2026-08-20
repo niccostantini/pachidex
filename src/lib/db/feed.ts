@@ -14,6 +14,7 @@ const SELECT_CATTURA = `
 	item:items(*),
 	autore:users(*),
 	reactions(user_id),
+	tag:capture_tags(utente:users(*)),
 	contestazioni:contests(*)
 `;
 
@@ -26,11 +27,13 @@ const SELECT_CATTURA_NUDA = `
 	*,
 	item:items(*),
 	autore:users(*),
-	reactions(user_id)
+	reactions(user_id),
+	tag:capture_tags(utente:users(*))
 `;
 
 interface RigaCattura {
 	reactions: { user_id: string }[];
+	tag: { utente: User }[];
 	contestazioni: Contest[];
 	[k: string]: unknown;
 }
@@ -43,6 +46,7 @@ function aPostCattura(riga: RigaCattura, ioId: string | null): PostCattura {
 		tipo: 'cattura',
 		likes: reactions.length,
 		ho_messo_like: !!ioId && reactions.some((r) => r.user_id === ioId),
+		taggati: (riga.tag ?? []).map((t) => t.utente).filter(Boolean),
 		// La piu' recente: una cattura ne ha al massimo una aperta per volta.
 		contestazione:
 			[...contestazioni].sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,

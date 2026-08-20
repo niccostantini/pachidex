@@ -35,6 +35,7 @@ npm run dev
    - `0007_r2_migrazione.sql` — restringe Storage al solo bucket `avatar`
    - `0008` e `0009` — azzeramento del gioco, compatibile con `safeupdate`
    - `0010_foto_gps.sql` — i posti diventano `foto_gps` e contestabili
+   - `0011_tag.sql` — @menzioni: una foto vale per piu' giocatori
 3. Da **Project Settings > API** copia URL e `anon` key dentro `.env`:
 
 ```
@@ -122,6 +123,7 @@ come una credenziale vera, perche' chi la ottiene puo' svuotare il bucket.
 | Pietanze, animali, attivita | Foto e autocertificazione |
 | Contestabilita' | Tutto e' contestabile, posti compresi: il GPS prova che c'eri, non che la foto valga qualcosa |
 | Elementi ripetibili | Catturabili all'infinito, sempre a valore pieno |
+| Tag @menzione | Scrivi `@nome` nella didascalia e la foto vale anche per lui: stessi Croquembouche, stesso sblocco nel PachiDex |
 | Contestazione | Costa 1 ✦ a chi la apre, comunque vada |
 | Chi perde | Lascia altri 15 ✦ (contestato se cade la cattura, contestante se regge) |
 | Voto | Vota chiunque tranne il contestato: con 6 profili sono 5 voti, mai parita' |
@@ -134,6 +136,16 @@ vacanza non riscrive il passato.
 
 Il saldo non e' un contatore salvato ma una vista calcolata dagli eventi
 (`v_saldi`), quindi non puo' andare in drift.
+
+Sui tag valgono tre regole che vale la pena sapere a cena:
+
+- Un elemento **non ripetibile vale una volta sola per persona**, comunque le
+  arrivi. Se Gu la granita l'ha gia' presa da solo, farsi taggare in quella di
+  un altro non gli aggiunge niente.
+- Se la foto viene contestata e bocciata, **i punti svaniscono per tutti** i
+  taggati: la foto e' una sola, cade tutta insieme.
+- La **penalita' la paga solo chi ha pubblicato**, non i taggati: e' lui che
+  ci ha messo la faccia, e gli altri potrebbero non sapere nemmeno di esserci.
 
 ## Pannello admin
 

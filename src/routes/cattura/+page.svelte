@@ -10,7 +10,9 @@
 	import { messaggioErrore } from '$lib/supabase';
 	import Finestra from '$lib/components/Finestra.svelte';
 	import Rarita from '$lib/components/Rarita.svelte';
-	import type { VoceDex } from '$lib/types';
+	import { completaMenzione, estraiTaggati, menzioneInCorso } from '$lib/game/tag';
+	import Avatar from '$lib/components/Avatar.svelte';
+	import type { User, VoceDex } from '$lib/types';
 
 	let voci = $state<VoceDex[]>([]);
 	let mie = $state<Map<string, MiaVoce>>(new Map());
@@ -84,6 +86,36 @@
 		urlAnteprima = anteprima(f);
 	}
 
+	/* --- @menzioni nella didascalia --------------------------------------- */
+	let campoNota: HTMLInputElement | undefined = $state();
+	let cursore = $state(0);
+
+	const menzione = $derived(menzioneInCorso(nota, cursore));
+
+	const candidati = $derived.by(() => {
+		if (!menzione) return [];
+		const q = menzione.parziale.toLowerCase();
+		return profilo.altri.filter((u) => u.nome.toLowerCase().startsWith(q)).slice(0, 5);
+	});
+
+	const taggati = $derived(estraiTaggati(nota, profilo.utenti, profilo.io?.id));
+
+	function segnaCursore() {
+		cursore = campoNota?.selectionStart ?? nota.length;
+	}
+
+	function scegliMenzione(u: User) {
+		if (!menzione) return;
+		const esito = completaMenzione(nota, menzione.inizio, cursore, u.nome);
+		nota = esito.testo;
+		cursore = esito.cursore;
+		// Il cursore va rimesso a mano: il valore cambia sotto i piedi al campo.
+		requestAnimationFrame(() => {
+			campoNota?.focus();
+			campoNota?.setSelectionRange(esito.cursore, esito.cursore);
+		});
+	}
+
 	async function pubblica() {
 		if (!scelta || !file || !profilo.io) return;
 		inInvio = true;
@@ -97,6 +129,7 @@
 				blob: pronta.blob,
 				estensione: pronta.estensione,
 				nota: nota.trim() || null,
+				taggati: taggati.map((u) => u.id),
 				lat: pos?.lat ?? null,
 				lng: pos?.lng ?? null
 			});
@@ -194,10 +227,47 @@
 				{/if}
 			{/if}
 
-			<!-- 3. Due parole -->
-			<div class="field-row">
-				<label class="field-label" for="nota">Didascalia (facoltativa)</label>
-				<input id="nota" class="field" bind:value={nota} maxlength="180" placeholder="Due parole" />
+			<!-- 3. Due parole, e chi c'era -->
+			<div class="field-row composer">
+				<label class="field-label" for="nota">
+					Didascalia — scrivi @ per dare i punti anche a chi era con te
+				</label>
+				<input
+					id="nota"
+					class="field"
+					bind:value={nota}
+					bind:this={campoNota}
+					oninput={segnaCursore}
+					onclick={segnaCursore}
+					onkeyup={segnaCursore}
+					maxlength="180"
+					autocomplete="off"
+					placeholder="Granita con @..."
+				/>
+
+				{#if candidati.length}
+					<ul class="menu">
+						{#each candidati as u (u.id)}
+							<li>
+								<button type="button" class="menu__voce" onclick={() => scegliMenzione(u)}>
+									<Avatar utente={u} dimensione="sm" />
+									<span>{u.nome}</span>
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+
+				{#if taggati.length}
+					<p class="taggati t-small">
+						Vale anche per
+						{#each taggati as u, i (u.id)}<strong>{u.nome}</strong>{i <
+							taggati.length - 1
+							? ', '
+							: ''}{/each}
+						— stessi Croquembouche, stesso sblocco nel PachiDex.
+					</p>
+				{/if}
 			</div>
 
 			{#if errore}
@@ -372,5 +442,48 @@
 	.errore {
 		color: var(--red);
 		font-weight: 700;
+	}
+
+	.composer {
+		position: relative;
+	}
+
+	/* Il menu galleggia sopra il resto del modulo, come in ogni composer. */
+	.menu {
+		position: absolute;
+		left: 0;
+		right: 0;
+		z-index: 20;
+		background: var(--paper);
+		border: var(--border) solid var(--navy);
+		box-shadow: var(--shadow);
+		max-height: 44dvh;
+		overflow-y: auto;
+	}
+
+	.menu__voce {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		width: 100%;
+		padding: 6px var(--space-2);
+		background: transparent;
+		border: 0;
+		border-bottom: var(--border-thin) solid rgba(22, 27, 61, 0.15);
+		text-align: left;
+		cursor: pointer;
+		font-weight: 700;
+	}
+
+	.menu__voce:active {
+		background: var(--orange);
+		color: var(--paper);
+	}
+
+	.taggati {
+		margin-top: var(--space-2);
+		background: rgba(53, 183, 154, 0.2);
+		border: var(--border-thin) solid var(--navy);
+		padding: var(--space-2);
 	}
 </style>

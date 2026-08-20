@@ -93,7 +93,16 @@ const saldoDi = async (id) => {
 };
 
 /* --- stato del collaudo --------------------------------------------------- */
-const creato = { itemId: null, checkpointId: null, captureId: null, transferId: null, file: null };
+const creato = {
+	itemId: null,
+	itemTagId: null,
+	checkpointId: null,
+	captureId: null,
+	captureTagId: null,
+	captureTag2Id: null,
+	transferId: null,
+	file: null
+};
 
 try {
 	/* --- 1. lo schema c'e'? ---------------------------------------------- */
@@ -348,6 +357,105 @@ try {
 		`-25 di cattura, -${config.penalita_extra_contestazione} di penalita`
 	);
 
+	/* --- 5ter. tag @menzione ----------------------------------------------- */
+	titolo('Tag (@menzione)');
+
+	const { data: itemTag, error: errIt } = await db
+		.from('items')
+		.insert({
+			nome: `«collaudo tag» ${Date.now()}`,
+			categoria: 'pietanza',
+			rarita: 'comune',
+			croquembouche: 10,
+			ripetibile: false,
+			validazione: 'foto'
+		})
+		.select()
+		.single();
+
+	if (errIt) {
+		ko('creazione elemento per i tag', errIt.message);
+	} else {
+		creato.itemTagId = itemTag.id;
+
+		const primaTerzo = await saldoDi(terzo.id);
+		const primaQuarto = await saldoDi(quarto.id);
+
+		// Il quarto scatta e tagga il terzo, piu' se stesso (che va ignorato)
+		// e un id inventato (che va lasciato cadere senza far fallire tutto).
+		const { data: capTag, error: errCapTag } = await db.rpc('registra_cattura', {
+			p_user: quarto.id,
+			p_item: itemTag.id,
+			p_foto: fotoUrl,
+			p_nota: `con @${terzo.nome}`,
+			p_lat: null,
+			p_lng: null,
+			p_taggati: [terzo.id, quarto.id, '00000000-0000-4000-8000-000000000000']
+		});
+
+		if (errCapTag) {
+			ko('cattura con taggati', errCapTag.message);
+		} else {
+			creato.captureTagId = capTag;
+			ok('cattura con taggati registrata');
+
+			const { data: tag } = await db
+				.from('capture_tags')
+				.select('user_id')
+				.eq('capture_id', capTag);
+
+			verifica(
+				'chi scatta non si tagga da solo, gli id inesistenti cadono',
+				tag?.length === 1 && tag[0].user_id === terzo.id,
+				`${tag?.length ?? 0} tag salvati`
+			);
+
+			verifica(
+				'il taggato prende i Croquembouche',
+				(await saldoDi(terzo.id)) === primaTerzo + 10,
+				`${primaTerzo} → ${await saldoDi(terzo.id)}`
+			);
+			verifica(
+				'chi scatta li prende comunque',
+				(await saldoDi(quarto.id)) === primaQuarto + 10,
+				`${primaQuarto} → ${await saldoDi(quarto.id)}`
+			);
+
+			const { data: crediti } = await db
+				.from('v_crediti')
+				.select('user_id, da_tag')
+				.eq('item_id', itemTag.id);
+			verifica(
+				'il taggato lo sblocca nel PachiDex',
+				crediti?.some((c) => c.user_id === terzo.id && c.da_tag === true),
+				'credito da tag presente'
+			);
+
+			// Doppione: il terzo viene taggato di nuovo sullo stesso elemento
+			// non ripetibile. Il tag si salva ma non deve valere un secondo.
+			const saldoPrimaDoppione = await saldoDi(terzo.id);
+			const { data: cap2, error: errCap2 } = await db.rpc('registra_cattura', {
+				p_user: contestante.id,
+				p_item: itemTag.id,
+				p_foto: fotoUrl,
+				p_nota: `di nuovo con @${terzo.nome}`,
+				p_lat: null,
+				p_lng: null,
+				p_taggati: [terzo.id]
+			});
+			if (errCap2) {
+				ko('seconda cattura con lo stesso taggato', errCap2.message);
+			} else {
+				creato.captureTag2Id = cap2;
+				verifica(
+					'un non ripetibile non paga due volte al taggato',
+					(await saldoDi(terzo.id)) === saldoPrimaDoppione,
+					`resta a ${await saldoDi(terzo.id)}`
+				);
+			}
+		}
+	}
+
 	/* --- 5bis. checkpoint foto + GPS --------------------------------------- */
 	titolo('Checkpoint (foto + GPS)');
 
@@ -485,6 +593,11 @@ try {
 	if (creato.transferId) {
 		await db.from('transfers').delete().eq('id', creato.transferId);
 		ok('scambio di prova rimosso');
+	}
+	if (creato.itemTagId) {
+		// Cancellare l'elemento porta via a cascata catture e tag.
+		await db.from('items').delete().eq('id', creato.itemTagId);
+		ok('elemento dei tag rimosso');
 	}
 	if (creato.checkpointId) {
 		await db.from('items').delete().eq('id', creato.checkpointId);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tempoRelativo } from '$lib/game/rules';
+	import { spezzaMenzioni } from '$lib/game/tag';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { alternaLike } from '$lib/db/feed';
 	import Avatar from './Avatar.svelte';
@@ -91,7 +92,26 @@
 	</a>
 
 	{#if post.nota}
-		<p class="post__nota">{post.nota}</p>
+		<p class="post__nota">
+			{#each spezzaMenzioni(post.nota, profilo.utenti) as pezzo, i (i)}
+				{#if pezzo.utente}
+					<span class="menzione">{pezzo.testo}</span>
+				{:else}{pezzo.testo}{/if}
+			{/each}
+		</p>
+	{/if}
+
+	{#if post.taggati.length}
+		<!-- Chi altro prende i Croquembouche di questa foto. -->
+		<div class="post__taggati">
+			<span class="t-label t-muted">Vale anche per</span>
+			{#each post.taggati as u (u.id)}
+				<span class="tag">
+					<Avatar utente={u} dimensione="sm" />
+					<span>{u.nome}</span>
+				</span>
+			{/each}
+		</div>
 	{/if}
 
 	{#if !compatta}
@@ -157,6 +177,29 @@
 
 	.post__nota {
 		font-size: 0.9375rem;
+	}
+
+	.menzione {
+		font-weight: 700;
+		color: var(--blue);
+	}
+
+	.post__taggati {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		flex-wrap: wrap;
+	}
+
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 2px 5px 2px 2px;
+		background: var(--cream);
+		border: var(--border-thin) solid var(--navy);
+		font-size: 0.75rem;
+		font-weight: 700;
 	}
 
 	.post__azioni {
