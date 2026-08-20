@@ -40,6 +40,23 @@ const installata = () =>
 	// Safari su iOS non espone display-mode standalone in tutte le versioni.
 	(navigator as unknown as { standalone?: boolean }).standalone === true;
 
+/**
+ * navigator.serviceWorker.ready non si risolve MAI se nessuno ha registrato
+ * un service worker: non fallisce, resta appesa. Senza questo limite il
+ * pulsante restava su "Attivo…" per sempre, senza errori ne' spiegazioni.
+ */
+function serviceWorkerPronto(msMax = 10000): Promise<ServiceWorkerRegistration> {
+	return Promise.race([
+		navigator.serviceWorker.ready,
+		new Promise<never>((_, rifiuta) =>
+			setTimeout(
+				() => rifiuta(new Error('Il service worker non risponde: prova a riaprire l app')),
+				msMax
+			)
+		)
+	]);
+}
+
 class StatoNotifiche {
 	stato = $state<StatoPush>('sconosciuto');
 	inCorso = $state(false);
@@ -66,9 +83,15 @@ class StatoNotifiche {
 			return;
 		}
 
-		const reg = await navigator.serviceWorker.ready;
-		const iscrizione = await reg.pushManager.getSubscription();
-		this.stato = iscrizione ? 'attive' : 'da_chiedere';
+		try {
+			const reg = await serviceWorkerPronto();
+			const iscrizione = await reg.pushManager.getSubscription();
+			this.stato = iscrizione ? 'attive' : 'da_chiedere';
+		} catch {
+			// Nessun service worker: si puo' comunque provare ad attivare, e in
+			// caso l'errore lo dira' con parole sue.
+			this.stato = 'da_chiedere';
+		}
 	}
 
 	/** Va chiamata da un gesto dell'utente: i browser non concedono altrimenti. */
@@ -83,7 +106,7 @@ class StatoNotifiche {
 				return;
 			}
 
-			const reg = await navigator.serviceWorker.ready;
+			const reg = await serviceWorkerPronto();
 			const iscrizione =
 				(await reg.pushManager.getSubscription()) ??
 				(await reg.pushManager.subscribe({
@@ -117,7 +140,7 @@ class StatoNotifiche {
 		if (!browser || this.inCorso) return;
 		this.inCorso = true;
 		try {
-			const reg = await navigator.serviceWorker.ready;
+			const reg = await serviceWorkerPronto();
 			const iscrizione = await reg.pushManager.getSubscription();
 			if (iscrizione) {
 				await supabase.from('push_subscriptions').delete().eq('endpoint', iscrizione.endpoint);
@@ -138,7 +161,8 @@ class StatoNotifiche {
 	 */
 	async riassegna(userId: string) {
 		if (!browser || this.stato !== 'attive') return;
-		const reg = await navigator.serviceWorker.ready;
+		const reg = await serviceWorkerPronto().catch(() => null);
+		if (!reg) return;
 		const iscrizione = await reg.pushManager.getSubscription();
 		if (!iscrizione) return;
 		await supabase

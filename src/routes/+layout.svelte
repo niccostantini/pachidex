@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { dev } from '$app/environment';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { profilo } from '$lib/state/profilo.svelte';
@@ -17,6 +18,21 @@
 	onMount(() => {
 		void profilo.carica();
 		void coda.init();
+
+		// La registrazione del service worker va fatta a mano: il plugin PWA
+		// genera registerSW.js ma con SvelteKit non lo aggancia da nessuna
+		// parte, e senza registrazione navigator.serviceWorker.ready non si
+		// risolve MAI — le notifiche restavano appese all'infinito.
+		//
+		// Solo in produzione: in sviluppo il plugin servirebbe il service
+		// worker in TypeScript non compilato, che il browser non sa eseguire.
+		// Le push vanno comunque provate sul deploy, perche' su iOS servono
+		// HTTPS e la PWA installata.
+		if (!dev) {
+			void import('virtual:pwa-register').then(({ registerSW }) =>
+				registerSW({ immediate: true })
+			);
+		}
 	});
 
 	// Nessun profilo scelto: si passa dalla porta "Chi sei?". L'admin no, cosi'
