@@ -8,6 +8,7 @@ import {
 	R2_PUBLIC_BASE_URL,
 	R2_JURISDICTION
 } from '$env/static/private';
+import { idUnico } from '$lib/id';
 import type { RequestHandler } from './$types';
 
 /**
@@ -58,7 +59,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const contentType = ESTENSIONI[estensione];
-	const nomeFile = `${crypto.randomUUID()}.${estensione}`;
+	const nomeFile = `${idUnico()}.${estensione}`;
 	const chiave = `catture/${userId}/${nomeFile}`;
 
 	const endpoint = new URL(`https://${HOST}/${R2_BUCKET}/${chiave}`);

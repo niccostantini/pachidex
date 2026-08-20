@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { del, get, keys, set } from 'idb-keyval';
 import { supabase } from '$lib/supabase';
+import { idUnico } from '$lib/id';
 
 /**
  * Coda di upload per quando il segnale non c'e' (succedera', vicino a
@@ -60,7 +61,7 @@ class StatoCoda {
 	async accoda(voce: Omit<CatturaInCoda, 'id' | 'creata' | 'tentativi'>) {
 		const completa: CatturaInCoda = {
 			...voce,
-			id: crypto.randomUUID(),
+			id: idUnico(),
 			creata: Date.now(),
 			tentativi: 0
 		};
