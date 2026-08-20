@@ -23,6 +23,7 @@ import type { RequestHandler } from './$types';
  */
 
 const ESTENSIONI: Record<string, string> = {
+	avif: 'image/avif',
 	webp: 'image/webp',
 	jpg: 'image/jpeg'
 };

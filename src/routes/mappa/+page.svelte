@@ -197,7 +197,7 @@
 	}
 
 	:global(.leaflet-container) {
-		font-family: 'Pixelify Sans', monospace;
+		font-family: var(--font-ui);
 		background: var(--cream);
 	}
 

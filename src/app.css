@@ -3,8 +3,15 @@
    Pixel art fine + chrome finestra retro. Palette dal riferimento.
    ========================================================================== */
 
-@import '@fontsource/pixelify-sans/latin-400.css';
-@import '@fontsource/pixelify-sans/latin-700.css';
+/* Ithaca: font bitmap, sottoinsieme ai soli caratteri italiani (4 KB).
+   Ha un solo peso, quindi il grassetto lo sintetizza il browser. */
+@font-face {
+	font-family: 'Ithaca';
+	src: url('./assets/fonts/ithaca.woff2') format('woff2');
+	font-weight: 400 700;
+	font-style: normal;
+	font-display: swap;
+}
 
 :root {
 	/* --- palette ------------------------------------------------------- */
@@ -41,6 +48,10 @@
 	/* Nessun raggio: il pixel non ha angoli tondi. */
 	--radius: 0;
 
+	/* I simboli geometrici della UI (✦ ▸ ★ ⚠ …) non esistono in Ithaca, come
+	   non esistevano nel font precedente: cadono sul font di sistema. */
+	--font-ui: 'Ithaca', 'Courier New', monospace;
+
 	--space-1: 4px;
 	--space-2: 8px;
 	--space-3: 12px;
@@ -61,14 +72,16 @@
 }
 
 html {
-	font-size: 16px;
+	/* Un filo piu' grande del solito: Ithaca ha un'altezza-x contenuta
+	   e a 16px si leggeva stretta al sole. */
+	font-size: 18px;
 	-webkit-text-size-adjust: 100%;
 }
 
 body {
 	background: var(--cream);
 	color: var(--navy);
-	font-family: 'Pixelify Sans', 'Courier New', monospace;
+	font-family: var(--font-ui);
 	font-weight: 400;
 	line-height: 1.45;
 	min-height: 100dvh;
