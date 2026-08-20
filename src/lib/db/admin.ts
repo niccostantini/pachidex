@@ -187,3 +187,26 @@ export async function eliminaCattura(id: string) {
 	const { error } = await supabase.from('captures').delete().eq('id', id);
 	if (error) throw error;
 }
+
+/* --- azzeramento ------------------------------------------------------------ */
+
+export interface RigaAzzerata {
+	tabella: string;
+	cancellate: number;
+}
+
+/**
+ * Ricomincia il gioco da capo. Cancella cronaca e sfiziosita' in una sola
+ * transazione lato database; giocatori e configurazione restano.
+ *
+ * Le foto gia' caricate su R2 non vengono toccate: restano li' come file
+ * orfani, senza piu' niente che le referenzi. Sono pochi megabyte su un
+ * bucket da 10 GB gratuiti, e cancellarle richiederebbe un endpoint server
+ * apposta — se un giorno danno fastidio si svuota la cartella dal pannello
+ * Cloudflare.
+ */
+export async function azzeraGioco(): Promise<RigaAzzerata[]> {
+	const { data, error } = await supabase.rpc('azzera_gioco');
+	if (error) throw error;
+	return (data ?? []) as RigaAzzerata[];
+}
