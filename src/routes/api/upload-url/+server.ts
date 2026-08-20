@@ -5,7 +5,8 @@ import {
 	R2_ACCESS_KEY_ID,
 	R2_SECRET_ACCESS_KEY,
 	R2_BUCKET,
-	R2_PUBLIC_BASE_URL
+	R2_PUBLIC_BASE_URL,
+	R2_JURISDICTION
 } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
@@ -35,6 +36,15 @@ const client = new AwsClient({
 	region: 'auto'
 });
 
+/**
+ * R2 espone endpoint diversi per giurisdizione: un bucket creato con
+ * giurisdizione EU non e' raggiungibile da quello standard, e risponde
+ * AccessDenied — indistinguibile da una chiave sbagliata, quindi vale la
+ * pena tenerlo esplicito invece di scoprirlo a tentativi.
+ */
+const SOTTODOMINIO = R2_JURISDICTION ? `${R2_JURISDICTION}.` : '';
+const HOST = `${R2_ACCOUNT_ID}.${SOTTODOMINIO}r2.cloudflarestorage.com`;
+
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json().catch(() => null);
 	const userId = body?.userId;
@@ -51,9 +61,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const nomeFile = `${crypto.randomUUID()}.${estensione}`;
 	const chiave = `catture/${userId}/${nomeFile}`;
 
-	const endpoint = new URL(
-		`https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}/${chiave}`
-	);
+	const endpoint = new URL(`https://${HOST}/${R2_BUCKET}/${chiave}`);
 	// Cinque minuti bastano e avanzano: la foto e' gia' pronta sul dispositivo
 	// quando si chiede l'URL, l'upload parte subito dopo.
 	endpoint.searchParams.set('X-Amz-Expires', '300');

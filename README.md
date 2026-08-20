@@ -60,6 +60,12 @@ quota del piano free e costano meno a crescere.
    `R2_SECRET_ACCESS_KEY`. La secret la vedi una volta sola.
 4. **Account ID** — e' nella barra laterale della dashboard Cloudflare, va in
    `R2_ACCOUNT_ID`.
+5. **Giurisdizione** — se accanto al nome del bucket il pannello mostra "EU",
+   metti `R2_JURISDICTION="eu"`; se non mostra niente, lascia la variabile
+   vuota. R2 ha endpoint separati per giurisdizione e un bucket EU **non**
+   risponde da quello standard: restituisce `AccessDenied`, che sembra
+   identico a una chiave sbagliata. Se l'upload da 403 e le chiavi sono
+   giuste, e' quasi sempre questo.
 
 Il browser non parla mai direttamente con R2 usando queste chiavi: chiede un
 URL di upload temporaneo a `/api/upload-url`, che lo firma lato server e vale
@@ -92,7 +98,7 @@ riga per riga.
 Importa il repo su Vercel: rileva SvelteKit da solo, non serve configurare
 build command o output directory.
 
-Poi, in **Settings > Environment Variables**, incolla tutte e sette le
+Poi, in **Settings > Environment Variables**, incolla tutte e otto le
 variabili di `.env.example` con i valori veri (Production, Preview e
 Development). Da li' in poi ogni push su `main` fa il deploy.
 
@@ -101,7 +107,7 @@ prerenderizzate — e resta **una sola funzione serverless**, `/api/upload-url`,
 che esiste solo per firmare gli upload verso R2.
 
 Le due variabili `PUBLIC_*` finiscono nel bundle client: e' voluto, la anon key
-di Supabase e' pensata per stare li' ed e' protetta dalle RLS. Le cinque `R2_*`
+di Supabase e' pensata per stare li' ed e' protetta dalle RLS. Le sei `R2_*`
 no: restano solo lato server, e la secret key di R2 in particolare va trattata
 come una credenziale vera, perche' chi la ottiene puo' svuotare il bucket.
 

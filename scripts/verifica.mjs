@@ -59,8 +59,10 @@ const r2 = r2Pronto
 		})
 	: null;
 
-const r2Endpoint = (chiave) =>
-	new URL(`https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${env.R2_BUCKET}/${chiave}`);
+// Stesso host che costruisce l'endpoint server, giurisdizione inclusa.
+const r2Host = `${env.R2_ACCOUNT_ID}.${env.R2_JURISDICTION ? env.R2_JURISDICTION + '.' : ''}r2.cloudflarestorage.com`;
+
+const r2Endpoint = (chiave) => new URL(`https://${r2Host}/${env.R2_BUCKET}/${chiave}`);
 
 /* --- strumenti ----------------------------------------------------------- */
 let passati = 0;
@@ -177,7 +179,21 @@ try {
 			headers: { 'Content-Type': 'image/png' },
 			body: png
 		});
-		verifica('upload su R2', rispPut.ok, `HTTP ${rispPut.status}`);
+		let dettaglio = `HTTP ${rispPut.status}`;
+		if (!rispPut.ok) {
+			const corpo = await rispPut.text().catch(() => '');
+			const codice = corpo.match(/<Code>([^<]+)<\/Code>/)?.[1];
+			if (codice) dettaglio += ` ${codice}`;
+			// AccessDenied da R2 e' ambiguo: dice la stessa cosa per una chiave
+			// sbagliata e per un bucket che sta su un'altra giurisdizione.
+			if (codice === 'AccessDenied') {
+				dettaglio +=
+					env.R2_JURISDICTION
+						? ` — con giurisdizione "${env.R2_JURISDICTION}"; se il bucket e' standard, svuota R2_JURISDICTION`
+						: ' — se il bucket ha giurisdizione EU, imposta R2_JURISDICTION="eu"; altrimenti controlla i permessi del token';
+			}
+		}
+		verifica('upload su R2', rispPut.ok, dettaglio);
 
 		fotoUrl = `${env.R2_PUBLIC_BASE_URL}/${creato.file}`;
 		const rispGet = await fetch(fotoUrl);
