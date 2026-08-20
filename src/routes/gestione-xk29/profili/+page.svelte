@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { caricaAvatar, eliminaUtente, salvaUtente } from '$lib/db/admin';
+	import { eliminaUtente, salvaUtente } from '$lib/db/admin';
 	import { annullaScambio, tuttiGliScambi } from '$lib/db/admin';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { tempoRelativo } from '$lib/game/rules';
@@ -49,18 +49,6 @@
 		}
 	}
 
-	async function sprite(e: Event, u: User) {
-		const f = (e.currentTarget as HTMLInputElement).files?.[0];
-		if (!f) return;
-		try {
-			const url = await caricaAvatar(u.id, f);
-			await salvaUtente({ id: u.id, nome: u.nome, avatar: url });
-			await rileggi();
-		} catch (err) {
-			errore = messaggioErrore(err);
-		}
-	}
-
 	async function elimina(u: User) {
 		if (!confirm(`Elimino ${u.nome}? Spariscono anche le sue catture e i suoi scambi.`)) return;
 		try {
@@ -86,15 +74,6 @@
 						<p class="t-small t-muted">✦ {profilo.saldoDi(u.id)}</p>
 					</div>
 					<div class="azioni">
-						<label class="btn btn--sm">
-							Sprite
-							<input
-								type="file"
-								accept="image/png,image/gif,image/webp"
-								class="visually-hidden"
-								onchange={(e) => sprite(e, u)}
-							/>
-						</label>
 						<button class="btn btn--sm" onclick={() => (modifica = { ...u })}>Modifica</button>
 						<button class="btn btn--sm btn--danger" onclick={() => elimina(u)}>×</button>
 					</div>
@@ -110,8 +89,9 @@
 		</button>
 
 		<p class="t-small t-muted nota">
-			Lo sprite ideale e' un PNG quadrato piccolo, tipo 32×32: viene mostrato senza sfocatura,
-			quindi piu' e' pixel e meglio sta. Senza sprite si vedono le iniziali sul colore scelto.
+			Gli avatar sono disegnati e cablati nel codice, uno per giocatore: non si caricano
+			da qui. Un profilo aggiunto adesso non ne ha uno e mostra le iniziali sul colore
+			scelto.
 		</p>
 	</Finestra>
 
@@ -159,7 +139,7 @@
 			</div>
 
 			<div>
-				<p class="field-label">Colore (per le iniziali, quando manca lo sprite)</p>
+				<p class="field-label">Colore (per le iniziali, se non ha un avatar)</p>
 				<div class="colori">
 					{#each COLORI as c (c)}
 						<button

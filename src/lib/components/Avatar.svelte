@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { iniziali } from '$lib/game/rules';
+	import { avatarDi } from '$lib/avatars';
 	import type { User } from '$lib/types';
 
 	interface Props {
@@ -14,12 +15,15 @@
 			.filter(Boolean)
 			.join(' ')
 	);
+
+	const sprite = $derived(avatarDi(utente?.nome));
 </script>
 
-{#if utente?.avatar}
-	<img class={classe} src={utente.avatar} alt={utente.nome} loading="lazy" />
+{#if sprite}
+	<img class={classe} src={sprite} alt={utente?.nome} loading="lazy" />
 {:else}
-	<!-- Finche' l'admin non carica lo sprite, le iniziali sul colore del giocatore. -->
+	<!-- Chi non ha uno sprite disegnato (un profilo aggiunto dopo) tiene le
+	     iniziali sul suo colore. -->
 	<span
 		class="{classe} avatar--initials"
 		style:background={utente?.colore ?? 'var(--navy-soft)'}

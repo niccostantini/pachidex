@@ -103,18 +103,8 @@ export async function eliminaUtente(id: string) {
 	if (error) throw error;
 }
 
-/** Sprite pixel dell'avatar: file piccolissimi, 32x32 o giu' di li'. */
-export async function caricaAvatar(userId: string, file: File): Promise<string> {
-	const estensione = file.name.split('.').pop()?.toLowerCase() ?? 'png';
-	const percorso = `${userId}.${estensione}`;
-	const { error } = await supabase.storage
-		.from('avatar')
-		.upload(percorso, file, { upsert: true, contentType: file.type });
-	if (error) throw error;
-	const { data } = supabase.storage.from('avatar').getPublicUrl(percorso);
-	// La cache busting serve: il percorso resta lo stesso a ogni sostituzione.
-	return `${data.publicUrl}?v=${Date.now()}`;
-}
+/* Gli avatar non si caricano piu': sono sei sprite cablati nel codice,
+   vedi src/lib/avatars.ts. */
 
 /* --- contestazioni ---------------------------------------------------------- */
 
