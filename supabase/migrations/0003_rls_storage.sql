@@ -24,6 +24,8 @@ begin
 	foreach t in array array[
 		'users', 'items', 'captures', 'reactions', 'contests', 'votes', 'transfers', 'game_config'
 	] loop
+		-- Idempotente: la migration si puo' rieseguire senza schiantarsi.
+		execute format('drop policy if exists %I on public.%I', 'accesso_libero_' || t, t);
 		execute format(
 			'create policy %I on public.%I for all to anon, authenticated using (true) with check (true)',
 			'accesso_libero_' || t, t
