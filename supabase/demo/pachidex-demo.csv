@@ -1,9 +1,9 @@
 nome,categoria,rarita,croquembouche,ripetibile,validazione,note,lat,lng
-Isola di Vendicari,posto,raro,25,no,auto_gps,Scarpe chiuse: il sentiero è pietra viva,36.8106,15.1042
-Spiaggia di Calamosche,posto,raro,25,no,auto_gps,Venti minuti a piedi dal parcheggio,36.8006,15.1053
-Tonnara di Vendicari,posto,comune,10,no,auto_gps,Le rovine viste dal sentiero basso,36.7986,15.0975
-Isola delle Correnti,posto,leggendario,60,no,auto_gps,Dove lo Ionio incontra il Mediterraneo,36.6456,15.0863
-Piazza Regina Margherita,posto,comune,10,no,auto_gps,Il cuore di Marzamemi,36.7364,15.1181
+Isola di Vendicari,posto,raro,25,no,foto_gps,Scarpe chiuse: il sentiero è pietra viva,36.8106,15.1042
+Spiaggia di Calamosche,posto,raro,25,no,foto_gps,Venti minuti a piedi dal parcheggio,36.8006,15.1053
+Tonnara di Vendicari,posto,comune,10,no,foto_gps,Le rovine viste dal sentiero basso,36.7986,15.0975
+Isola delle Correnti,posto,leggendario,60,no,foto_gps,Dove lo Ionio incontra il Mediterraneo,36.6456,15.0863
+Piazza Regina Margherita,posto,comune,10,no,foto_gps,Il cuore di Marzamemi,36.7364,15.1181
 Granita alla mandorla,pietanza,comune,10,si,foto,Con la brioche o non vale,,
 Pomodoro di Pachino,pietanza,comune,10,si,foto,Quello vero ha il marchio IGP,,
 Arancino,pietanza,comune,10,si,foto,Qui è maschile e non si discute,,

@@ -30,12 +30,11 @@
 	);
 
 	const mia = $derived(post.user_id === profilo.io?.id);
+	// Anche i posti si contestano: il GPS dimostra che c'eri, non che la foto
+	// valga qualcosa. Essere a Vendicari e fotografarsi il pollice non e'
+	// catturare Vendicari.
 	const contestabile = $derived(
-		!compatta &&
-			!mia &&
-			post.item.validazione === 'foto' &&
-			post.stato === 'valido' &&
-			!!profilo.io
+		!compatta && !mia && post.stato === 'valido' && !!profilo.io
 	);
 	const handle = $derived('@' + post.autore.nome.toLowerCase());
 
@@ -74,7 +73,7 @@
 
 	<div class="post__meta">
 		<Rarita rarita={post.item.rarita} croquembouche={post.item.croquembouche} />
-		{#if post.item.validazione === 'auto_gps'}
+		{#if post.item.validazione === 'foto_gps'}
 			<span class="badge badge--gps">GPS ✓</span>
 		{/if}
 		{#if post.item.ripetibile}

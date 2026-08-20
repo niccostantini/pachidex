@@ -166,16 +166,16 @@ export function validaCSV(testo: string): EsitoImport {
 		// si prende col GPS, tutto il resto per foto.
 		let validazione = normalizza(cella('validazione')).replace(/[\s-]/g, '_') as Validazione;
 		if (!validazione) {
-			validazione = categoria === 'posto' && lat !== null && lng !== null ? 'auto_gps' : 'foto';
+			validazione = categoria === 'posto' && lat !== null && lng !== null ? 'foto_gps' : 'foto';
 		}
-		if (!['auto_gps', 'foto'].includes(validazione)) {
+		if (!['foto_gps', 'foto'].includes(validazione)) {
 			errori.push(`validazione "${cella('validazione')}" non valida`);
 		}
-		if (validazione === 'auto_gps' && categoria !== 'posto') {
-			errori.push('il GPS vale solo per la categoria posto');
+		if (validazione === 'foto_gps' && categoria !== 'posto') {
+			errori.push('foto_gps vale solo per la categoria posto');
 		}
-		if (validazione === 'auto_gps' && (lat === null || lng === null)) {
-			errori.push('un checkpoint GPS ha bisogno di lat e lng');
+		if (validazione === 'foto_gps' && (lat === null || lng === null)) {
+			errori.push('un checkpoint foto_gps ha bisogno di lat e lng');
 		}
 
 		const chiave = `${normalizza(nome)}|${categoria}`;
@@ -208,7 +208,7 @@ export function validaCSV(testo: string): EsitoImport {
 export function templateCSV(): string {
 	return [
 		COLONNE_CSV.join(','),
-		'Isola di Vendicari,posto,raro,25,no,auto_gps,Portati le scarpe chiuse,36.8106,15.1042',
+		'Isola di Vendicari,posto,raro,25,no,foto_gps,Portati le scarpe chiuse,36.8106,15.1042',
 		'Granita alla mandorla,pietanza,comune,10,si,foto,Vale ogni volta,,'
 	].join('\n');
 }

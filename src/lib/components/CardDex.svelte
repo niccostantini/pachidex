@@ -58,7 +58,7 @@
 			<span class="conta t-num">×{mia?.quante}</span>
 		{/if}
 
-		{#if voce.validazione === 'auto_gps'}
+		{#if voce.validazione === 'foto_gps'}
 			<span class="gps" title="Checkpoint GPS">▲</span>
 		{/if}
 	</div>

@@ -55,7 +55,7 @@
 						{etichettaCategoria(voce.categoria)}
 					</span>
 					{#if voce.ripetibile}<span class="badge">ripetibile</span>{/if}
-					{#if voce.validazione === 'auto_gps'}<span class="badge badge--gps">GPS</span>{/if}
+					{#if voce.validazione === 'foto_gps'}<span class="badge badge--gps">GPS</span>{/if}
 				</div>
 
 				{#if voce.note}

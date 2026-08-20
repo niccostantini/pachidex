@@ -144,7 +144,7 @@
 									<td>{r.dati?.rarita}</td>
 									<td class="dx t-num">{r.dati?.croquembouche}</td>
 									<td>{r.dati?.ripetibile ? 'si' : 'no'}</td>
-									<td>{r.dati?.validazione === 'auto_gps' ? 'GPS' : 'foto'}</td>
+									<td>{r.dati?.validazione === 'foto_gps' ? 'foto+GPS' : 'foto'}</td>
 									<td class="t-num t-small">
 										{r.dati?.lat != null ? `${r.dati.lat}, ${r.dati.lng}` : '—'}
 									</td>
@@ -160,7 +160,7 @@
 								<span class="t-small t-muted">
 									{etichettaCategoria(r.dati!.categoria)} · {r.dati?.rarita} · ✦{r.dati
 										?.croquembouche}
-									{r.dati?.validazione === 'auto_gps' ? '· GPS' : ''}
+									{r.dati?.validazione === 'foto_gps' ? '· foto+GPS' : ''}
 								</span>
 							</li>
 						{/each}

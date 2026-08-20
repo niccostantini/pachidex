@@ -93,7 +93,7 @@ const saldoDi = async (id) => {
 };
 
 /* --- stato del collaudo --------------------------------------------------- */
-const creato = { itemId: null, captureId: null, transferId: null, file: null };
+const creato = { itemId: null, checkpointId: null, captureId: null, transferId: null, file: null };
 
 try {
 	/* --- 1. lo schema c'e'? ---------------------------------------------- */
@@ -348,6 +348,83 @@ try {
 		`-25 di cattura, -${config.penalita_extra_contestazione} di penalita`
 	);
 
+	/* --- 5bis. checkpoint foto + GPS --------------------------------------- */
+	titolo('Checkpoint (foto + GPS)');
+
+	const LAT = 36.8106;
+	const LNG = 15.1042;
+
+	const { data: checkpoint, error: errCk } = await db
+		.from('items')
+		.insert({
+			nome: `«collaudo checkpoint» ${Date.now()}`,
+			categoria: 'posto',
+			rarita: 'comune',
+			croquembouche: 10,
+			ripetibile: false,
+			validazione: 'foto_gps',
+			lat: LAT,
+			lng: LNG
+		})
+		.select()
+		.single();
+
+	if (errCk) {
+		ko('creazione checkpoint foto_gps', errCk.message);
+	} else {
+		creato.checkpointId = checkpoint.id;
+		ok('checkpoint foto_gps accettato dal vincolo');
+
+		// Lontano dal posto: deve rifiutare, il GPS e' meta' della validazione.
+		const { error: errLontano } = await db.rpc('registra_cattura', {
+			p_user: terzo.id,
+			p_item: checkpoint.id,
+			p_foto: fotoUrl,
+			p_nota: null,
+			p_lat: 45.4642, // Milano
+			p_lng: 9.19
+		});
+		verifica('da lontano il checkpoint rifiuta', !!errLontano, errLontano?.message ?? 'e passato!');
+
+		// Senza posizione: idem.
+		const { error: errSenzaPos } = await db.rpc('registra_cattura', {
+			p_user: terzo.id,
+			p_item: checkpoint.id,
+			p_foto: fotoUrl,
+			p_nota: null,
+			p_lat: null,
+			p_lng: null
+		});
+		verifica('senza posizione il checkpoint rifiuta', !!errSenzaPos, errSenzaPos?.message ?? 'e passato!');
+
+		// Sul posto e con foto: passa.
+		const { data: capCk, error: errCap } = await db.rpc('registra_cattura', {
+			p_user: terzo.id,
+			p_item: checkpoint.id,
+			p_foto: fotoUrl,
+			p_nota: 'collaudo checkpoint',
+			p_lat: LAT,
+			p_lng: LNG
+		});
+		if (errCap) {
+			ko('sul posto con foto il checkpoint accetta', errCap.message);
+		} else {
+			ok('sul posto con foto il checkpoint accetta');
+
+			// La regola cambiata: adesso anche un posto si contesta.
+			const { error: errCont2 } = await db.rpc('apri_contestazione', {
+				p_capture: capCk,
+				p_contestante: quarto.id,
+				p_motivo: 'collaudo: anche i checkpoint si contestano'
+			});
+			verifica(
+				'un checkpoint ora e contestabile',
+				!errCont2,
+				errCont2?.message ?? 'contestazione aperta'
+			);
+		}
+	}
+
 	/* --- 6. scambio -------------------------------------------------------- */
 	titolo('Scambio di Croquembouche');
 
@@ -408,6 +485,10 @@ try {
 	if (creato.transferId) {
 		await db.from('transfers').delete().eq('id', creato.transferId);
 		ok('scambio di prova rimosso');
+	}
+	if (creato.checkpointId) {
+		await db.from('items').delete().eq('id', creato.checkpointId);
+		ok('checkpoint di prova rimosso');
 	}
 	if (creato.itemId) {
 		// Cancellare l'elemento porta via a cascata cattura, contestazione e voti.

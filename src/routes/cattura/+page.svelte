@@ -148,9 +148,10 @@
 					</button>
 				</div>
 
-				{#if scelta.validazione === 'auto_gps'}
+				{#if scelta.validazione === 'foto_gps'}
 					<p class="gps-ok t-small">
-						Checkpoint verificato dal GPS: questa cattura non e' contestabile.
+						Checkpoint: il GPS conferma che sei qui, ma la foto serve lo stesso — e
+						resta contestabile come tutte le altre.
 					</p>
 				{/if}
 			{:else}

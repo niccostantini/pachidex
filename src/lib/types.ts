@@ -1,6 +1,6 @@
 export type Categoria = 'posto' | 'pietanza' | 'animale' | 'attivita';
 export type Rarita = 'comune' | 'raro' | 'leggendario';
-export type Validazione = 'auto_gps' | 'foto';
+export type Validazione = 'foto_gps' | 'foto';
 export type StatoCattura = 'valido' | 'in_contestazione' | 'invalidato';
 export type StatoContestazione = 'aperta' | 'chiusa_valido' | 'chiusa_non_valido' | 'scaduta';
 export type Voto = 'valido' | 'non_valido';

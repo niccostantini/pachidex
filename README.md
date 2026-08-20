@@ -33,6 +33,8 @@ npm run dev
    - `0005_cron.sql` — **opzionale**, chiude le contestazioni scadute da sole
    - `0006_indurimento.sql` — chiude gli avvisi del linter di sicurezza
    - `0007_r2_migrazione.sql` — restringe Storage al solo bucket `avatar`
+   - `0008` e `0009` — azzeramento del gioco, compatibile con `safeupdate`
+   - `0010_foto_gps.sql` — i posti diventano `foto_gps` e contestabili
 3. Da **Project Settings > API** copia URL e `anon` key dentro `.env`:
 
 ```
@@ -87,7 +89,8 @@ nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng
 - `rarita`: `comune` | `raro` | `leggendario`
 - `croquembouche`: se vuoto, prende il default della rarita' (10 / 25 / 60)
 - `ripetibile`: `si` / `no`
-- `validazione`: `auto_gps` (solo per i posti, richiede lat e lng) oppure `foto`
+- `validazione`: `foto_gps` per i checkpoint (solo categoria `posto`, richiede
+  lat e lng: serve la foto **e** essere sul posto) oppure `foto`
 - separatore virgola o punto e virgola, decide da solo
 
 Le righe valide entrano anche se altre sono rotte: gli errori sono segnalati
@@ -115,8 +118,9 @@ come una credenziale vera, perche' chi la ottiene puo' svuotare il bucket.
 
 | Cosa | Come |
 |---|---|
-| Posti | Validati dal GPS entro il raggio configurato. **Non contestabili.** |
-| Pietanze, animali, attivita | Foto e autocertificazione. **Contestabili.** |
+| Posti | **Foto + GPS**: serve lo scatto *e* stare nel raggio configurato |
+| Pietanze, animali, attivita | Foto e autocertificazione |
+| Contestabilita' | Tutto e' contestabile, posti compresi: il GPS prova che c'eri, non che la foto valga qualcosa |
 | Elementi ripetibili | Catturabili all'infinito, sempre a valore pieno |
 | Contestazione | Costa 1 ✦ a chi la apre, comunque vada |
 | Chi perde | Lascia altri 15 ✦ (contestato se cade la cattura, contestante se regge) |
@@ -137,7 +141,7 @@ Il saldo non e' un contatore salvato ma una vista calcolata dagli eventi
 Responsive: tabelle da desktop, card da telefono.
 
 Import CSV · gestione elementi · regole e valori · contestazioni con override
-manuale · giocatori e sprite avatar · annullamento scambi.
+manuale · giocatori · annullamento scambi · azzeramento del gioco.
 
 ## Note tecniche
 

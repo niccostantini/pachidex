@@ -80,7 +80,7 @@ export function checkpointVicini(
 	raggio: number
 ): CheckpointVicino[] {
 	return voci
-		.filter((v) => v.validazione === 'auto_gps' && v.lat != null && v.lng != null)
+		.filter((v) => v.validazione === 'foto_gps' && v.lat != null && v.lng != null)
 		.map((voce) => {
 			const distanza = distanzaMetri(pos.lat, pos.lng, voce.lat as number, voce.lng as number);
 			return { voce, distanza, dentro: distanza <= raggio };

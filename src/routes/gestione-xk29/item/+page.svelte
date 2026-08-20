@@ -70,7 +70,7 @@
 	function cambiaCategoria(c: Categoria) {
 		if (!modifica) return;
 		modifica.categoria = c;
-		if (c !== 'posto' && modifica.validazione === 'auto_gps') modifica.validazione = 'foto';
+		if (c !== 'posto' && modifica.validazione === 'foto_gps') modifica.validazione = 'foto';
 	}
 
 	async function salva() {
@@ -78,7 +78,7 @@
 			erroreForm = 'Il nome serve.';
 			return;
 		}
-		if (modifica.validazione === 'auto_gps' && (modifica.lat == null || modifica.lng == null)) {
+		if (modifica.validazione === 'foto_gps' && (modifica.lat == null || modifica.lng == null)) {
 			erroreForm = 'Un checkpoint GPS ha bisogno di lat e lng.';
 			return;
 		}
@@ -157,7 +157,7 @@
 							<td><Rarita rarita={i.rarita} /></td>
 							<td class="dx t-num">{i.croquembouche}</td>
 							<td>{i.ripetibile ? 'si' : 'no'}</td>
-							<td>{i.validazione === 'auto_gps' ? 'GPS' : 'foto'}</td>
+							<td>{i.validazione === 'foto_gps' ? 'foto+GPS' : 'foto'}</td>
 							<td>{i.attivo ? 'attiva' : 'spenta'}</td>
 							<td class="azioni">
 								<button class="btn btn--sm" onclick={() => (modifica = { ...i })}>Modifica</button>
@@ -181,7 +181,7 @@
 						</div>
 						<p class="t-small t-muted">
 							{etichettaCategoria(i.categoria)}
-							· {i.validazione === 'auto_gps' ? 'GPS' : 'foto'}
+							· {i.validazione === 'foto_gps' ? 'foto+GPS' : 'foto'}
 							{#if i.ripetibile}· ripetibile{/if}
 							{#if !i.attivo}· <strong>spenta</strong>{/if}
 						</p>
@@ -258,16 +258,16 @@
 						disabled={modifica.categoria !== 'posto'}
 					>
 						<option value="foto">Foto + autocertificazione</option>
-						<option value="auto_gps">GPS automatico</option>
+						<option value="foto_gps">Foto + GPS (checkpoint)</option>
 					</select>
 				</div>
 			</div>
 
 			{#if modifica.categoria !== 'posto'}
-				<p class="t-small t-muted">Il GPS vale solo per i posti.</p>
+				<p class="t-small t-muted">Il checkpoint GPS vale solo per i posti.</p>
 			{/if}
 
-			{#if modifica.validazione === 'auto_gps' || modifica.categoria === 'posto'}
+			{#if modifica.validazione === 'foto_gps' || modifica.categoria === 'posto'}
 				<div class="due">
 					<div class="field-row">
 						<label class="field-label" for="f-lat">Latitudine</label>
