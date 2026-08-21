@@ -107,6 +107,18 @@
 				{/if}
 			</div>
 
+			{@const conAvvisi = esito.valide.filter((r) => r.avvisi.length)}
+			{#if conAvvisi.length}
+				<div class="avvisi">
+					<p class="t-label">Entrano lo stesso, ma guarda qui</p>
+					<ul class="t-small">
+						{#each conAvvisi as r (r.numero)}
+							<li><strong>Riga {r.numero}</strong> — {r.avvisi.join(' · ')}</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+
 			{#if esito.invalide.length}
 				<div class="errori">
 					<p class="t-label">Righe scartate</p>
@@ -252,6 +264,21 @@
 		border: var(--border-thin) solid var(--red);
 		padding: var(--space-2);
 		margin-bottom: var(--space-3);
+	}
+
+	/* Giallo e non rosso: la riga entra, e' solo un dettaglio da sistemare. */
+	.avvisi {
+		background: rgba(245, 197, 24, 0.22);
+		border: var(--border-thin) solid var(--navy);
+		padding: var(--space-2);
+		margin-bottom: var(--space-3);
+	}
+
+	.avvisi ul {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+		margin-top: 4px;
 	}
 
 	.errori ul,

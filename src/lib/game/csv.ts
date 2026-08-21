@@ -1,4 +1,5 @@
 import { CROQ_DEFAULT } from './rules';
+import { esisteRiferimento } from '$lib/riferimenti';
 import type { Categoria, Rarita, Validazione } from '$lib/types';
 
 export const COLONNE_CSV = [
@@ -10,7 +11,8 @@ export const COLONNE_CSV = [
 	'validazione',
 	'note',
 	'lat',
-	'lng'
+	'lng',
+	'riferimento'
 ] as const;
 
 export interface RigaItem {
@@ -23,12 +25,19 @@ export interface RigaItem {
 	note: string | null;
 	lat: number | null;
 	lng: number | null;
+	riferimento: string | null;
 }
 
 export interface EsitoRiga {
 	numero: number; // numero di riga nel file, com'e' in Excel
 	dati?: RigaItem;
 	errori: string[];
+	/**
+	 * Cose storte che non giustificano lo scarto della riga. Un riferimento
+	 * che non trova la sua immagine e' un elemento senza foto, non un
+	 * elemento rotto: entra lo stesso e l'avviso lo dice.
+	 */
+	avvisi: string[];
 }
 
 export interface EsitoImport {
@@ -127,6 +136,7 @@ export function validaCSV(testo: string): EsitoImport {
 			return i === -1 ? '' : (righe[r][i] ?? '').trim();
 		};
 		const errori: string[] = [];
+		const avvisi: string[] = [];
 
 		const nome = cella('nome');
 		if (!nome) errori.push('nome mancante');
@@ -178,11 +188,18 @@ export function validaCSV(testo: string): EsitoImport {
 			errori.push('un checkpoint foto_gps ha bisogno di lat e lng');
 		}
 
+		// Il riferimento punta a un file nel repo: se non c'e', si segnala
+		// senza bocciare la riga.
+		const riferimento = cella('riferimento').trim().toLowerCase() || null;
+		if (riferimento && !esisteRiferimento(riferimento)) {
+			avvisi.push(`nessuna immagine chiamata "${riferimento}" in src/assets/riferimenti`);
+		}
+
 		const chiave = `${normalizza(nome)}|${categoria}`;
 		if (nome && nomiVisti.has(chiave)) errori.push('nome ripetuto nel file');
 		nomiVisti.add(chiave);
 
-		const esito: EsitoRiga = { numero: r + 1, errori };
+		const esito: EsitoRiga = { numero: r + 1, errori, avvisi };
 		if (!errori.length) {
 			esito.dati = {
 				nome,
@@ -193,7 +210,8 @@ export function validaCSV(testo: string): EsitoImport {
 				validazione,
 				note: cella('note') || null,
 				lat,
-				lng
+				lng,
+				riferimento
 			};
 			valide.push(esito);
 		} else {
@@ -208,8 +226,9 @@ export function validaCSV(testo: string): EsitoImport {
 export function templateCSV(): string {
 	return [
 		COLONNE_CSV.join(','),
-		'Isola di Vendicari,posto,raro,25,no,foto_gps,Portati le scarpe chiuse,36.8106,15.1042',
-		'Granita alla mandorla,pietanza,comune,10,si,foto,Vale ogni volta,,'
+		'Isola di Vendicari,posto,raro,25,no,foto_gps,Portati le scarpe chiuse,36.8106,15.1042,',
+		'Granita alla mandorla,pietanza,comune,10,si,foto,Vale ogni volta,,,',
+		'Folaga,animale,raro,25,no,foto,Nera col becco bianco,,,folaga'
 	].join('\n');
 }
 

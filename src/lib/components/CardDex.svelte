@@ -7,9 +7,11 @@
 	interface Props {
 		voce: VoceDex;
 		mia: MiaVoce | undefined;
+		/** Chiamata quando si tocca una carta ancora bloccata. */
+		onApri?: (voce: VoceDex) => void;
 	}
 
-	let { voce, mia }: Props = $props();
+	let { voce, mia, onApri }: Props = $props();
 
 	let salta = $state(false);
 
@@ -23,9 +25,12 @@
 			void goto(`/pachidex/${voce.item_id}`);
 			return;
 		}
-		// Bloccato: il blocco rimbalza e basta, come quando ci sbatti sotto.
+		// Bloccato: il blocco rimbalza e apre la scheda, dove c'e' la foto di
+		// riferimento. Serve proprio adesso che l'elemento non e' ancora preso:
+		// e' quando non sai cosa stai guardando.
 		salta = true;
 		setTimeout(() => (salta = false), 340);
+		onApri?.(voce);
 	}
 </script>
 
@@ -34,7 +39,9 @@
 	class:carta--sbloccata={sbloccato}
 	class:holo={voce.rarita === 'leggendario' && sbloccato}
 	onclick={tocca}
-	aria-label={sbloccato ? `${voce.nome}, sbloccato` : `${voce.nome}, ancora da sbloccare`}
+	aria-label={sbloccato
+		? `${voce.nome}, sbloccato`
+		: `${voce.nome}, ancora da sbloccare — apri la scheda`}
 >
 	<div class="carta__immagine">
 		{#if sbloccato && immagine}

@@ -10,6 +10,7 @@
 	import { messaggioErrore } from '$lib/supabase';
 	import Finestra from '$lib/components/Finestra.svelte';
 	import Rarita from '$lib/components/Rarita.svelte';
+	import { riferimentoDi } from '$lib/riferimenti';
 	import { completaMenzione, estraiTaggati, menzioneInCorso } from '$lib/game/tag';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import type { User, VoceDex } from '$lib/types';
@@ -30,6 +31,9 @@
 	let errore = $state<string | null>(null);
 
 	const raggio = $derived(config.raggio_gps_metri ?? 100);
+
+	// La foto di riferimento dell'elemento scelto, se ne ha una.
+	const riferimento = $derived(riferimentoDi(scelta?.riferimento));
 
 	const vicini = $derived(pos ? checkpointVicini(voci, pos, raggio) : []);
 	const dentroRaggio = $derived(vicini.filter((v) => v.dentro));
@@ -171,6 +175,9 @@
 				<p class="t-label t-muted">Carico gli elementi…</p>
 			{:else if scelta}
 				<div class="scelta">
+					{#if riferimento}
+						<img class="scelta__rif" src={riferimento} alt="Com'e' fatto: {scelta.nome}" />
+					{/if}
 					<div class="grow">
 						<p class="t-label t-muted">{etichettaCategoria(scelta.categoria)}</p>
 						<p class="scelta__nome">{scelta.nome}</p>
@@ -180,6 +187,10 @@
 						Cambia
 					</button>
 				</div>
+
+				{#if scelta.note}
+					<p class="indizio t-small">{scelta.note}</p>
+				{/if}
 
 				{#if scelta.validazione === 'foto_gps'}
 					<p class="gps-ok t-small">
@@ -367,6 +378,22 @@
 	.scelta__nome {
 		font-size: 1.125rem;
 		font-weight: 700;
+	}
+
+	/* Piccola apposta: conferma che stai fotografando la cosa giusta, non
+	   ruba spazio all'anteprima del tuo scatto. */
+	.scelta__rif {
+		width: 56px;
+		height: 56px;
+		object-fit: cover;
+		border: var(--border-thin) solid var(--navy);
+		flex-shrink: 0;
+	}
+
+	.indizio {
+		background: var(--cream);
+		border-left: var(--border) solid var(--navy);
+		padding: 5px var(--space-2);
 	}
 
 	.gps-ok {

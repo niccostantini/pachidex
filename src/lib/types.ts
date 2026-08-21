@@ -25,6 +25,8 @@ export interface Item {
 	note: string | null;
 	lat: number | null;
 	lng: number | null;
+	/** Nome del file in src/assets/riferimenti/, non un URL. */
+	riferimento: string | null;
 	attivo: boolean;
 	created_at: string;
 }
@@ -113,6 +115,7 @@ export interface VoceDex {
 	note: string | null;
 	lat: number | null;
 	lng: number | null;
+	riferimento: string | null;
 	prima_foto: string | null;
 	primo_scopritore: string | null;
 	prima_volta: string | null;

@@ -5,11 +5,13 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import CardDex from '$lib/components/CardDex.svelte';
+	import SchedaElemento from '$lib/components/SchedaElemento.svelte';
 	import type { Categoria, VoceDex } from '$lib/types';
 
 	let voci = $state<VoceDex[]>([]);
 	let mie = $state<Map<string, MiaVoce>>(new Map());
 	let tab = $state<Categoria>('posto');
+	let scheda = $state<VoceDex | null>(null);
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
 
@@ -83,11 +85,13 @@
 		</p>
 		<div class="griglia">
 			{#each dellaCategoria as v (v.item_id)}
-				<CardDex voce={v} mia={mie.get(v.item_id)} />
+				<CardDex voce={v} mia={mie.get(v.item_id)} onApri={(x) => (scheda = x)} />
 			{/each}
 		</div>
 	{/if}
 </div>
+
+<SchedaElemento voce={scheda} onChiudi={() => (scheda = null)} />
 
 <style>
 	.dex {

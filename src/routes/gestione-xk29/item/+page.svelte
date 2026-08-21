@@ -8,6 +8,7 @@
 	import Finestra from '$lib/components/Finestra.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
 	import Rarita from '$lib/components/Rarita.svelte';
+	import { riferimentiDisponibili, riferimentoDi } from '$lib/riferimenti';
 	import type { Categoria, Item, Rarita as TRarita, Validazione } from '$lib/types';
 
 	let item = $state<Item[]>([]);
@@ -18,6 +19,8 @@
 	let errore = $state<string | null>(null);
 
 	let modifica = $state<Partial<Item> | null>(null);
+	const immagini = riferimentiDisponibili();
+	const anteprimaRif = $derived(riferimentoDi(modifica?.riferimento));
 	let salvando = $state(false);
 	let erroreForm = $state<string | null>(null);
 
@@ -51,6 +54,7 @@
 			note: null,
 			lat: null,
 			lng: null,
+			riferimento: null,
 			attivo: true
 		};
 		erroreForm = null;
@@ -285,6 +289,30 @@
 				<textarea id="f-note" class="field" rows="2" bind:value={modifica.note}></textarea>
 			</div>
 
+			<div class="field-row">
+				<label class="field-label" for="f-rif">
+					Foto di riferimento — com'e' fatto, per chi non lo riconosce
+				</label>
+				{#if immagini.length}
+					<div class="rif">
+						{#if anteprimaRif}
+							<img class="rif__prova" src={anteprimaRif} alt="" />
+						{/if}
+						<select id="f-rif" class="field grow" bind:value={modifica.riferimento}>
+							<option value={null}>Nessuna</option>
+							{#each immagini as nome (nome)}
+								<option value={nome}>{nome}</option>
+							{/each}
+						</select>
+					</div>
+				{:else}
+					<p class="t-small t-muted">
+						Nessuna immagine caricata. Mettile in <code>src/assets/riferimenti/</code> e
+						compariranno qui.
+					</p>
+				{/if}
+			</div>
+
 			<label class="check">
 				<input type="checkbox" bind:checked={modifica.ripetibile} />
 				<span>Ripetibile — si puo' catturare piu' volte, sempre a valore pieno</span>
@@ -394,6 +422,26 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: var(--space-2);
+	}
+
+	.rif {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.rif__prova {
+		width: 44px;
+		height: 44px;
+		object-fit: cover;
+		border: var(--border-thin) solid var(--navy);
+		flex-shrink: 0;
+	}
+
+	code {
+		background: var(--cream);
+		padding: 1px 4px;
+		font-size: 0.8125rem;
 	}
 
 	.check {

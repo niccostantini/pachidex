@@ -85,7 +85,7 @@ precaricato. Vai su `/gestione-xk29`, sezione **Import CSV**, scarica il
 template e caricalo. Colonne attese:
 
 ```
-nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng
+nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng, riferimento
 ```
 
 - `categoria`: `posto` | `pietanza` | `animale` | `attivita`
@@ -94,10 +94,31 @@ nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng
 - `ripetibile`: `si` / `no`
 - `validazione`: `foto_gps` per i checkpoint (solo categoria `posto`, richiede
   lat e lng: serve la foto **e** essere sul posto) oppure `foto`
+- `riferimento`: nome di un file in `src/assets/riferimenti/`, **senza
+  estensione** — la foto che mostra com'e' fatto l'elemento, per chi non lo
+  riconosce (vedi sotto). Vuoto se non serve
 - separatore virgola o punto e virgola, decide da solo
 
 Le righe valide entrano anche se altre sono rotte: gli errori sono segnalati
-riga per riga.
+riga per riga. Un `riferimento` che non trova la sua immagine e' un **avviso**,
+non un errore: l'elemento entra lo stesso, semplicemente senza foto.
+
+### Foto di riferimento
+
+Non tutti sanno com'e' fatta una folaga. Ogni elemento puo' avere un'immagine
+che si vede **prima** di averlo catturato — toccando la sua carta ancora
+bloccata nel PachiDex, e accanto al nome nella schermata di cattura.
+
+I file stanno in `src/assets/riferimenti/` e si agganciano da soli per nome:
+non c'e' nessun elenco da aggiornare nel codice. Finiscono nel bundle e nel
+precache del service worker, quindi si vedono anche senza campo — che dalle
+parti della riserva e' la norma.
+
+```bash
+node scripts/prepara-riferimenti.mjs   # ridimensiona e alleggerisce
+```
+
+Istruzioni e vincoli di licenza in `src/assets/riferimenti/LEGGIMI.md`.
 
 ### Notifiche push
 
