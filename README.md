@@ -115,8 +115,14 @@ precache del service worker, quindi si vedono anche senza campo — che dalle
 parti della riserva e' la norma.
 
 ```bash
-node scripts/prepara-riferimenti.mjs   # ridimensiona e alleggerisce
+node scripts/prepara-riferimenti.mjs   # 720px, WebP, non ingrandisce mai
 ```
+
+Butta i file dentro la cartella come li hai scaricati: lo script li porta a
+720px di lato lungo e li ricomprime in WebP, tipicamente da qualche megabyte a
+10-50KB l'uno. **Non ci sono immagini da caricare da nessuna parte**: stanno nel
+repo, quindi basta committarle e Vercel le impacchetta al deploy successivo.
+Diversamente dalle foto delle catture, che invece finiscono su R2 a runtime.
 
 Istruzioni e vincoli di licenza in `src/assets/riferimenti/LEGGIMI.md`.
 
