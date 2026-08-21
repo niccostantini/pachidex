@@ -66,11 +66,18 @@ for (const nome of immagini) {
 	const lato = latoLungo(percorso);
 	prima += partenza;
 
-	// Gia' a posto: non si ritocca. Ricomprimere un WebP a ogni giro
-	// significa perdere qualita' ogni volta, per niente.
-	if (extname(nome).toLowerCase() === '.webp' && lato <= LATO && partenza <= BUDGET_KB) {
+	// Gia' WebP e gia' della dimensione giusta: non si tocca, nemmeno se pesa
+	// piu' del budget. Ricomprimerlo a ogni giro perde qualita' ogni volta e
+	// non recupera niente: su una foto molto dettagliata il secondo passaggio
+	// ha guadagnato 2KB, che non valgono una generazione di artefatti. Il
+	// peso eccessivo si segnala e basta: si risolve cambiando foto, non
+	// schiacciandola di nuovo.
+	if (extname(nome).toLowerCase() === '.webp' && lato <= LATO) {
 		dopo += partenza;
-		console.log(`  ${nome.padEnd(26)} ${partenza.toFixed(0).padStart(4)}KB  ${lato}px  gia' a posto`);
+		if (partenza > BUDGET_KB) grosse.push(`${nome} (${partenza.toFixed(0)}KB)`);
+		console.log(
+			`  ${nome.padEnd(26)} ${partenza.toFixed(0).padStart(4)}KB  ${lato}px  gia' a posto`
+		);
 		continue;
 	}
 

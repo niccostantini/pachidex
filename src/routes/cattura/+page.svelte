@@ -381,11 +381,14 @@
 	}
 
 	/* Piccola apposta: conferma che stai fotografando la cosa giusta, non
-	   ruba spazio all'anteprima del tuo scatto. */
+	   ruba spazio all'anteprima del tuo scatto. `contain` e non `cover`
+	   perche' su una foto verticale il ritaglio quadrato mangia la testa
+	   dell'animale, che e' esattamente cio' che si sta confrontando. */
 	.scelta__rif {
-		width: 56px;
-		height: 56px;
-		object-fit: cover;
+		width: 64px;
+		height: 64px;
+		object-fit: contain;
+		background: var(--paper);
 		border: var(--border-thin) solid var(--navy);
 		flex-shrink: 0;
 	}

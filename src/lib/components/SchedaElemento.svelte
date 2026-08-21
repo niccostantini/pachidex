@@ -66,11 +66,20 @@
 		background: var(--cream);
 	}
 
+	/**
+	 * Niente riquadro di proporzioni fisse e niente `cover`: le foto arrivano
+	 * verticali, orizzontali e quadrate, e ritagliarle a 4:3 tagliava via la
+	 * testa dell'airone — cioe' l'unica cosa che serve per riconoscerlo.
+	 * L'altezza segue l'immagine, con un tetto perche' una foto molto alta non
+	 * spinga fuori schermo il resto della scheda.
+	 */
 	.riferimento img {
-		width: 100%;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
 		display: block;
+		width: 100%;
+		height: auto;
+		max-height: 52dvh;
+		object-fit: contain;
+		background: var(--cream);
 		border-bottom: var(--border-thin) solid var(--navy);
 	}
 
