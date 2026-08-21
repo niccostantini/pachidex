@@ -189,6 +189,38 @@ async function scambio(transferId: string) {
 
 /* --- sorpassi -------------------------------------------------------------- */
 /** Da chiamare dopo ogni evento che muove i saldi. */
+/**
+ * Capitoli appena sbloccati. Il titolo arriva dal database ma NON si mette
+ * nella notifica: si vede solo aprendo l'app, che e' il momento della
+ * rivelazione. La notifica dice quanti e basta.
+ */
+async function capitoli() {
+	const { data } = await db.rpc('sblocca_capitoli');
+	const nuovi = (data ?? []) as { numero: number; titolo: string | null }[];
+	if (!nuovi.length) return 0;
+
+	const tutti = await tuttiTranne([]);
+
+	// Piu' capitoli insieme sono un evento solo: una giornata grossa non deve
+	// far arrivare tre notifiche in fila.
+	const m =
+		nuovi.length === 1
+			? {
+					titolo: `Capitolo ${nuovi[0].numero} sbloccato!`,
+					corpo: 'La storia continua. Apri per vedere quale.',
+					url: '/storia',
+					tag: 'storia'
+				}
+			: {
+					titolo: `${nuovi.length} capitoli sbloccati!`,
+					corpo: `Dal ${nuovi[0].numero} al ${nuovi[nuovi.length - 1].numero}. Che giornata.`,
+					url: '/storia',
+					tag: 'storia'
+				};
+
+	return inviaA(tutti, m);
+}
+
 async function sorpassi() {
 	const { data } = await db.rpc('registra_sorpassi');
 	const righe = (data ?? []) as { superato: string; superante: string }[];
@@ -234,6 +266,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	// Ogni evento qui sopra muove i saldi, quindi puo' aver ribaltato la
 	// classifica: si controlla sempre, subito dopo.
 	inviate += await sorpassi();
+
+	// E puo' aver riempito la barra della storia. Si controlla sempre anche
+	// questo: sblocca_capitoli() non fa niente se non c'e' niente da
+	// sbloccare, e cosi' nessun percorso puo' dimenticarsene.
+	inviate += await capitoli();
 
 	return json({ inviate });
 };

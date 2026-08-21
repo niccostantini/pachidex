@@ -12,6 +12,7 @@
 		{ href: '/gestione-xk29/item', label: 'Sfiziosita' },
 		{ href: '/gestione-xk29/import', label: 'Import CSV' },
 		{ href: '/gestione-xk29/config', label: 'Regole' },
+		{ href: '/gestione-xk29/storia', label: 'Storia' },
 		{ href: '/gestione-xk29/contestazioni', label: 'Contestazioni' },
 		{ href: '/gestione-xk29/profili', label: 'Giocatori' }
 	];

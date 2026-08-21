@@ -10,6 +10,8 @@
 	import CardScambio from '$lib/components/CardScambio.svelte';
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
+	import BarraStoria from '$lib/components/BarraStoria.svelte';
+	import { caricaStoria, type StatoStoria } from '$lib/db/storia';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
 
 	let fissati = $state<PostContestazione[]>([]);
@@ -17,6 +19,7 @@
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
 	let config = $state<Record<string, number>>({});
+	let storia = $state<StatoStoria | null>(null);
 
 	// Contestazione in preparazione
 	let daContestare = $state<PostCattura | null>(null);
@@ -29,9 +32,13 @@
 
 	async function carica() {
 		try {
-			const res = await caricaFeed(profilo.io?.id ?? null);
+			const [res, st] = await Promise.all([
+				caricaFeed(profilo.io?.id ?? null),
+				caricaStoria()
+			]);
 			fissati = res.fissati;
 			timeline = res.timeline;
+			storia = st;
 			stato = 'ok';
 			void profilo.aggiornaSaldi();
 		} catch (e) {
@@ -87,6 +94,8 @@
 <svelte:head><title>Feed — Pachino Express</title></svelte:head>
 
 <div class="feed stack">
+	<BarraStoria {storia} />
+
 	{#if coda.inAttesa.length}
 		<div class="coda">
 			<p class="t-label">
