@@ -5,7 +5,12 @@
 	 * "pieni" e' l'inchiostro, "buchi" e' quello che si ritaglia via.
 	 */
 	type Rect = [x: number, y: number, w: number, h: number];
-	type Forma = { pieni: Rect[]; buchi?: Rect[] };
+	type Forma = {
+		pieni: Rect[];
+		buchi?: Rect[];
+		/** Disegnati per ultimi, sopra i buchi: pupille, dettagli interni. */
+		punti?: Rect[];
+	};
 
 	export const ICONE = {
 		feed: {
@@ -98,6 +103,30 @@
 				[5, 10, 2, 2]
 			]
 		},
+		occhio: {
+			pieni: [
+				[4, 3, 4, 1],
+				[2, 4, 8, 1],
+				[1, 5, 10, 2],
+				[2, 7, 8, 1],
+				[4, 8, 4, 1]
+			],
+			buchi: [
+				[4, 4, 4, 1],
+				[3, 5, 6, 2],
+				[4, 7, 4, 1]
+			],
+			punti: [[5, 5, 2, 2]]
+		},
+		occhio_chiuso: {
+			pieni: [
+				[1, 4, 2, 1],
+				[9, 4, 2, 1],
+				[2, 6, 8, 1],
+				[3, 7, 2, 1],
+				[7, 7, 2, 1]
+			]
+		},
 		chiave: {
 			pieni: [
 				[2, 1, 6, 6],
@@ -138,5 +167,8 @@
 	{/each}
 	{#each forma.buchi ?? [] as [x, y, w, h] (`b${x}-${y}-${w}-${h}`)}
 		<rect {x} {y} width={w} height={h} fill={sfondo} />
+	{/each}
+	{#each forma.punti ?? [] as [x, y, w, h] (`p${x}-${y}-${w}-${h}`)}
+		<rect {x} {y} width={w} height={h} fill={colore} />
 	{/each}
 </svg>

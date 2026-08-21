@@ -3,6 +3,7 @@
 	import { capitoliAdmin, caricaStoria, salvaCapitolo, type Capitolo, type StatoStoria } from '$lib/db/storia';
 	import { messaggioErrore } from '$lib/supabase';
 	import Finestra from '$lib/components/Finestra.svelte';
+	import Icona from '$lib/components/Icona.svelte';
 
 	let capitoli = $state<Capitolo[]>([]);
 	let storia = $state<StatoStoria | null>(null);
@@ -10,6 +11,17 @@
 	let salvando = $state(false);
 	let salvato = $state(false);
 	let errore = $state<string | null>(null);
+
+	/**
+	 * Quali titoli sono in chiaro. Di default nessuno fra quelli bloccati:
+	 * cosi' il nostro amico puo' scriverli senza che l'admin — che gioca —
+	 * se li legga per sbaglio scorrendo la pagina.
+	 *
+	 * E' un velo, non una serratura: il titolo arriva comunque al browser e
+	 * chi apre gli strumenti da sviluppatore lo trova. Serve a non
+	 * rovinarsi la sorpresa, non a difendersi da se stessi.
+	 */
+	let inChiaro = $state<Record<number, boolean>>({});
 
 	// Copia modificabile: si salva solo cio' che e' cambiato davvero.
 	let bozza = $state<Record<number, { soglia: number; titolo: string }>>({});
@@ -89,8 +101,10 @@
 	<Finestra titolo="Soglie e titoli" variante="blue">
 		{#if !caricando}
 			<p class="t-small t-muted avviso">
-				I titoli si vedono <strong>solo a capitolo sbloccato</strong>: prima non escono
-				nemmeno dalla risposta di rete. Lasciali vuoti se preferisci mostrare solo il numero.
+				I titoli dei capitoli ancora chiusi sono <strong>coperti</strong>: il nostro amico
+				puo' scriverli qui senza che tu te li legga per sbaglio. L'occhio li scopre uno
+				alla volta, se proprio ti serve. Quelli gia' sbloccati restano in chiaro, tanto
+				li hai gia' sentiti.
 			</p>
 
 			<div class="righe">
@@ -109,14 +123,39 @@
 							/>
 						</label>
 
-						<label class="campo grow">
+						<div class="campo grow">
 							<span class="field-label">Titolo</span>
-							<input
-								class="field"
-								placeholder="(solo il numero)"
-								bind:value={bozza[c.numero].titolo}
-							/>
-						</label>
+							<div class="titolo">
+								<input
+									class="field grow"
+									placeholder="(solo il numero)"
+									type={c.sbloccato || inChiaro[c.numero] ? 'text' : 'password'}
+									autocomplete="off"
+									autocapitalize="sentences"
+									spellcheck="false"
+									data-1p-ignore
+									data-lpignore="true"
+									bind:value={bozza[c.numero].titolo}
+								/>
+								{#if !c.sbloccato}
+									<button
+										class="occhio"
+										type="button"
+										onclick={() => (inChiaro[c.numero] = !inChiaro[c.numero])}
+										aria-label={inChiaro[c.numero]
+											? `Nascondi il titolo del capitolo ${c.numero}`
+											: `Mostra il titolo del capitolo ${c.numero}`}
+										title={inChiaro[c.numero] ? 'Nascondi' : 'Mostra'}
+									>
+										<Icona
+											nome={inChiaro[c.numero] ? 'occhio' : 'occhio_chiuso'}
+											dimensione={18}
+											sfondo="var(--paper)"
+										/>
+									</button>
+								{/if}
+							</div>
+						</div>
 
 						<span class="stato t-label">
 							{c.sbloccato ? 'sbloccato' : '—'}
@@ -230,6 +269,27 @@
 
 	.campo--soglia {
 		width: 96px;
+	}
+
+	.titolo {
+		display: flex;
+		align-items: stretch;
+		gap: 4px;
+	}
+
+	.occhio {
+		display: grid;
+		place-items: center;
+		width: 40px;
+		flex-shrink: 0;
+		background: var(--paper);
+		border: var(--border) solid var(--navy);
+		cursor: pointer;
+		color: var(--navy);
+	}
+
+	.occhio:active {
+		background: var(--cream);
 	}
 
 	.stato {
