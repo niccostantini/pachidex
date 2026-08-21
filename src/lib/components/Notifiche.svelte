@@ -23,6 +23,7 @@
 	class:campanella--spenta={!notifiche.attive}
 	onclick={() => (aperto = true)}
 	aria-label="Notifiche"
+	data-giro="campanella"
 >
 	<Icona nome="campana" dimensione={15} colore="var(--paper)" sfondo="var(--orange)" />
 </button>

@@ -9,7 +9,7 @@
 </script>
 
 {#if storia}
-	<a class="barra" href="/storia">
+	<a class="barra" href="/storia" data-giro="storia">
 		<div class="barra__testa">
 			<span class="t-label">
 				{#if storia.prossimo}

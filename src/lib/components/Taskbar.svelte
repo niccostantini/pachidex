@@ -2,11 +2,11 @@
 	import { page } from '$app/state';
 	import Icona, { type NomeIcona } from './Icona.svelte';
 
-	const voci: { href: string; label: string; icona: NomeIcona }[] = [
-		{ href: '/', label: 'Feed', icona: 'feed' },
-		{ href: '/pachidex', label: 'Dex', icona: 'dex' },
-		{ href: '/mappa', label: 'Mappa', icona: 'mappa' },
-		{ href: '/classifica', label: 'Top', icona: 'classifica' }
+	const voci: { href: string; label: string; icona: NomeIcona; giro: string }[] = [
+		{ href: '/', label: 'Feed', icona: 'feed', giro: 'feed' },
+		{ href: '/pachidex', label: 'Dex', icona: 'dex', giro: 'dex' },
+		{ href: '/mappa', label: 'Mappa', icona: 'mappa', giro: 'mappa' },
+		{ href: '/classifica', label: 'Top', icona: 'classifica', giro: 'top' }
 	];
 
 	const attivo = (href: string) =>
@@ -16,20 +16,20 @@
 <nav class="taskbar" aria-label="Navigazione principale">
 	<div class="taskbar__lato">
 		{#each voci.slice(0, 2) as v (v.href)}
-			<a class="tab" class:tab--attivo={attivo(v.href)} href={v.href}>
+			<a class="tab" class:tab--attivo={attivo(v.href)} href={v.href} data-giro={v.giro}>
 				<Icona nome={v.icona} dimensione={18} sfondo="var(--navy)" />
 				<span class="tab__label">{v.label}</span>
 			</a>
 		{/each}
 	</div>
 
-	<a class="fab" href="/cattura" aria-label="Cattura">
+	<a class="fab" href="/cattura" aria-label="Cattura" data-giro="cattura">
 		<Icona nome="foto" dimensione={28} colore="var(--paper)" sfondo="var(--orange)" />
 	</a>
 
 	<div class="taskbar__lato">
 		{#each voci.slice(2) as v (v.href)}
-			<a class="tab" class:tab--attivo={attivo(v.href)} href={v.href}>
+			<a class="tab" class:tab--attivo={attivo(v.href)} href={v.href} data-giro={v.giro}>
 				<Icona nome={v.icona} dimensione={18} sfondo="var(--navy)" />
 				<span class="tab__label">{v.label}</span>
 			</a>

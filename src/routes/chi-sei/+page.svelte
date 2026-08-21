@@ -45,6 +45,16 @@
 	<p class="nota t-small t-muted">
 		Nessuna password: il telefono si ricorda la scelta. Se sbagli, tocca il tuo avatar in alto.
 	</p>
+
+	<button
+		class="btn btn--sm rivedi"
+		onclick={() => {
+			localStorage.removeItem('pachidex:giro-fatto');
+			void goto('/');
+		}}
+	>
+		Rivedi come funziona
+	</button>
 </div>
 
 <style>
@@ -103,5 +113,9 @@
 
 	.nota {
 		text-align: center;
+	}
+
+	.rivedi {
+		align-self: center;
 	}
 </style>

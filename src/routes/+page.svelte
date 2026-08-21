@@ -11,6 +11,8 @@
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
 	import BarraStoria from '$lib/components/BarraStoria.svelte';
+	import GiroGuidato from '$lib/components/GiroGuidato.svelte';
+	import { browser } from '$app/environment';
 	import { caricaStoria, type StatoStoria } from '$lib/db/storia';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
 
@@ -20,6 +22,25 @@
 	let errore = $state<string | null>(null);
 	let config = $state<Record<string, number>>({});
 	let storia = $state<StatoStoria | null>(null);
+
+	/**
+	 * Giro guidato al primo avvio. Parte solo quando i dati ci sono: la barra
+	 * della storia e' una delle tappe e non si puo' illuminare un elemento
+	 * che non e' ancora stato disegnato.
+	 */
+	const CHIAVE_GIRO = 'pachidex:giro-fatto';
+	let giroAperto = $state(false);
+
+	function chiudiGiro() {
+		giroAperto = false;
+		if (browser) localStorage.setItem(CHIAVE_GIRO, '1');
+	}
+
+	$effect(() => {
+		if (!browser || stato !== 'ok' || !storia || !profilo.io) return;
+		if (localStorage.getItem(CHIAVE_GIRO)) return;
+		giroAperto = true;
+	});
 
 	// Contestazione in preparazione
 	let daContestare = $state<PostCattura | null>(null);
@@ -158,6 +179,10 @@
 		{/each}
 	{/if}
 </div>
+
+{#if giroAperto}
+	<GiroGuidato onFine={chiudiGiro} />
+{/if}
 
 <Foglio
 	aperto={!!daContestare}
