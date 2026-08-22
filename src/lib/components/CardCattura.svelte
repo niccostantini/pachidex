@@ -6,6 +6,7 @@
 	import Avatar from './Avatar.svelte';
 	import Icona from './Icona.svelte';
 	import Rarita from './Rarita.svelte';
+	import Lente from './Lente.svelte';
 	import type { PostCattura } from '$lib/types';
 
 	interface Props {
@@ -22,6 +23,10 @@
 	 * aggiornato lo scarto si azzera da solo, senza doverlo risincronizzare.
 	 */
 	let ottimistico = $state<{ id: string; mio: boolean } | null>(null);
+
+	/** La foto si apre dentro l'app: un link a un'altra origine farebbe
+	    uscire iOS dalla PWA e comparire le barre di Safari. */
+	let ingrandita = $state(false);
 
 	const mioLike = $derived(
 		ottimistico?.id === post.id ? ottimistico.mio : post.ho_messo_like
@@ -87,9 +92,9 @@
 		{/if}
 	</div>
 
-	<a class="post__foto" href={post.foto_url} target="_blank" rel="noopener">
+	<button class="post__foto" onclick={() => (ingrandita = true)} aria-label="Ingrandisci la foto">
 		<img class="photo" src={post.foto_url} alt={post.item.nome} loading="lazy" />
-	</a>
+	</button>
 
 	{#if post.nota}
 		<p class="post__nota">
@@ -130,6 +135,12 @@
 		</div>
 	{/if}
 </article>
+
+<Lente
+	src={ingrandita ? post.foto_url : null}
+	alt={post.item.nome}
+	onChiudi={() => (ingrandita = false)}
+/>
 
 <style>
 	.post {
@@ -173,6 +184,11 @@
 	.post__foto {
 		display: block;
 		line-height: 0;
+		width: 100%;
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: pointer;
 	}
 
 	.post__nota {

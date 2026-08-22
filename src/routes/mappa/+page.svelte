@@ -37,6 +37,10 @@
 				}
 
 				mappa = L.map(contenitore, { zoomControl: false, attributionControl: true });
+				// Via il "Leaflet" che il controllo mette da solo: e' un link a
+				// un altro sito, e su iOS installato aprirebbe il browser interno
+				// con le barre di Safari sopra la PWA.
+				mappa.attributionControl.setPrefix('');
 				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 					maxZoom: 19,
 					attribution: '© OpenStreetMap'
