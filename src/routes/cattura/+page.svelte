@@ -205,6 +205,8 @@
 						id="cerca"
 						class="field"
 						type="search"
+						enterkeyhint="search"
+						autocapitalize="none"
 						bind:value={cerca}
 						placeholder="Cerca fra le sfiziosita'…"
 					/>
@@ -253,6 +255,8 @@
 					onkeyup={segnaCursore}
 					maxlength="180"
 					autocomplete="off"
+					autocorrect="off"
+					enterkeyhint="done"
 					placeholder="Granita con @..."
 				/>
 

@@ -93,6 +93,7 @@
 							id={c.chiave}
 							class="field t-num"
 							type="number"
+							inputmode="numeric"
 							min="0"
 							bind:value={valori[c.chiave]}
 						/>

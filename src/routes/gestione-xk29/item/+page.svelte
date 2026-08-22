@@ -118,7 +118,14 @@
 <div class="stack">
 	<Finestra titolo="Le sfiziosita" variante="navy">
 		<div class="filtri">
-			<input class="field cerca" type="search" bind:value={cerca} placeholder="Cerca…" />
+			<input
+				class="field cerca"
+				type="search"
+				enterkeyhint="search"
+				autocapitalize="none"
+				bind:value={cerca}
+				placeholder="Cerca…"
+			/>
 			<select class="field" bind:value={filtro}>
 				<option value="tutte">Tutte le categorie</option>
 				{#each CATEGORIE as c (c.valore)}
@@ -250,7 +257,14 @@
 			<div class="due">
 				<div class="field-row">
 					<label class="field-label" for="f-croq">Croquembouche</label>
-					<input id="f-croq" class="field t-num" type="number" min="0" bind:value={modifica.croquembouche} />
+					<input
+						id="f-croq"
+						class="field t-num"
+						type="number"
+						inputmode="numeric"
+						min="0"
+						bind:value={modifica.croquembouche}
+					/>
 				</div>
 
 				<div class="field-row">
@@ -275,11 +289,25 @@
 				<div class="due">
 					<div class="field-row">
 						<label class="field-label" for="f-lat">Latitudine</label>
-						<input id="f-lat" class="field t-num" type="number" step="any" bind:value={modifica.lat} />
+						<input
+							id="f-lat"
+							class="field t-num"
+							type="number"
+							inputmode="decimal"
+							step="any"
+							bind:value={modifica.lat}
+						/>
 					</div>
 					<div class="field-row">
 						<label class="field-label" for="f-lng">Longitudine</label>
-						<input id="f-lng" class="field t-num" type="number" step="any" bind:value={modifica.lng} />
+						<input
+							id="f-lng"
+							class="field t-num"
+							type="number"
+							inputmode="decimal"
+							step="any"
+							bind:value={modifica.lng}
+						/>
 					</div>
 				</div>
 			{/if}

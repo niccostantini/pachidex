@@ -117,6 +117,7 @@
 							<input
 								class="field t-num"
 								type="number"
+								inputmode="numeric"
 								min="0"
 								disabled={c.numero === 1}
 								bind:value={bozza[c.numero].soglia}

@@ -215,6 +215,7 @@
 					id="motivo"
 					class="field"
 					rows="3"
+					enterkeyhint="done"
 					bind:value={motivo}
 					placeholder="Quella non è una granita, è un ghiacciolo sciolto"
 				></textarea>

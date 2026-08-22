@@ -134,6 +134,8 @@
 		<input
 			class="field grow"
 			type="search"
+			enterkeyhint="search"
+			autocapitalize="none"
 			bind:value={cerca}
 			placeholder="Cerca per nome…"
 			aria-label="Cerca fra le sfiziosità"

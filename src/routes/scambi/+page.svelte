@@ -90,6 +90,8 @@
 						id="importo"
 						class="field t-num"
 						type="number"
+						inputmode="numeric"
+						enterkeyhint="done"
 						min="1"
 						max={disponibile}
 						bind:value={importo}
