@@ -10,6 +10,7 @@
 	import { messaggioErrore } from '$lib/supabase';
 	import Finestra from '$lib/components/Finestra.svelte';
 	import Rarita from '$lib/components/Rarita.svelte';
+	import FestaCattura from '$lib/components/FestaCattura.svelte';
 	import { riferimentoDi } from '$lib/riferimenti';
 	import { completaMenzione, estraiTaggati, menzioneInCorso } from '$lib/game/tag';
 	import Avatar from '$lib/components/Avatar.svelte';
@@ -35,6 +36,8 @@
 	let origine = $state<'fotocamera' | 'galleria' | null>(null);
 	let inInvio = $state(false);
 	let errore = $state<string | null>(null);
+	/** L'elemento appena catturato, mostrato dalla festa prima di tornare al feed. */
+	let festeggia = $state<VoceDex | null>(null);
 
 	const raggio = $derived(config.raggio_gps_metri ?? 100);
 
@@ -157,8 +160,10 @@
 				lat: pos?.lat ?? null,
 				lng: pos?.lng ?? null
 			});
-			// Si torna subito al feed: se la rete manca, la coda ci pensa dopo.
-			await goto('/');
+			// Prima la festa, poi il feed. L'accodamento e' gia' avvenuto: se la
+			// rete manca la coda ci pensa comunque, quindi si puo' festeggiare
+			// senza aspettare l'upload.
+			festeggia = scelta;
 		} catch (e) {
 			errore = messaggioErrore(e);
 		} finally {
@@ -409,6 +414,8 @@
 		{/if}
 	</Finestra>
 </div>
+
+<FestaCattura voce={festeggia} onFine={() => goto('/')} />
 
 <style>
 	.cattura {

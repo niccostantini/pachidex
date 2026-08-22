@@ -33,6 +33,15 @@ class ErroreDefinitivo extends Error {}
 
 const PREFISSO = 'coda:';
 
+/**
+ * IndexedDB non sa clonare un Proxy, e tutto cio' che passa da $state lo e'.
+ * Senza questo passaggio il salvataggio lanciava DataCloneError, e la
+ * contabilita' dei tentativi non veniva MAI scritta: una voce in coda
+ * restava a zero tentativi e senza errore anche dopo mille fallimenti, e un
+ * rifiuto definitivo non veniva mai marcato come tale.
+ */
+const clonabile = (v: CatturaInCoda): CatturaInCoda => $state.snapshot(v) as CatturaInCoda;
+
 class StatoCoda {
 	inAttesa = $state<CatturaInCoda[]>([]);
 	inInvio = $state(false);
@@ -89,13 +98,13 @@ class StatoCoda {
 						voce.tentativi++;
 						voce.ultimoErrore = e.message;
 						voce.definitivo = true;
-						await set(PREFISSO + voce.id, voce);
+						await set(PREFISSO + voce.id, clonabile(voce));
 						this.inAttesa = [...this.inAttesa];
 						continue;
 					}
 					voce.tentativi++;
 					voce.ultimoErrore = e instanceof Error ? e.message : String(e);
-					await set(PREFISSO + voce.id, voce);
+					await set(PREFISSO + voce.id, clonabile(voce));
 					this.inAttesa = [...this.inAttesa];
 					break; // caduta la rete: si riprende quando torna
 				}

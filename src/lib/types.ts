@@ -133,6 +133,8 @@ export interface PostCattura extends Capture {
 	/** Chi altro prende i Croquembouche di questa foto. */
 	taggati: User[];
 	contestazione: Contest | null;
+	/** Vero se e' la prima cattura di questo elemento per tutto il gruppo. */
+	primato: boolean;
 	at: string;
 }
 

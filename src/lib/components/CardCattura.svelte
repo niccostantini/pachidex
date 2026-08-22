@@ -56,7 +56,11 @@
 	}
 </script>
 
-<article class="post" class:post--invalidata={post.stato === 'invalidato'}>
+<article
+	class="post"
+	class:post--invalidata={post.stato === 'invalidato'}
+	class:holo={post.item.rarita === 'leggendario' && post.stato !== 'invalidato'}
+>
 	<div class="post__testa">
 		<Avatar utente={post.autore} />
 		<div class="grow">
@@ -94,6 +98,11 @@
 
 	<button class="post__foto" onclick={() => (ingrandita = true)} aria-label="Ingrandisci la foto">
 		<img class="photo" src={post.foto_url} alt={post.item.nome} loading="lazy" />
+		{#if post.primato && post.stato !== 'invalidato'}
+			<!-- Primo del gruppo a trovarlo: un primato si vede una volta sola,
+			     tanto vale che si veda bene. -->
+			<span class="primo">Primo!</span>
+		{/if}
 	</button>
 
 	{#if post.nota}
@@ -184,11 +193,30 @@
 	.post__foto {
 		display: block;
 		line-height: 0;
+		position: relative;
 		width: 100%;
 		padding: 0;
 		border: 0;
 		background: none;
 		cursor: pointer;
+	}
+
+	.primo {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		padding: 3px 8px;
+		background: var(--yellow);
+		color: var(--navy);
+		border: var(--border) solid var(--navy);
+		box-shadow: 3px 3px 0 rgba(22, 27, 61, 0.5);
+		font-size: 0.8125rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		/* Storto come un timbro vero, che e' quello che e'. */
+		transform: rotate(-6deg);
 	}
 
 	.post__nota {

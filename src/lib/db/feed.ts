@@ -50,6 +50,8 @@ function aPostCattura(riga: RigaCattura, ioId: string | null): PostCattura {
 		// La piu' recente: una cattura ne ha al massimo una aperta per volta.
 		contestazione:
 			[...contestazioni].sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,
+		// Riempito da caricaFeed(): qui non si sa ancora.
+		primato: false,
 		at: (riga as unknown as PostCattura).timestamp
 	};
 }
@@ -121,15 +123,30 @@ export async function caricaContestazioni(
  * Le contestazioni aperte restano fissate in cima finche' non si chiudono,
  * poi scivolano al loro posto in cronologia e ci restano per sempre.
  */
+/**
+ * Le catture che hanno scoperto un elemento per prime nel gruppo.
+ * Una riga per elemento, quindi al massimo quante sono le sfiziosita':
+ * si porta dietro tutto il feed senza pesare.
+ */
+async function idPrimati(): Promise<Set<string>> {
+	const { data, error } = await supabase.from('v_primati').select('capture_id');
+	if (error) return new Set();
+	return new Set((data ?? []).map((r) => (r as { capture_id: string }).capture_id));
+}
+
 export async function caricaFeed(ioId: string | null): Promise<{
 	fissati: PostContestazione[];
 	timeline: PostFeed[];
 }> {
-	const [catture, scambi, contestazioni] = await Promise.all([
+	const [catture, scambi, contestazioni, primati] = await Promise.all([
 		caricaCatture(ioId),
 		caricaScambi(),
-		caricaContestazioni(ioId)
+		caricaContestazioni(ioId),
+		idPrimati()
 	]);
+
+	for (const c of catture) c.primato = primati.has(c.id);
+	for (const c of contestazioni) c.cattura.primato = primati.has(c.cattura.id);
 
 	const fissati = contestazioni.filter((c) => c.contest.stato === 'aperta');
 	const chiuse = contestazioni.filter((c) => c.contest.stato !== 'aperta');
