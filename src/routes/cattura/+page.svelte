@@ -27,6 +27,12 @@
 	let nota = $state('');
 	let file = $state<File | null>(null);
 	let urlAnteprima = $state<string | null>(null);
+	/**
+	 * Da dove arriva la foto. Serve perche' i checkpoint vanno fotografati sul
+	 * posto: l'attributo capture apre la fotocamera ma non lascia traccia di
+	 * cio' che e' successo, quindi la provenienza la si ricorda qui.
+	 */
+	let origine = $state<'fotocamera' | 'galleria' | null>(null);
 	let inInvio = $state(false);
 	let errore = $state<string | null>(null);
 
@@ -34,6 +40,16 @@
 
 	// La foto di riferimento dell'elemento scelto, se ne ha una.
 	const riferimento = $derived(riferimentoDi(scelta?.riferimento));
+
+	/** I posti si fotografano sul momento: niente galleria. */
+	const soloFotocamera = $derived(scelta?.validazione === 'foto_gps');
+
+	/**
+	 * La foto si puo' scegliere prima dell'elemento, e un checkpoint vicino si
+	 * preseleziona da solo: puo' quindi capitare di ritrovarsi un posto con
+	 * una foto presa dalla galleria. Qui si intercetta.
+	 */
+	const fotoNonAmmessa = $derived(soloFotocamera && origine === 'galleria');
 
 	const vicini = $derived(pos ? checkpointVicini(voci, pos, raggio) : []);
 	const dentroRaggio = $derived(vicini.filter((v) => v.dentro));
@@ -81,13 +97,17 @@
 		if (!scelta && dentroRaggio.length) scelta = dentroRaggio[0].voce;
 	});
 
-	function scegliFoto(e: Event) {
+	function scegliFoto(e: Event, da: 'fotocamera' | 'galleria') {
 		const input = e.currentTarget as HTMLInputElement;
 		const f = input.files?.[0];
 		if (!f) return;
 		file = f;
+		origine = da;
 		if (urlAnteprima) URL.revokeObjectURL(urlAnteprima);
 		urlAnteprima = anteprima(f);
+		// Il campo si svuota: riscegliendo lo stesso file l'evento change
+		// non scatterebbe una seconda volta.
+		input.value = '';
 	}
 
 	/* --- @menzioni nella didascalia --------------------------------------- */
@@ -121,7 +141,7 @@
 	}
 
 	async function pubblica() {
-		if (!scelta || !file || !profilo.io) return;
+		if (!scelta || !file || !profilo.io || fotoNonAmmessa) return;
 		inInvio = true;
 		errore = null;
 		try {
@@ -153,22 +173,77 @@
 	<Finestra titolo="Nuova cattura" onChiudi={() => goto('/')}>
 		<div class="stack">
 			<!-- 1. La foto -->
-			<label class="scatta" class:scatta--piena={!!urlAnteprima}>
-				{#if urlAnteprima}
+			{#if urlAnteprima}
+				<div class="foto">
 					<img class="photo" src={urlAnteprima} alt="Anteprima" />
-					<span class="scatta__cambia btn btn--sm">Rifai</span>
-				{:else}
-					<span class="scatta__icona" aria-hidden="true">◉</span>
-					<span class="t-label">Apri la fotocamera</span>
-				{/if}
-				<input
-					type="file"
-					accept="image/*"
-					capture="environment"
-					onchange={scegliFoto}
-					class="visually-hidden"
-				/>
-			</label>
+					<span class="foto__da t-label">
+						{origine === 'galleria' ? 'dalla galleria' : 'scattata ora'}
+					</span>
+				</div>
+				<div class="rifai">
+					<label class="btn btn--sm grow">
+						Riscatta
+						<input
+							type="file"
+							accept="image/*"
+							capture="environment"
+							onchange={(e) => scegliFoto(e, 'fotocamera')}
+							class="visually-hidden"
+						/>
+					</label>
+					{#if !soloFotocamera}
+						<label class="btn btn--sm grow">
+							Dalla galleria
+							<input
+								type="file"
+								accept="image/*"
+								onchange={(e) => scegliFoto(e, 'galleria')}
+								class="visually-hidden"
+							/>
+						</label>
+					{/if}
+				</div>
+			{:else}
+				<div class="prendi">
+					<label class="scatta">
+						<span class="scatta__icona" aria-hidden="true">◉</span>
+						<span class="t-label">Scatta ora</span>
+						<input
+							type="file"
+							accept="image/*"
+							capture="environment"
+							onchange={(e) => scegliFoto(e, 'fotocamera')}
+							class="visually-hidden"
+						/>
+					</label>
+
+					{#if !soloFotocamera}
+						<!-- Un animale non aspetta che apri l'app: capita di averlo gia'
+						     fotografato con la fotocamera di sistema. -->
+						<label class="scatta scatta--galleria">
+							<span class="scatta__icona" aria-hidden="true">▤</span>
+							<span class="t-label">Dalla galleria</span>
+							<input
+								type="file"
+								accept="image/*"
+								onchange={(e) => scegliFoto(e, 'galleria')}
+								class="visually-hidden"
+							/>
+						</label>
+					{/if}
+				</div>
+			{/if}
+
+			{#if fotoNonAmmessa}
+				<p class="blocco t-small">
+					Questa foto viene dalla galleria, ma <strong>{scelta?.nome}</strong> è un
+					checkpoint: va fotografato sul posto. Riscatta per continuare.
+				</p>
+			{:else if soloFotocamera && !urlAnteprima}
+				<p class="t-small t-muted">
+					I checkpoint si fotografano sul momento: qui la galleria non vale.
+				</p>
+			{/if}
 
 			<!-- 2. Cosa hai catturato -->
 			{#if caricamento}
@@ -291,7 +366,7 @@
 
 			<button
 				class="btn btn--primary btn--lg btn--block"
-				disabled={!scelta || !file || inInvio}
+				disabled={!scelta || !file || inInvio || fotoNonAmmessa}
 				onclick={pubblica}
 			>
 				{inInvio ? 'Pubblico…' : 'Cattura'}
@@ -354,9 +429,45 @@
 		position: relative;
 	}
 
-	.scatta--piena {
-		padding: 0;
-		border-style: solid;
+	/* Due scelte affiancate quando la galleria e' ammessa, una sola per i
+	   checkpoint: la griglia si adatta da sola al numero di figli. */
+	.prendi {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: var(--space-2);
+	}
+
+	.scatta--galleria {
+		background: var(--paper);
+	}
+
+	.foto {
+		position: relative;
+		line-height: 0;
+	}
+
+	/* Da dove viene la foto, scritto sopra: sull'ultima cattura di giornata
+	   uno non se lo ricorda piu'. */
+	.foto__da {
+		position: absolute;
+		left: var(--space-2);
+		bottom: var(--space-2);
+		background: var(--navy);
+		color: var(--paper);
+		border: var(--border-thin) solid var(--navy);
+		padding: 2px 6px;
+		line-height: 1.4;
+	}
+
+	.rifai {
+		display: flex;
+		gap: var(--space-2);
+	}
+
+	.blocco {
+		background: rgba(217, 59, 50, 0.14);
+		border: var(--border-thin) solid var(--red);
+		padding: var(--space-2);
 	}
 
 	.scatta__icona {
@@ -364,11 +475,6 @@
 		line-height: 1;
 	}
 
-	.scatta__cambia {
-		position: absolute;
-		right: var(--space-2);
-		bottom: var(--space-2);
-	}
 
 	.scelta {
 		display: flex;
