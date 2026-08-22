@@ -47,7 +47,14 @@
 		display: flex;
 		align-items: stretch;
 		justify-content: space-between;
-		height: var(--bar-h);
+		/*
+		 * L'altezza DEVE sommare la safe-area, non contenerla: con
+		 * box-sizing border-box — che vale globalmente — scrivere
+		 * `height: 56px` e `padding-bottom: 34px` lascia 22px al contenuto,
+		 * e icone ed etichette si schiacciano. Su un iPhone con la barra
+		 * home l'icona finiva resa a 2px invece di 18.
+		 */
+		height: calc(var(--bar-h) + env(safe-area-inset-bottom));
 		padding-bottom: env(safe-area-inset-bottom);
 		background: var(--navy);
 		border-top: var(--border) solid var(--navy);
