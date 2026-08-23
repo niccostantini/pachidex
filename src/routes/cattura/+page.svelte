@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { caricaDex, caricaConfig, mieCatture, type MiaVoce } from '$lib/db/dex';
 	import { checkpointVicini, formattaDistanza, posizioneAttuale, type Posizione } from '$lib/game/geo';
 	import { comprimiFoto, anteprima } from '$lib/game/image';
@@ -38,6 +39,8 @@
 	let errore = $state<string | null>(null);
 	/** L'elemento appena catturato, mostrato dalla festa prima di tornare al feed. */
 	let festeggia = $state<VoceDex | null>(null);
+	/** Si arriva qui dalla fine del giro guidato: c'e' un rito da compiere. */
+	const benvenuto = $derived(page.url.searchParams.get('benvenuto') === '1');
 
 	const raggio = $derived(config.raggio_gps_metri ?? 100);
 
@@ -96,8 +99,17 @@
 
 	// Un checkpoint a portata si preseleziona da solo: e' il caso piu' comune
 	// ed evita di far cercare a mano una cosa che il telefono gia' sa.
+	// Il selfie di benvenuto ha la precedenza: e' il motivo per cui si e' qui.
 	$effect(() => {
-		if (!scelta && dentroRaggio.length) scelta = dentroRaggio[0].voce;
+		if (scelta) return;
+		if (benvenuto) {
+			const rito = voci.find((v) => /inaugurale/i.test(v.nome));
+			if (rito) {
+				scelta = rito;
+				return;
+			}
+		}
+		if (dentroRaggio.length) scelta = dentroRaggio[0].voce;
 	});
 
 	function scegliFoto(e: Event, da: 'fotocamera' | 'galleria') {
@@ -175,6 +187,16 @@
 <svelte:head><title>Cattura — Pachino Express</title></svelte:head>
 
 <div class="cattura stack">
+	{#if benvenuto}
+		<div class="rito">
+			<p class="rito__titolo">Si comincia da qui</p>
+			<p class="t-small">
+				La prima cosa da fare è un <strong>selfie inaugurale</strong>. È già
+				selezionato: scatta e sei dentro.
+			</p>
+		</div>
+	{/if}
+
 	<Finestra titolo="Nuova cattura" onChiudi={() => goto('/')}>
 		<div class="stack">
 			<!-- 1. La foto -->
@@ -420,6 +442,34 @@
 <style>
 	.cattura {
 		padding: var(--space-3);
+	}
+
+	/* Il saluto di benvenuto, che arriva dalla fine del giro guidato. */
+	.rito {
+		background: var(--yellow);
+		border: var(--border) solid var(--navy);
+		box-shadow: var(--shadow-sm);
+		padding: var(--space-3);
+		animation: entra-rito 280ms steps(4, end);
+	}
+
+	.rito__titolo {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		margin-bottom: 4px;
+	}
+
+	@keyframes entra-rito {
+		from {
+			transform: translateY(-12px);
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.rito {
+			animation: none;
+		}
 	}
 
 	.scatta {

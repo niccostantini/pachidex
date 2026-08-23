@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { caricaFeed, chiudiScadute, sottoscriviFeed } from '$lib/db/feed';
 	import { caricaConfig } from '$lib/db/dex';
 	import { apriContestazione } from '$lib/db/azioni';
@@ -14,6 +15,7 @@
 	import GiroGuidato from '$lib/components/GiroGuidato.svelte';
 	import { browser } from '$app/environment';
 	import { caricaStoria, type StatoStoria } from '$lib/db/storia';
+	import { selfieDaFare } from '$lib/db/dex';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
 
 	let fissati = $state<PostContestazione[]>([]);
@@ -31,9 +33,15 @@
 	const CHIAVE_GIRO = 'pachidex:giro-fatto';
 	let giroAperto = $state(false);
 
-	function chiudiGiro() {
+	async function chiudiGiro() {
 		giroAperto = false;
 		if (browser) localStorage.setItem(CHIAVE_GIRO, '1');
+
+		// Il giro finisce mandando a fare la prima cosa, se non e' gia' fatta:
+		// un invito concreto vale piu' di un "buon divertimento".
+		if (!profilo.io) return;
+		const selfie = await selfieDaFare(profilo.io.id);
+		if (selfie) void goto('/cattura?benvenuto=1');
 	}
 
 	$effect(() => {

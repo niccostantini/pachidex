@@ -55,6 +55,7 @@
 			<div
 				class="qblock"
 				class:qblock--bump={salta}
+				class:qblock--luccica={voce.rarita === 'leggendario'}
 				style:--rarity="var(--rarity-{voce.rarita})"
 			>
 				<span class="qblock__mark">?</span>
@@ -126,6 +127,39 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
+	}
+
+	/* Solo i leggendari luccicano: se lo facessero tutti non vorrebbe dire
+	   niente, e sarebbero 114 elementi ad animarsi insieme. */
+	.qblock--luccica {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.qblock--luccica::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 26px;
+		background: rgba(255, 255, 255, 0.45);
+		transform: skewX(-20deg);
+		animation: luccichio 3.4s steps(10, end) infinite;
+	}
+
+	@keyframes luccichio {
+		0% {
+			left: -40%;
+		}
+		35%, 100% {
+			left: 130%;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.qblock--luccica::after {
+			display: none;
+		}
 	}
 
 	.conta {

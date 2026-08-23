@@ -99,8 +99,39 @@
 	}
 
 	/* Spenta finche' non sono attive: si vede a colpo d'occhio che manca. */
+	/**
+	 * Spenta non basta: pulsa piano finche' non le si attiva. Senza notifiche
+	 * meta' del gioco non arriva — contestazioni da votare, capitoli sbloccati
+	 * — e restare in silenzio significa che nessuno se ne accorge.
+	 */
 	.campanella--spenta {
 		opacity: 0.5;
+		animation: chiama 2.6s steps(2, end) infinite;
+	}
+
+	@keyframes chiama {
+		0%, 70% {
+			opacity: 0.5;
+			transform: none;
+		}
+		78% {
+			opacity: 1;
+			transform: rotate(-8deg);
+		}
+		86% {
+			opacity: 1;
+			transform: rotate(8deg);
+		}
+		94% {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.campanella--spenta {
+			animation: none;
+		}
 	}
 
 	.avviso {

@@ -81,3 +81,31 @@ export async function caricaConfig(): Promise<Record<string, number>> {
 		((data ?? []) as { chiave: string; valore: number }[]).map((r) => [r.chiave, r.valore])
 	);
 }
+
+/**
+ * Il rito d'inizio: la prima cosa da fare appena si apre l'app.
+ *
+ * Si cerca per nome e non per id, perche' l'id cambia a ogni azzeramento del
+ * gioco mentre il nome no. Se l'elemento non c'e' piu' — rinominato, tolto,
+ * gia' catturato — restituisce null e chi chiama lascia perdere: e' un
+ * invito, non un passaggio obbligato.
+ */
+export async function selfieDaFare(userId: string): Promise<VoceDex | null> {
+	const { data, error } = await supabase
+		.from('v_dex')
+		.select('*')
+		.ilike('nome', '%inaugurale%')
+		.limit(1);
+	if (error || !data?.length) return null;
+
+	const voce = data[0] as VoceDex;
+
+	const { count } = await supabase
+		.from('captures')
+		.select('*', { count: 'exact', head: true })
+		.eq('user_id', userId)
+		.eq('item_id', voce.item_id)
+		.neq('stato', 'invalidato');
+
+	return count ? null : voce;
+}

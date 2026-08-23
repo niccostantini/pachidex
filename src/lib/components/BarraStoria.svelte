@@ -85,6 +85,9 @@
 	.pista__riempi {
 		position: absolute;
 		inset: 0 auto 0 0;
+		/* Si riempie a scatti, non scivolando: il pixel non conosce la
+		   transizione morbida. */
+		transition: width 900ms steps(12, end);
 		background: repeating-linear-gradient(
 			90deg,
 			var(--orange) 0 6px,
@@ -101,6 +104,12 @@
 		background: var(--yellow);
 		border: 1px solid var(--navy);
 		flex-shrink: 0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pista__riempi {
+			transition: none;
+		}
 	}
 
 	.barra p {

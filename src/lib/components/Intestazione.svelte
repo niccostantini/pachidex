@@ -2,6 +2,24 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import Avatar from './Avatar.svelte';
+
+	/**
+	 * Il saldo lampeggia quando cambia: guadagnare Croquembouche e' il punto
+	 * del gioco e finora succedeva in silenzio, in un angolo dell'intestazione.
+	 */
+	let saldoPrecedente = $state<number | null>(null);
+	let lampeggia = $state(false);
+
+	$effect(() => {
+		const ora = profilo.saldo;
+		if (saldoPrecedente !== null && ora !== saldoPrecedente) {
+			lampeggia = true;
+			const t = setTimeout(() => (lampeggia = false), 700);
+			saldoPrecedente = ora;
+			return () => clearTimeout(t);
+		}
+		saldoPrecedente = ora;
+	});
 	import Notifiche from './Notifiche.svelte';
 </script>
 
@@ -17,7 +35,7 @@
 
 		<div class="testata__dx">
 			<Notifiche />
-			<span class="saldo t-num">✦ {profilo.saldo}</span>
+			<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
 			<a class="testata__io" href="/chi-sei" aria-label="Cambia profilo">
 				<Avatar utente={profilo.io} dimensione="sm" />
 			</a>
@@ -48,6 +66,27 @@
 		align-items: center;
 		gap: var(--space-2);
 		margin-left: auto;
+	}
+
+	.saldo--cambia {
+		animation: lampeggia 700ms steps(1, end);
+	}
+
+	@keyframes lampeggia {
+		0%, 40%, 80% {
+			background: var(--yellow);
+			color: var(--navy);
+		}
+		20%, 60%, 100% {
+			background: var(--navy);
+			color: var(--yellow);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.saldo--cambia {
+			animation: none;
+		}
 	}
 
 	.saldo {
