@@ -59,7 +59,7 @@
 			titolo: 'E adesso: cattura',
 			testo: 'Il pulsante che fa girare tutto. Funziona così:',
 			dettagli: [
-				'Scatti la foto, o la prendi dalla galleria se l’animale non ti ha aspettato',
+				'Scatti la foto, o la prendi dalla galleria se hai avuto fretta di fare la foto per non perdere l\'occasione fugace',
 				'Scegli cosa hai catturato dalla lista',
 				'Se sei su un checkpoint te lo propone da solo: il GPS sa dove sei — ma quelli vanno fotografati sul posto, niente galleria',
 				'Nella didascalia scrivi @nome per dare i punti anche a chi era con te',
