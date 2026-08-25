@@ -7,8 +7,12 @@
  * file. Il prezzo e' che la cache runtime, prima dichiarata in configurazione,
  * ora e' codice qui sotto.
  */
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
+import {
+	cleanupOutdatedCaches,
+	createHandlerBoundToURL,
+	precacheAndRoute
+} from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
@@ -27,6 +31,22 @@ self.addEventListener('install', () => {
 self.addEventListener('activate', (e) => {
 	e.waitUntil(self.clients.claim());
 });
+
+/**
+ * Rete assente: le rotte fisse (/cattura, /pachidex, /mappa...) stanno gia'
+ * nel precache e rispondono da sole. Quelle con un pezzo variabile no —
+ * /pachidex/<id> non e' un file — e un ricaricamento li' finirebbe sulla
+ * pagina di errore del browser. Questa regola ripiega sul guscio della home:
+ * l'app parte e il router disegna la pagina giusta da solo, senza rete.
+ *
+ * Va registrata DOPO precacheAndRoute, che ha la precedenza: le rotte fisse
+ * continuano a rispondere con il proprio guscio, non con questo.
+ */
+registerRoute(new NavigationRoute(createHandlerBoundToURL('/'), {
+	// Il pannello di gestione e le chiamate al server non sono navigazioni da
+	// far finire nel guscio: senza rete non avrebbero comunque niente da dire.
+	denylist: [/^\/api\//]
+}));
 
 /* --- cache runtime -------------------------------------------------------- */
 const cacheLunga = (nome: string, voci: number) => [

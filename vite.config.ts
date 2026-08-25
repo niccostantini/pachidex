@@ -31,7 +31,13 @@ export default defineConfig(() => {
 					]
 				},
 				injectManifest: {
-					globPatterns: ['**/*.{js,css,html,woff2,png,svg}']
+					// jpg e jpeg ci sono per le foto di riferimento degli animali:
+					// senza, offline restavano fuori 18 delle 26 e uno si trovava
+					// davanti a una folaga senza sapere che aspetto abbia.
+					globPatterns: ['**/*.{js,css,html,woff2,png,svg,webp,jpg,jpeg}'],
+					// Le foto di riferimento superano il mezzo mega: il limite
+					// predefinito di 2 MiB le lascerebbe fuori in silenzio.
+					maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
 				}
 			})
 		]

@@ -12,6 +12,11 @@ const config = {
 		// segreta che non puo' stare nel bundle client.
 		adapter: adapter(),
 		alias: { $components: 'src/lib/components' },
+		// Percorsi assoluti negli asset, non relativi (che e' il default).
+		// Con i relativi il guscio della home, riusato dal service worker per
+		// le rotte con un pezzo variabile come /pachidex/<id>, cercava il
+		// codice in /pachidex/_app/... e senza rete restava una pagina bianca.
+		paths: { relative: false },
 		serviceWorker: { register: false } // se ne occupa vite-plugin-pwa
 	}
 };
