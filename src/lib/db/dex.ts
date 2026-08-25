@@ -1,11 +1,20 @@
 import { supabase } from '$lib/supabase';
+import { conCache } from '$lib/db/cache';
 import type { Capture, RigaClassifica, User, VoceDex } from '$lib/types';
 
-/** La griglia intera: uguale per tutti, quindi una query sola. */
+/**
+ * La griglia intera: uguale per tutti, quindi una query sola.
+ *
+ * Tenuta in cache perche' e' la lista di cosa si puo' catturare: senza, la
+ * schermata di cattura senza linea direbbe "Il PachiDex e' vuoto" e non ci
+ * sarebbe niente da fotografare.
+ */
 export async function caricaDex(): Promise<VoceDex[]> {
-	const { data, error } = await supabase.from('v_dex').select('*').order('nome');
-	if (error) throw error;
-	return (data ?? []) as VoceDex[];
+	return conCache('dex', async () => {
+		const { data, error } = await supabase.from('v_dex').select('*').order('nome');
+		if (error) throw error;
+		return (data ?? []) as VoceDex[];
+	});
 }
 
 export interface MiaVoce {
@@ -25,6 +34,7 @@ export interface MiaVoce {
  * ricontrollare.
  */
 export async function mieCatture(userId: string): Promise<Map<string, MiaVoce>> {
+	return conCache(`crediti:${userId}`, async () => {
 	const { data, error } = await supabase
 		.from('v_crediti')
 		.select('item_id, timestamp, da_tag')
@@ -48,12 +58,14 @@ export async function mieCatture(userId: string): Promise<Map<string, MiaVoce>> 
 		}
 	}
 	return mappa;
+	});
 }
 
 /** Chi altro del gruppo ha preso questo elemento, taggati compresi. */
 export async function catturePerItem(
 	itemId: string
 ): Promise<(Capture & { autore: User; taggati: User[] })[]> {
+	return conCache(`catture:${itemId}`, async () => {
 	const { data, error } = await supabase
 		.from('captures')
 		.select('*, autore:users(*), tag:capture_tags(utente:users(*))')
@@ -66,20 +78,25 @@ export async function catturePerItem(
 		autore: User;
 		tag: { utente: User }[];
 	})[]).map((c) => ({ ...c, taggati: (c.tag ?? []).map((t) => t.utente).filter(Boolean) }));
+	});
 }
 
 export async function caricaClassifica(): Promise<RigaClassifica[]> {
-	const { data, error } = await supabase.from('v_classifica').select('*');
-	if (error) throw error;
-	return (data ?? []) as RigaClassifica[];
+	return conCache('classifica', async () => {
+		const { data, error } = await supabase.from('v_classifica').select('*');
+		if (error) throw error;
+		return (data ?? []) as RigaClassifica[];
+	});
 }
 
 export async function caricaConfig(): Promise<Record<string, number>> {
-	const { data, error } = await supabase.from('game_config').select('chiave, valore');
-	if (error) throw error;
-	return Object.fromEntries(
-		((data ?? []) as { chiave: string; valore: number }[]).map((r) => [r.chiave, r.valore])
-	);
+	return conCache('config', async () => {
+		const { data, error } = await supabase.from('game_config').select('chiave, valore');
+		if (error) throw error;
+		return Object.fromEntries(
+			((data ?? []) as { chiave: string; valore: number }[]).map((r) => [r.chiave, r.valore])
+		);
+	});
 }
 
 /**
@@ -100,12 +117,16 @@ export async function selfieDaFare(userId: string): Promise<VoceDex | null> {
 
 	const voce = data[0] as VoceDex;
 
-	const { count } = await supabase
+	const { count, error: errConta } = await supabase
 		.from('captures')
 		.select('*', { count: 'exact', head: true })
 		.eq('user_id', userId)
 		.eq('item_id', voce.item_id)
 		.neq('stato', 'invalidato');
+
+	// Senza linea il conteggio non arriva: meglio tacere che rimandare al
+	// selfie inaugurale uno che l'ha gia' fatto.
+	if (errConta) return null;
 
 	return count ? null : voce;
 }

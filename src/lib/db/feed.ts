@@ -1,4 +1,5 @@
 import { supabase } from '$lib/supabase';
+import { conCache } from '$lib/db/cache';
 import type {
 	Contest,
 	PostCattura,
@@ -138,6 +139,7 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	fissati: PostContestazione[];
 	timeline: PostFeed[];
 }> {
+	return conCache(`feed:${ioId ?? 'anonimo'}`, async () => {
 	const [catture, scambi, contestazioni, primati] = await Promise.all([
 		caricaCatture(ioId),
 		caricaScambi(),
@@ -154,6 +156,7 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	const timeline = [...catture, ...scambi, ...chiuse].sort((a, b) => b.at.localeCompare(a.at));
 
 	return { fissati, timeline };
+	});
 }
 
 /** Le contestazioni scadute si chiudono anche senza cron, appena qualcuno guarda. */

@@ -17,19 +17,30 @@
 	let catture = $state<(Capture & { autore: User })[]>([]);
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
+	/** true quando non si e' potuto sapere chi l'ha gia' preso. */
+	let chiCeLHaIgnoto = $state(false);
 
 	const mieQui = $derived(catture.filter((c) => c.user_id === profilo.io?.id));
 	const scopritori = $derived([...new Map(catture.map((c) => [c.user_id, c.autore])).values()]);
 
 	onMount(async () => {
 		try {
-			const [dex, cat] = await Promise.all([caricaDex(), catturePerItem(id as string)]);
+			const dex = await caricaDex();
 			voce = dex.find((v) => v.item_id === id) ?? null;
-			catture = cat;
 			stato = 'ok';
 		} catch (e) {
 			errore = messaggioErrore(e);
 			stato = 'errore';
+			return;
+		}
+
+		// Chi ce l'ha si chiede a parte, e se non arriva non e' un motivo per
+		// buttare via la scheda: senza rete e senza cache resta il dubbio,
+		// che va detto invece di far passare l'elemento per non preso.
+		try {
+			catture = await catturePerItem(id as string);
+		} catch {
+			chiCeLHaIgnoto = true;
 		}
 	});
 </script>
@@ -74,7 +85,11 @@
 		</Finestra>
 
 		<Finestra titolo="Chi ce l'ha" variante="blue">
-			{#if !catture.length}
+			{#if chiCeLHaIgnoto}
+				<p class="t-small t-muted">
+					Non si sa: senza linea questa parte non arriva. Potrebbe averlo gia' preso qualcuno.
+				</p>
+			{:else if !catture.length}
 				<p class="t-small t-muted">Nessuno, ancora. C'e' un primato da prendersi.</p>
 			{:else}
 				<div class="scopritori">

@@ -6,7 +6,9 @@
 	import { goto } from '$app/navigation';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
+	import { rete } from '$lib/state/rete.svelte';
 	import Intestazione from '$lib/components/Intestazione.svelte';
+	import BarraRete from '$lib/components/BarraRete.svelte';
 	import Taskbar from '$lib/components/Taskbar.svelte';
 
 	let { children } = $props();
@@ -16,6 +18,7 @@
 	const inGioco = $derived(!inAdmin && !inScelta);
 
 	onMount(() => {
+		rete.init();
 		void profilo.carica();
 		void coda.init();
 
@@ -44,6 +47,7 @@
 
 {#if inGioco}
 	<Intestazione />
+	<BarraRete />
 {/if}
 
 <main class="app" class:app--libera={!inGioco}>

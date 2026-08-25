@@ -1,4 +1,5 @@
 import { supabase } from '$lib/supabase';
+import { conCache } from '$lib/db/cache';
 
 export interface Capitolo {
 	numero: number;
@@ -21,10 +22,16 @@ export interface StatoStoria {
 }
 
 export async function caricaStoria(): Promise<StatoStoria> {
-	const [{ data: barra }, { data: capitoli }] = await Promise.all([
+	return conCache('storia', async () => {
+	const [{ data: barra, error: errBarra }, { data: capitoli, error: errCap }] = await Promise.all([
 		supabase.from('v_punti_storia').select('punti').single(),
 		supabase.rpc('capitoli')
 	]);
+
+	// Senza questo controllo una lettura fallita passava per un gioco appena
+	// cominciato: zero punti, nessun capitolo, la barra che si svuota da sola
+	// sotto gli occhi di tutti.
+	if (errBarra || errCap) throw errBarra ?? errCap;
 
 	const punti = (barra?.punti as number) ?? 0;
 	const elenco = ((capitoli ?? []) as Capitolo[]).sort((a, b) => a.numero - b.numero);
@@ -47,6 +54,7 @@ export async function caricaStoria(): Promise<StatoStoria> {
 		mancano: prossimo ? Math.max(prossimo.soglia - punti, 0) : 0,
 		avanzamento: tratto > 0 ? Math.min(Math.max(fatto / tratto, 0), 1) : 1
 	};
+	});
 }
 
 /* --- pannello admin -------------------------------------------------------- */
