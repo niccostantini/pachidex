@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { caricaDex, mieCatture, type MiaVoce } from '$lib/db/dex';
+	import { caricaSet, type SetConStato } from '$lib/db/set';
 	import { CATEGORIE, RARITA, etichettaRarita } from '$lib/game/rules';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
@@ -10,6 +11,7 @@
 	import type { Categoria, Rarita, VoceDex } from '$lib/types';
 
 	let voci = $state<VoceDex[]>([]);
+	let sets = $state<SetConStato[]>([]);
 	let mie = $state<Map<string, MiaVoce>>(new Map());
 	let scheda = $state<VoceDex | null>(null);
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
@@ -89,6 +91,15 @@
 		} catch (e) {
 			errore = messaggioErrore(e);
 			stato = 'errore';
+			return;
+		}
+
+		// I set stanno nella loro pagina: qui basta il contatore che ci porta.
+		// Se non arrivano si tace, non e' un motivo per rovinare il PachiDex.
+		try {
+			sets = await caricaSet(profilo.io?.id ?? null);
+		} catch {
+			sets = [];
 		}
 	}
 
@@ -129,6 +140,19 @@
 	>
 		Tutte le sfiziosità
 	</button>
+
+	{#if sets.length}
+		<a class="ai-set" href="/set">
+			<span class="grow">
+				<span class="ai-set__nome t-label">I set</span>
+				<span class="ai-set__spiega t-small">Gruppi che valgono un premio doppio</span>
+			</span>
+			<span class="ai-set__conta t-num">
+				{sets.filter((s) => s.completo).length}/{sets.length}
+			</span>
+			<span class="ai-set__freccia" aria-hidden="true">▸</span>
+		</a>
+	{/if}
 
 	<div class="cerca">
 		<input
@@ -268,6 +292,46 @@
 <SchedaElemento voce={scheda} onChiudi={() => (scheda = null)} />
 
 <style>
+	/* Il richiamo ai set: sta nel PachiDex perche' e' li' che uno guarda cosa
+	   gli manca, ma la bacheca vera ha una pagina sua — nove schede in cima
+	   alla griglia l'avrebbero spinta fuori schermo. */
+	.ai-set {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2);
+		background: var(--navy);
+		border: var(--border) solid var(--navy);
+		box-shadow: var(--shadow-sm);
+		color: var(--paper);
+		text-decoration: none;
+	}
+
+	.ai-set:active {
+		transform: translate(3px, 3px);
+		box-shadow: none;
+	}
+
+	.ai-set__nome {
+		display: block;
+		color: var(--yellow);
+	}
+
+	.ai-set__spiega {
+		display: block;
+		color: rgba(247, 243, 232, 0.72);
+	}
+
+	.ai-set__conta {
+		font-weight: 700;
+		font-size: 1.0625rem;
+		color: var(--yellow);
+	}
+
+	.ai-set__freccia {
+		color: var(--orange);
+	}
+
 	.dex {
 		padding: var(--space-3);
 	}
