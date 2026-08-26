@@ -36,6 +36,8 @@
 	 * standosene dentro il raggio di Marianelli non riusciva a registrarla.
 	 */
 	let sceltaMia = $state(false);
+	/** true quando la scelta l'ha messa il GPS: va detto, altrimenti sembra una decisione presa. */
+	let suggerito = $state(false);
 	let cerca = $state('');
 	let nota = $state('');
 	let file = $state<File | null>(null);
@@ -120,7 +122,10 @@
 				return;
 			}
 		}
-		if (dentroRaggio.length) scelta = dentroRaggio[0].voce;
+		if (dentroRaggio.length) {
+			scelta = dentroRaggio[0].voce;
+			suggerito = true;
+		}
 	});
 
 	/** Il GPS suggerisce, il giocatore decide: passa tutto di qui. */
@@ -128,6 +133,7 @@
 		scelta = v;
 		cerca = '';
 		sceltaMia = true;
+		suggerito = false;
 	}
 
 	function scegliFoto(e: Event, da: 'fotocamera' | 'galleria') {
@@ -299,11 +305,15 @@
 						<img class="scelta__rif" src={riferimento} alt="Com'e' fatto: {scelta.nome}" />
 					{/if}
 					<div class="grow">
-						<p class="t-label t-muted">{etichettaCategoria(scelta.categoria)}</p>
+						<p class="t-label t-muted">
+							{suggerito
+								? `${etichettaCategoria(scelta.categoria)} · suggerito dal GPS`
+								: etichettaCategoria(scelta.categoria)}
+						</p>
 						<p class="scelta__nome">{scelta.nome}</p>
 						<Rarita rarita={scelta.rarita} croquembouche={scelta.croquembouche} />
 					</div>
-					<button class="btn btn--sm" onclick={() => scegli(null)}> Cambia </button>
+					<button class="btn btn--primary cambia" onclick={() => scegli(null)}> Cambia </button>
 				</div>
 
 				{#if scelta.note}
@@ -628,6 +638,15 @@
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
 		font-size: 0.75rem;
+		flex-shrink: 0;
+	}
+
+	/* Piu' in vista di un btn--sm: e' la via d'uscita dal suggerimento del
+	   GPS, e finche' era un pulsantino bianco sembrava che non facesse
+	   niente invece che essere l'unica cosa da premere. */
+	.cambia {
+		padding: 7px 13px;
+		font-size: 0.8125rem;
 		flex-shrink: 0;
 	}
 
