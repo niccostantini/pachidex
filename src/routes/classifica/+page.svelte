@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { caricaClassifica } from '$lib/db/dex';
+	import { caricaTitoli, type VoceTitolo } from '$lib/db/titoli';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Finestra from '$lib/components/Finestra.svelte';
+	import BachecaTitoli from '$lib/components/BachecaTitoli.svelte';
 	import type { RigaClassifica } from '$lib/types';
 
 	let righe = $state<RigaClassifica[]>([]);
+	let titoli = $state<VoceTitolo[]>([]);
 	let tab = $state<'croq' | 'unici'>('croq');
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
@@ -29,6 +32,15 @@
 		} catch (e) {
 			errore = messaggioErrore(e);
 			stato = 'errore';
+			return;
+		}
+
+		// I titoli si chiedono a parte: sono un di piu', e se non arrivano la
+		// classifica deve restare in piedi lo stesso.
+		try {
+			titoli = await caricaTitoli();
+		} catch {
+			titoli = [];
 		}
 	});
 </script>
@@ -86,6 +98,14 @@
 	</Finestra>
 
 	{#if stato === 'ok'}
+		<Finestra titolo="I titoli" variante="orange">
+			<BachecaTitoli {titoli} />
+			<p class="spiega t-small t-muted">
+				Uno per titolo, sempre a chi è in testa adesso. A pari merito lo tiene
+				chi ci è arrivata prima — e si perdono.
+			</p>
+		</Finestra>
+
 		<Finestra titolo="Dettaglio" variante="blue">
 			<div class="tabella">
 				<div class="th">
