@@ -25,6 +25,17 @@
 	let caricamento = $state(true);
 
 	let scelta = $state<VoceDex | null>(null);
+	/**
+	 * true appena il giocatore mette bocca sulla scelta: la cambia, la azzera,
+	 * ne prende un'altra dall'elenco o da un checkpoint li' accanto.
+	 *
+	 * Da quel momento il GPS non tocca piu' niente. Senza questo flag il
+	 * pulsante Cambia sembrava rotto: azzerava la scelta, l'effetto qui sotto
+	 * ripartiva — legge scelta, quindi si riattiva appena torna null — e
+	 * rimetteva il checkpoint un istante dopo. Chi aveva visto una folaga
+	 * standosene dentro il raggio di Marianelli non riusciva a registrarla.
+	 */
+	let sceltaMia = $state(false);
 	let cerca = $state('');
 	let nota = $state('');
 	let file = $state<File | null>(null);
@@ -101,7 +112,7 @@
 	// ed evita di far cercare a mano una cosa che il telefono gia' sa.
 	// Il selfie di benvenuto ha la precedenza: e' il motivo per cui si e' qui.
 	$effect(() => {
-		if (scelta) return;
+		if (sceltaMia || scelta) return;
 		if (benvenuto) {
 			const rito = voci.find((v) => /inaugurale/i.test(v.nome));
 			if (rito) {
@@ -111,6 +122,13 @@
 		}
 		if (dentroRaggio.length) scelta = dentroRaggio[0].voce;
 	});
+
+	/** Il GPS suggerisce, il giocatore decide: passa tutto di qui. */
+	function scegli(v: VoceDex | null) {
+		scelta = v;
+		cerca = '';
+		sceltaMia = true;
+	}
 
 	function scegliFoto(e: Event, da: 'fotocamera' | 'galleria') {
 		const input = e.currentTarget as HTMLInputElement;
@@ -285,9 +303,7 @@
 						<p class="scelta__nome">{scelta.nome}</p>
 						<Rarita rarita={scelta.rarita} croquembouche={scelta.croquembouche} />
 					</div>
-					<button class="btn btn--sm" onclick={() => ((scelta = null), (cerca = ''))}>
-						Cambia
-					</button>
+					<button class="btn btn--sm" onclick={() => scegli(null)}> Cambia </button>
 				</div>
 
 				{#if scelta.note}
@@ -325,7 +341,7 @@
 								<button
 									class="risultato"
 									disabled={giaPresa(v)}
-									onclick={() => (scelta = v)}
+									onclick={() => scegli(v)}
 								>
 									<span class="cat" style:background="var(--cat-{v.categoria})">
 										{CATEGORIE.find((c) => c.valore === v.categoria)?.icona}
@@ -423,7 +439,7 @@
 						<span class="grow">{v.voce.nome}</span>
 						<span class="t-num t-small">{formattaDistanza(v.distanza)}</span>
 						{#if v.dentro}
-							<button class="btn btn--sm btn--ok" onclick={() => (scelta = v.voce)}>
+							<button class="btn btn--sm btn--ok" onclick={() => scegli(v.voce)}>
 								Sei qui
 							</button>
 						{/if}
