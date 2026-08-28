@@ -492,14 +492,6 @@ select.field {
 }
 
 /* Le foto delle catture restano nitide: e' il contrasto voluto. */
-.photo {
-	width: 100%;
-	aspect-ratio: 4 / 3;
-	object-fit: cover;
-	background: var(--cream);
-	border: var(--border) solid var(--navy);
-}
-
 .avatar {
 	width: 32px;
 	height: 32px;

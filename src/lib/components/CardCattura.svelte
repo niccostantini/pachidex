@@ -4,6 +4,7 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { alternaLike } from '$lib/db/feed';
 	import Avatar from './Avatar.svelte';
+	import Scatto from './Scatto.svelte';
 	import Icona from './Icona.svelte';
 	import Rarita from './Rarita.svelte';
 	import Lente from './Lente.svelte';
@@ -97,7 +98,7 @@
 	</div>
 
 	<button class="post__foto" onclick={() => (ingrandita = true)} aria-label="Ingrandisci la foto">
-		<img class="photo" src={post.foto_url} alt={post.item.nome} loading="lazy" />
+		<Scatto src={post.foto_url} alt={post.item.nome} />
 		{#if post.primato && post.stato !== 'invalidato'}
 			<!-- Primo del gruppo a trovarlo: un primato si vede una volta sola,
 			     tanto vale che si veda bene. -->

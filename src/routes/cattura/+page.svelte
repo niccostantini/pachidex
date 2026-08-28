@@ -15,6 +15,7 @@
 	import { riferimentoDi } from '$lib/riferimenti';
 	import { completaMenzione, estraiTaggati, menzioneInCorso } from '$lib/game/tag';
 	import Avatar from '$lib/components/Avatar.svelte';
+	import Scatto from '$lib/components/Scatto.svelte';
 	import type { User, VoceDex } from '$lib/types';
 
 	let voci = $state<VoceDex[]>([]);
@@ -226,7 +227,7 @@
 			<!-- 1. La foto -->
 			{#if urlAnteprima}
 				<div class="foto">
-					<img class="photo" src={urlAnteprima} alt="Anteprima" />
+					<Scatto src={urlAnteprima} alt="Anteprima" pigra={false} />
 					<span class="foto__da t-label">
 						{origine === 'galleria' ? 'dalla galleria' : 'scattata ora'}
 					</span>
