@@ -111,7 +111,10 @@
 	<Finestra titolo="Regole in vigore" variante="blue">
 		{#if pronto}
 			<ul class="regole t-small">
-				<li>Aprire una contestazione costa <strong>✦ {config.costo_apertura_contestazione}</strong></li>
+				<li>
+					Aprire una contestazione costa <strong>✦ {config.costo_apertura_contestazione}</strong>;
+					chi vince se ne riprende <strong>✦ {config.costo_apertura_contestazione * 2}</strong>
+				</li>
 				<li>Chi perde la contestazione lascia altri <strong>✦ {config.penalita_extra_contestazione}</strong></li>
 				<li>
 					Valori di default: comune ✦ {config.croq_comune}, raro ✦ {config.croq_raro},

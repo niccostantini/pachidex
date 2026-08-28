@@ -207,10 +207,14 @@
 
 			<div class="regole">
 				<p class="t-small">
-					Aprire costa <strong>✦ {costoContestazione}</strong>, comunque vada.
+					Aprire costa <strong>✦ {costoContestazione}</strong>, subito.
 				</p>
 				<p class="t-small">
-					Se il gruppo ti da' torto, ne perdi altri <strong>✦ {penalita}</strong>.
+					Se il gruppo ti da' ragione te ne tornano <strong>✦ {costoContestazione * 2}</strong>:
+					la posta e altrettanto, perche' ci hai messo la faccia.
+				</p>
+				<p class="t-small">
+					Se ti da' torto, ne perdi altri <strong>✦ {penalita}</strong>.
 				</p>
 				<p class="t-small t-muted">
 					Il tuo voto "non valida" e' automatico. Hai {config.durata_contestazione_ore ?? 24} ore.
