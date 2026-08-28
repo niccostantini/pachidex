@@ -5,13 +5,13 @@
 	/**
 	 * La festa dopo una cattura.
 	 *
-	 * Esiste perche' era l'unico momento muto dell'app: scatti, scegli,
+	 * Esiste perchè era l'unico momento muto dell'app: scatti, scegli,
 	 * tocchi Cattura e ti ritrovi nel feed senza che sia successo niente.
-	 * E' il gesto piu' ripetuto della vacanza — qualche centinaio di volte in
+	 * È il gesto più ripetuto della vacanza — qualche centinaio di volte in
 	 * dieci giorni — e non dava mai soddisfazione.
 	 *
-	 * Non sa se e' un primato: quello lo stabilisce il server dopo l'upload,
-	 * e si vede nel feed. Qui si celebra cio' che si sa gia' con certezza.
+	 * Non sa se è un primato: quello lo stabilisce il server dopo l'upload,
+	 * e si vede nel feed. Qui si celebra ciò che si sa già con certezza.
 	 */
 	interface Props {
 		voce: VoceDex | null;
@@ -37,7 +37,7 @@
 		// sbatti sotto in un gioco a piattaforme.
 		tempi.push(setTimeout(() => (fase = 'aperto'), 340));
 
-		// I Croquembouche salgono contando invece di comparire: e' la parte
+		// I Croquembouche salgono contando invece di comparire: è la parte
 		// che si guarda volentieri.
 		const passi = 14;
 		const meta = voce.croquembouche / passi;
