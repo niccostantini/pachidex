@@ -5,6 +5,7 @@
 	import { caricaDex, caricaConfig, mieCatture, type MiaVoce } from '$lib/db/dex';
 	import { checkpointVicini, formattaDistanza, posizioneAttuale, type Posizione } from '$lib/game/geo';
 	import { comprimiFoto, anteprima } from '$lib/game/image';
+	import { attesaResidua, formattaAttesa, segnaCattura } from '$lib/game/ritmo';
 	import { CATEGORIE, etichettaCategoria } from '$lib/game/rules';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
@@ -57,6 +58,22 @@
 	const benvenuto = $derived(page.url.searchParams.get('benvenuto') === '1');
 
 	const raggio = $derived(config.raggio_gps_metri ?? 100);
+
+	/**
+	 * Il ritmo: quanto manca prima di poter catturare di nuovo.
+	 *
+	 * Serve a non far scattare, scegliere e scrivere la didascalia per poi
+	 * sentirsi dire di no dal database. Il secondo scorre da solo.
+	 */
+	let adesso = $state(Date.now());
+	$effect(() => {
+		const t = setInterval(() => (adesso = Date.now()), 1000);
+		return () => clearInterval(t);
+	});
+
+	const attesa = $derived(
+		attesaResidua(config.catture_max_finestra ?? 3, config.catture_finestra_minuti ?? 6, adesso)
+	);
 
 	// La foto di riferimento dell'elemento scelto, se ne ha una.
 	const riferimento = $derived(riferimentoDi(scelta?.riferimento));
@@ -197,6 +214,7 @@
 				lat: pos?.lat ?? null,
 				lng: pos?.lng ?? null
 			});
+			segnaCattura();
 			// Prima la festa, poi il feed. L'accodamento e' gia' avvenuto: se la
 			// rete manca la coda ci pensa comunque, quindi si puo' festeggiare
 			// senza aspettare l'upload.
@@ -420,11 +438,24 @@
 
 			<button
 				class="btn btn--primary btn--lg btn--block"
-				disabled={!scelta || !file || inInvio || fotoNonAmmessa}
+				disabled={!scelta || !file || inInvio || fotoNonAmmessa || attesa > 0}
 				onclick={pubblica}
 			>
-				{inInvio ? 'Pubblico…' : 'Cattura'}
+				{#if inInvio}
+					Pubblico…
+				{:else if attesa > 0}
+					Fra {formattaAttesa(attesa)}
+				{:else}
+					Cattura
+				{/if}
 			</button>
+
+			{#if attesa > 0}
+				<p class="t-small t-muted">
+					Hai catturato {config.catture_max_finestra ?? 3} cose in pochi minuti: il gioco
+					vuole che ti guardi intorno. La foto e la scelta restano qui.
+				</p>
+			{/if}
 
 			{#if !coda.online}
 				<p class="t-small t-muted">

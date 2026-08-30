@@ -141,7 +141,12 @@ class StatoCoda {
 			p_nota: voce.nota,
 			p_lat: voce.lat,
 			p_lng: voce.lng,
-			p_taggati: voce.taggati?.length ? voce.taggati : null
+			p_taggati: voce.taggati?.length ? voce.taggati : null,
+			// L'ora in cui la cattura e' stata fatta, non quella in cui riesce
+			// a partire. Senza, una coda rimasta ferma tutto il pomeriggio
+			// arriverebbe tutta insieme e il limite di ritmo la rifiuterebbe in
+			// blocco — e per la coda un rifiuto e' definitivo.
+			p_scattata: new Date(voce.creata).toISOString()
 		});
 		if (errRpc) {
 			// Il database ha detto no per una regola (doppione, troppo lontano):
