@@ -159,6 +159,58 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	});
 }
 
+/**
+ * Il feed di una persona sola: quello che ha catturato lei, e quello in cui
+ * l'hanno taggata.
+ *
+ * Le due liste restano separate perche' in pagina sono due schede: mescolarle
+ * qui vorrebbe dire doverle ridividere di la'.
+ *
+ * I taggati si prendono in due passaggi — prima gli id dalle capture_tags,
+ * poi le catture — perche' PostgREST non sa fare un "or" fra una colonna e
+ * una tabella collegata.
+ */
+export async function catturePersona(
+	personaId: string,
+	ioId: string | null
+): Promise<{ suoi: PostCattura[]; taggata: PostCattura[] }> {
+	return conCache(`persona:${personaId}:${ioId ?? 'anonimo'}`, async () => {
+		const [proprie, riferimenti, primati] = await Promise.all([
+			supabase
+				.from('captures')
+				.select(SELECT_CATTURA)
+				.eq('user_id', personaId)
+				.order('timestamp', { ascending: false })
+				.limit(100),
+			supabase.from('capture_tags').select('capture_id').eq('user_id', personaId),
+			idPrimati()
+		]);
+		if (proprie.error) throw proprie.error;
+		if (riferimenti.error) throw riferimenti.error;
+
+		const ids = ((riferimenti.data ?? []) as { capture_id: string }[]).map((r) => r.capture_id);
+		let righeTag: unknown[] = [];
+		if (ids.length) {
+			const r = await supabase
+				.from('captures')
+				.select(SELECT_CATTURA)
+				.in('id', ids)
+				.order('timestamp', { ascending: false });
+			if (r.error) throw r.error;
+			righeTag = r.data ?? [];
+		}
+
+		const converti = (righe: unknown[]) =>
+			(righe as RigaCattura[]).map((r) => {
+				const post = aPostCattura(r, ioId);
+				post.primato = primati.has(post.id);
+				return post;
+			});
+
+		return { suoi: converti((proprie.data ?? []) as unknown[]), taggata: converti(righeTag) };
+	});
+}
+
 /** Le contestazioni scadute si chiudono anche senza cron, appena qualcuno guarda. */
 export async function chiudiScadute() {
 	await supabase.rpc('chiudi_contestazioni_scadute');

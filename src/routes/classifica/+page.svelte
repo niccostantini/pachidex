@@ -78,7 +78,7 @@
 						<span class="pos t-num" class:pos--primo={i === 0}>{i + 1}</span>
 						<Avatar utente={profilo.utenti.find((u) => u.id === r.user_id)} />
 						<div class="grow">
-							<p class="nome">{r.nome}</p>
+							<p class="nome"><a class="chi" href="/profilo/{r.user_id}">{r.nome}</a></p>
 							<div class="barra">
 								<div
 									class="barra__riempi"
@@ -136,6 +136,17 @@
 </div>
 
 <style>
+	/* Dal podio si va al profilo: e' il posto in cui viene piu' naturale
+	   chiedersi "ma cosa ha catturato per stare li' sopra?". */
+	.chi {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.chi:active {
+		text-decoration: underline;
+	}
+
 	.cl {
 		padding: var(--space-3);
 	}

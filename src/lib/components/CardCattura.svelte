@@ -66,8 +66,10 @@
 		<Avatar utente={post.autore} />
 		<div class="grow">
 			<div class="post__chi">
-				<strong>{post.autore.nome}</strong>
-				<span class="t-small t-muted">{handle}</span>
+				<a class="chi" href="/profilo/{post.autore.id}">
+					<strong>{post.autore.nome}</strong>
+					<span class="t-small t-muted">{handle}</span>
+				</a>
 				<span class="t-small t-muted">·</span>
 				<span class="t-small t-muted">{tempoRelativo(post.timestamp)}</span>
 			</div>
@@ -110,7 +112,7 @@
 		<p class="post__nota">
 			{#each spezzaMenzioni(post.nota, profilo.utenti) as pezzo, i (i)}
 				{#if pezzo.utente}
-					<span class="menzione">{pezzo.testo}</span>
+					<a class="menzione" href="/profilo/{pezzo.utente.id}">{pezzo.testo}</a>
 				{:else}{pezzo.testo}{/if}
 			{/each}
 		</p>
@@ -121,10 +123,10 @@
 		<div class="post__taggati">
 			<span class="t-label t-muted">Vale anche per</span>
 			{#each post.taggati as u (u.id)}
-				<span class="tag">
+				<a class="tag" href="/profilo/{u.id}">
 					<Avatar utente={u} dimensione="sm" />
 					<span>{u.nome}</span>
-				</span>
+				</a>
 			{/each}
 		</div>
 	{/if}
@@ -135,8 +137,8 @@
 				<!-- Niente "sfondo": serve solo a ritagliare i buchi, e questa
 				     scritta non ne ha. Il colore lo eredita dal pulsante, che
 				     diventa bianco su rosso quando il like e' tuo. -->
-				<Icona nome="chic" dimensione={15} />
-				<span class="t-num">{likes}</span>
+				<Icona nome="chic" dimensione={10} />
+				<span class="t-num">&nbsp;{likes}</span>
 			</button>
 
 			{#if contestabile && onContesta}
@@ -227,8 +229,23 @@
 		font-size: 0.9375rem;
 	}
 
+	/* I nomi portano al profilo di chi li porta: restano scritti come prima,
+	   si sottolineano solo quando li si tocca. */
+	.chi {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 5px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.chi:active {
+		text-decoration: underline;
+	}
+
 	.menzione {
 		font-weight: 700;
+		text-decoration: none;
 		color: var(--blue);
 	}
 
@@ -252,9 +269,13 @@
 
 	.post__azioni {
 		display: flex;
-		gap: var(--space-2);
+		gap: var(--space-6);
 		border-top: var(--border-thin) solid rgba(22, 27, 61, 0.18);
 		padding-top: var(--space-2);
+	}
+	
+	.t-num {
+		font-size: 1.1rem;
 	}
 
 	.azione {

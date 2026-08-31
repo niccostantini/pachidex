@@ -18,9 +18,10 @@
 		<Avatar utente={post.destinatario} dimensione="sm" />
 
 		<div class="grow t-small">
-			<strong>{post.mittente.nome}</strong> ha passato
+			<a class="chi" href="/profilo/{post.mittente.id}"><strong>{post.mittente.nome}</strong></a>
+			ha passato
 			<strong class="importo">✦ {post.importo}</strong>
-			a <strong>{post.destinatario.nome}</strong>
+			a <a class="chi" href="/profilo/{post.destinatario.id}"><strong>{post.destinatario.nome}</strong></a>
 		</div>
 
 		<span class="t-small t-muted">{tempoRelativo(post.created_at)}</span>
@@ -32,6 +33,15 @@
 </article>
 
 <style>
+	.chi {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.chi:active {
+		text-decoration: underline;
+	}
+
 	.scambio {
 		background: var(--cream);
 		border: var(--border-thin) solid var(--navy);

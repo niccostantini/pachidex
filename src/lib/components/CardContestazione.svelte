@@ -98,8 +98,9 @@
 		<div class="cont__chi">
 			<Avatar utente={post.contestante} dimensione="sm" />
 			<p class="t-small grow">
-				<strong>{post.contestante.nome}</strong> contesta la cattura di
-				<strong>{contestato.nome}</strong>
+				<a class="chi" href="/profilo/{post.contestante.id}"><strong>{post.contestante.nome}</strong></a>
+				contesta la cattura di
+				<a class="chi" href="/profilo/{contestato.id}"><strong>{contestato.nome}</strong></a>
 			</p>
 		</div>
 
@@ -167,6 +168,15 @@
 </section>
 
 <style>
+	.chi {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.chi:active {
+		text-decoration: underline;
+	}
+
 	.cont {
 		background: var(--paper);
 		border: var(--border) solid var(--navy);
