@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	/**
-	 * Icone disegnate a rettangoli su griglia 12x12: restano pixel perfetti a
-	 * qualsiasi dimensione e pesano quanto un attributo.
+	 * Icone disegnate a rettangoli su griglia, di norma 12x12: restano pixel
+	 * perfetti a qualsiasi dimensione e pesano quanto un attributo.
 	 * "pieni" e' l'inchiostro, "buchi" e' quello che si ritaglia via.
 	 */
 	type Rect = [x: number, y: number, w: number, h: number];
@@ -10,6 +10,12 @@
 		buchi?: Rect[];
 		/** Disegnati per ultimi, sopra i buchi: pupille, dettagli interni. */
 		punti?: Rect[];
+		/**
+		 * Griglia su cui e' disegnata, se diversa dai 12x12 di default.
+		 * Serve alle scritte, che sono lunghe e basse: senza, tutto quello che
+		 * sta oltre la dodicesima colonna finisce fuori dal viewBox e sparisce.
+		 */
+		griglia?: [larghezza: number, altezza: number];
 	};
 
 	export const ICONE = {
@@ -135,6 +141,33 @@
 				[7, 10, 2, 1]
 			],
 			buchi: [[4, 3, 2, 2]]
+		},
+		chic: {
+			pieni: [
+				// C
+				[1, 0, 3, 1],
+				[0, 1, 1, 3],
+				[4, 1, 1, 1],
+				[1, 4, 3, 1],
+				// H
+				[6, 0, 1, 5],
+				[10, 0, 1, 5],
+				[7, 2, 3, 1],
+				// I
+				[12, 0, 5, 1],
+				[14, 1, 1, 3],
+				[12, 4, 5, 1],
+				// C
+				[19, 0, 3, 1],
+				[18, 1, 1, 3],
+				[22, 1, 1, 1],
+				[19, 4, 3, 1],
+				// !
+				[24, 0, 1, 3],
+				[24, 4, 1, 1]
+			],
+			// Venticinque colonne per cinque righe: e' una scritta, non un'icona.
+			griglia: [25, 5]
 		}
 	} satisfies Record<string, Forma>;
 
@@ -152,12 +185,17 @@
 	let { nome, dimensione = 20, colore = 'currentColor', sfondo = 'transparent' }: Props = $props();
 
 	const forma = $derived(ICONE[nome] as Forma);
+
+	// "dimensione" e' l'altezza; la larghezza segue le proporzioni della
+	// griglia. Per le icone quadrate le due coincidono, come prima.
+	const griglia = $derived(forma.griglia ?? ([12, 12] as [number, number]));
+	const larghezza = $derived(Math.round((dimensione * griglia[0]) / griglia[1]));
 </script>
 
 <svg
-	width={dimensione}
+	width={larghezza}
 	height={dimensione}
-	viewBox="0 0 12 12"
+	viewBox="0 0 {griglia[0]} {griglia[1]}"
 	shape-rendering="crispEdges"
 	aria-hidden="true"
 	focusable="false"

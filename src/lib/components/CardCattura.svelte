@@ -132,7 +132,10 @@
 	{#if !compatta}
 		<div class="post__azioni">
 			<button class="azione" class:azione--on={mioLike} onclick={like} disabled={!profilo.io}>
-				<Icona nome="cuore" dimensione={14} sfondo={mioLike ? 'var(--red)' : 'var(--paper)'} />
+				<!-- Niente "sfondo": serve solo a ritagliare i buchi, e questa
+				     scritta non ne ha. Il colore lo eredita dal pulsante, che
+				     diventa bianco su rosso quando il like e' tuo. -->
+				<Icona nome="chic" dimensione={15} />
 				<span class="t-num">{likes}</span>
 			</button>
 
