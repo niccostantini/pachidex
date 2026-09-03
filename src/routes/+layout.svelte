@@ -7,6 +7,7 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import { rete } from '$lib/state/rete.svelte';
+	import { sottoscriviFinale, statoFinale } from '$lib/db/finale';
 	import Intestazione from '$lib/components/Intestazione.svelte';
 	import BarraRete from '$lib/components/BarraRete.svelte';
 	import Taskbar from '$lib/components/Taskbar.svelte';
@@ -16,6 +17,24 @@
 	const inAdmin = $derived(page.url.pathname.startsWith('/gestione-'));
 	const inScelta = $derived(page.url.pathname.startsWith('/chi-sei'));
 	const inGioco = $derived(!inAdmin && !inScelta);
+
+	/**
+	 * Quando comincia la premiazione tutti i telefoni ci vanno da soli.
+	 *
+	 * Sono nella stessa stanza e la cerimonia e' sincronizzata: chiedere a
+	 * ciascuno di aprire la pagina giusta vorrebbe dire cominciare con cinque
+	 * minuti di "ma io cosa devo guardare?". Il pannello e la scelta del
+	 * profilo restano fuori: da li' si deve poter avviare e rimediare.
+	 */
+	async function guardaLaFinale() {
+		if (!inGioco) return;
+		try {
+			const f = await statoFinale();
+			if (f && page.url.pathname !== '/finale') await goto('/finale');
+		} catch {
+			/* senza rete si resta dove si e': la cerimonia vuole la linea */
+		}
+	}
 
 	onMount(() => {
 		rete.init();
@@ -36,6 +55,9 @@
 				registerSW({ immediate: true })
 			);
 		}
+
+		void guardaLaFinale();
+		return sottoscriviFinale(() => void guardaLaFinale());
 	});
 
 	// Nessun profilo scelto: si passa dalla porta "Chi sei?". L'admin no, cosi'

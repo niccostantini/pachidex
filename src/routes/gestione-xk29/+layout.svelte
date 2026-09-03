@@ -15,7 +15,8 @@
 		{ href: '/gestione-xk29/set', label: 'Set' },
 		{ href: '/gestione-xk29/storia', label: 'Storia' },
 		{ href: '/gestione-xk29/contestazioni', label: 'Contestazioni' },
-		{ href: '/gestione-xk29/profili', label: 'Giocatori' }
+		{ href: '/gestione-xk29/profili', label: 'Giocatori' },
+		{ href: '/gestione-xk29/finale', label: 'Premiazione' }
 	];
 
 	const attiva = (href: string) =>
