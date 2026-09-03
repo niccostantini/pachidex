@@ -170,6 +170,66 @@ Il testo dei messaggi si compone **lato server leggendo dal database**: il
 client dice solo "e' successa la cosa X", cosi' nessuno puo' far arrivare agli
 altri una notifica che dice quello che gli pare.
 
+## Ambiente locale
+
+Un Supabase completo in Docker, con il catalogo vero e una vacanza finta: si
+prova tutto — premiazione compresa — senza toccare la produzione.
+
+Serve **Docker in esecuzione** e la CLI di Supabase (`brew install supabase/tap/supabase`).
+
+```bash
+npm run db:start     # la prima volta scarica le immagini: 2-4 minuti, poi ~20 secondi
+npm run db:collega   # scrive .env.local puntando al Supabase locale
+npm run dev
+```
+
+Da qui in poi `npm run dev` e `npm run preview` parlano con il database di
+questa macchina. **Il deploy su Vercel non e' toccato**: usa le variabili sue.
+Per tornare alla produzione basta cancellare `.env.local`.
+
+| Comando | Cosa fa |
+|---|---|
+| `npm run db:start` | avvia lo stack (Postgres, PostgREST, Realtime, Studio) |
+| `npm run db:stop` | lo ferma |
+| `npm run db:reset` | ricrea tutto da zero: migrazioni + dati finti |
+| `npm run db:seed` | rigenera `supabase/seed.sql` dal catalogo di produzione |
+| `npm run db:studio` | apre Studio per guardare le tabelle |
+| `npm run db:collega` | ricollega `.env.local` (rifallo se cambi rete) |
+| `npm run preview:lan` | server visibile agli altri telefoni della rete |
+
+### Cosa c'e' dentro
+
+Il catalogo e' quello vero, scaricato dall'API di produzione: sono contenuti
+di gioco, niente di personale. L'attivita' invece e' inventata ma
+**deterministica** — 75 catture, tag, like, due scambi, una contestazione gia'
+chiusa — quindi `db:reset` rida' sempre la stessa partita e se ne puo' parlare.
+I set e i titoli hanno abbastanza materiale per attivarsi davvero.
+
+Le foto puntano a `/icon-512.png`, un asset statico: il feed funziona senza
+rete e senza credenziali R2.
+
+### Provare in piu' persone
+
+```bash
+npm run db:collega      # usa l'IP della LAN, non 127.0.0.1
+npm run build && npm run preview:lan
+```
+
+Gli altri aprono `http://<ip-del-mac>:4173` sulla stessa rete. Rilancia
+`db:collega` a ogni cambio di rete: l'IP cambia.
+
+Su `http` il service worker non si installa, quindi niente offline e niente
+notifiche — ma la premiazione, che vuole comunque la linea, funziona.
+
+### Due avvertenze
+
+`db:reset` ricrea i giocatori con id nuovi, quindi il profilo scelto sul
+telefono non combacia piu': ti rimanda a "Chi sei?" ed e' normale.
+
+Il caricamento delle foto passa comunque dal **R2 di produzione**, perche' le
+credenziali stanno in `.env`. Catturare in locale scrive un file vero nel
+bucket: per le prove non serve, ma sappilo.
+
 ## Deploy su Vercel
 
 Importa il repo su Vercel: rileva SvelteKit da solo, non serve configurare

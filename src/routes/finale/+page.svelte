@@ -101,7 +101,7 @@
 			await rileggi();
 		})();
 
-		const stop = sottoscriviFinale(() => void rileggi());
+		const stop = sottoscriviFinale(() => void rileggi(), 'cerimonia-sala');
 		const t = setInterval(() => (ora = Date.now()), 500);
 		return () => {
 			stop();

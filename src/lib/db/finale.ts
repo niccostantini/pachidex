@@ -123,9 +123,16 @@ export async function annullaFinale() {
 	if (error) throw error;
 }
 
-/** Un canale solo per tutta la cerimonia: meno socket, meno batteria. */
-export function sottoscriviFinale(onCambio: () => void) {
-	const canale = supabase.channel('cerimonia');
+/**
+ * Un canale per chi ascolta, e il nome va passato.
+ *
+ * Due canali con lo STESSO nome sullo stesso client si annullano a vicenda:
+ * il layout (che sorveglia l'avvio) e la pagina della cerimonia ascoltano
+ * tutti e due, e finche' si chiamavano uguale non arrivava niente a nessuno
+ * — i voti si registravano sul database e gli schermi restavano fermi.
+ */
+export function sottoscriviFinale(onCambio: () => void, nome = 'cerimonia') {
+	const canale = supabase.channel(nome);
 	for (const table of ['finale', 'premi_voti', 'premi_esiti', 'premi']) {
 		canale.on('postgres_changes', { event: '*', schema: 'public', table }, onCambio);
 	}

@@ -10,7 +10,14 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"verifica": "node scripts/verifica.mjs"
+		"verifica": "node scripts/verifica.mjs",
+		"db:start": "supabase start",
+		"db:stop": "supabase stop",
+		"db:reset": "supabase db reset",
+		"db:seed": "node scripts/genera-seed.mjs",
+		"db:studio": "open http://127.0.0.1:54323",
+		"db:collega": "node scripts/collega-locale.mjs",
+		"preview:lan": "vite preview --host 0.0.0.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^6.3.4",

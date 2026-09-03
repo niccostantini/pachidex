@@ -26,15 +26,23 @@
 	 * minuti di "ma io cosa devo guardare?". Il pannello e la scelta del
 	 * profilo restano fuori: da li' si deve poter avviare e rimediare.
 	 */
-	async function guardaLaFinale() {
-		if (!inGioco) return;
+	let finaleAttiva = $state(false);
+
+	async function cercaLaFinale() {
 		try {
-			const f = await statoFinale();
-			if (f && page.url.pathname !== '/finale') await goto('/finale');
+			finaleAttiva = (await statoFinale()) !== null;
 		} catch {
 			/* senza rete si resta dove si e': la cerimonia vuole la linea */
 		}
 	}
+
+	// Il dirottamento e' un effetto e non un controllo all'avvio: chi apre
+	// l'app sulla porta "chi sei" sceglie il profilo DOPO, e a quel punto il
+	// mount e' gia' passato. Prima si controllava una volta sola e chi non
+	// aveva ancora scelto restava fuori dalla premiazione.
+	$effect(() => {
+		if (finaleAttiva && inGioco && page.url.pathname !== '/finale') void goto('/finale');
+	});
 
 	onMount(() => {
 		rete.init();
@@ -56,8 +64,8 @@
 			);
 		}
 
-		void guardaLaFinale();
-		return sottoscriviFinale(() => void guardaLaFinale());
+		void cercaLaFinale();
+		return sottoscriviFinale(() => void cercaLaFinale(), 'cerimonia-guardia');
 	});
 
 	// Nessun profilo scelto: si passa dalla porta "Chi sei?". L'admin no, cosi'
