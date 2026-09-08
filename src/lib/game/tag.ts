@@ -4,8 +4,8 @@ import type { User } from '$lib/types';
  * Le @menzioni nella didascalia.
  *
  * Il riconoscimento e' per nome esatto, non per prefisso: "@nic" resterebbe
- * ambiguo fra Nicco e NickDeVita, e attribuire i Croquembouche alla persona
- * sbagliata e' peggio che non attribuirli. A scrivere il nome giusto ci pensa
+ * ambiguo fra due nomi che cominciano uguale, e attribuire i Croquembouche
+ * alla persona sbagliata e' peggio che non attribuirli. Al nome giusto pensa
  * l'autocompletamento; chi digita a mano e sbaglia semplicemente non tagga.
  */
 

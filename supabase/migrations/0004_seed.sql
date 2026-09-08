@@ -4,13 +4,15 @@
 -- arrivano dal CSV caricato dal pannello admin.
 -- ============================================================================
 
+-- Nomi di comodo: dalla 0027 ogni giocatore nasce da un account vero e
+-- questi vengono cancellati, quindi contano solo come colori di partenza.
 insert into users (nome, colore, is_admin) values
-	('Nicco',        '#F0552B', true),
-	('NickDeVita',   '#2B5ED0', false),
-	('Aliona',       '#35B79A', false),
-	('BF',           '#8B5CF6', false),
-	('MirkoTheBest', '#D93B32', false),
-	('Gu',           '#C98A18', false)
+	('Vito',   '#F0552B', true),
+	('Rosa',   '#2B5ED0', false),
+	('Turi',   '#35B79A', false),
+	('Nina',   '#8B5CF6', false),
+	('Ciccio', '#D93B32', false),
+	('Lella',  '#C98A18', false)
 on conflict (nome) do nothing;
 
 insert into game_config (chiave, valore, descrizione) values

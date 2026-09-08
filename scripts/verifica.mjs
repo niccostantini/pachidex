@@ -134,7 +134,7 @@ try {
 	if (errU) throw new Error(`non riesco a leggere gli utenti: ${errU.message}`);
 
 	verifica('sei profili seminati', utenti.length === 6, `trovati ${utenti.length}`);
-	verifica('Nicco e amministratore', utenti.some((u) => u.nome === 'Nicco' && u.is_admin));
+	verifica('c\'e un amministratore', utenti.some((u) => u.is_admin));
 
 	if (utenti.length < 4) throw new Error('servono almeno 4 profili per collaudare una votazione');
 

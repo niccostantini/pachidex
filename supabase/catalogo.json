@@ -1512,13 +1512,13 @@
 		"riferimento": null
 	},
 	{
-		"nome": "La quest di Mirko",
+		"nome": "La rivincita",
 		"categoria": "attivita",
 		"rarita": "leggendario",
 		"croquembouche": 60,
 		"ripetibile": false,
 		"validazione": "foto",
-		"note": "Assistere a MirkoTheBest che fa finalmente l'ordine che non è riuscito a fare l'anno scorso al ristorante \"Nakè\" di Noto",
+		"note": "Portare a termine la cosa che l'anno scorso non ti è riuscita. Sai già qual è.",
 		"lat": null,
 		"lng": null,
 		"riferimento": null
