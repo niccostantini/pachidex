@@ -101,7 +101,7 @@
 	/* Spenta finche' non sono attive: si vede a colpo d'occhio che manca. */
 	/**
 	 * Spenta non basta: pulsa piano finche' non le si attiva. Senza notifiche
-	 * meta' del gioco non arriva — contestazioni da votare, capitoli sbloccati
+	 * meta' del gioco non arriva — contestazioni da votare, scambi
 	 * — e restare in silenzio significa che nessuno se ne accorge.
 	 */
 	.campanella--spenta {

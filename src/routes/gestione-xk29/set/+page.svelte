@@ -86,8 +86,7 @@
 		<div class="stack">
 			<p class="t-small">
 				Un set è una lista di requisiti: chi li soddisfa tutti lo chiude e prende
-				i Croquembouche, mentre i puntini vanno alla barra della storia — che è
-				di tutti, quindi ogni giocatrice che lo completa la fa salire di nuovo.
+				i Croquembouche del premio.
 			</p>
 			<p class="t-small t-muted">
 				Le parole chiave non fanno distinzione fra maiuscole e minuscole e cercano
@@ -119,7 +118,7 @@
 						<span class="t-small t-muted grow">
 							{s.requisiti.length}
 							{s.requisiti.length === 1 ? 'requisito' : 'requisiti'}
-							· {s.croquembouche} ✦ · {s.punti_storia} puntini
+							· {s.croquembouche} ✦
 							{#if s.giorno}· solo il {s.giorno}{/if}
 							{#if s.stesso_giorno}· stessa giornata{/if}
 						</span>
@@ -144,10 +143,6 @@
 							<label class="campo">
 								<span class="t-label">Croquembouche</span>
 								<input class="field" type="number" min="0" bind:value={s.croquembouche} />
-							</label>
-							<label class="campo">
-								<span class="t-label">Puntini storia</span>
-								<input class="field" type="number" min="0" bind:value={s.punti_storia} />
 							</label>
 							<label class="campo">
 								<span class="t-label">Solo il giorno</span>

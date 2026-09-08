@@ -13,7 +13,6 @@
 		{ href: '/gestione-xk29/import', label: 'Import CSV' },
 		{ href: '/gestione-xk29/config', label: 'Regole' },
 		{ href: '/gestione-xk29/set', label: 'Set' },
-		{ href: '/gestione-xk29/storia', label: 'Storia' },
 		{ href: '/gestione-xk29/contestazioni', label: 'Contestazioni' },
 		{ href: '/gestione-xk29/profili', label: 'Giocatori' },
 		{ href: '/gestione-xk29/finale', label: 'Premiazione' }

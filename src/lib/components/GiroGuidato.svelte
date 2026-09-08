@@ -43,12 +43,6 @@
 				'Due gare diverse: chi ha più Croquembouche e chi ha collezionato più roba. Si può vincere una e perdere l’altra, perché i Croquembouche si scambiano fra voi.'
 		},
 		{
-			bersaglio: 'storia',
-			titolo: 'I puntini piccini picciò',
-			testo:
-				'Questa barra è di tutti. Ogni cattura del gruppo la riempie di quanto vale, e a ogni soglia si sblocca un capitolo della storia. Si svuota solo con le contestazioni.'
-		},
-		{
 			bersaglio: 'campanella',
 			titolo: 'Le notifiche',
 			testo:
@@ -119,8 +113,8 @@
 	}
 
 	onMount(() => {
-		// Il giro parte dall'alto: la barra della storia e in cima al feed e
-		// se la pagina e gia' scrollata resterebbe fuori dal riflettore.
+		// Il giro parte dall'alto: se la pagina e' gia' scrollata il primo
+		// bersaglio resterebbe fuori dal riflettore.
 		window.scrollTo({ top: 0 });
 		misura();
 

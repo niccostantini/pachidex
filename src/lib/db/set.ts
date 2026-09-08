@@ -3,7 +3,7 @@ import { conCache } from '$lib/db/cache';
 
 /**
  * I set: gruppi di sfiziosita' che, completati, valgono Croquembouche a chi
- * li chiude e puntini alla barra della storia, che e' di tutti.
+ * li chiude.
  *
  * Servono a dare uno scopo alla coda lunga — quelle voci che da sole valgono
  * dieci punti e che altrimenti non guarderebbe nessuno.
@@ -26,7 +26,6 @@ export interface SetGioco {
 	nome: string;
 	descrizione: string | null;
 	croquembouche: number;
-	punti_storia: number;
 	stesso_giorno: boolean;
 	giorno: string | null;
 	ordine: number;
@@ -114,7 +113,6 @@ export async function salvaSet(s: Partial<SetGioco> & { nome: string }) {
 		nome: s.nome,
 		descrizione: s.descrizione || null,
 		croquembouche: s.croquembouche ?? 30,
-		punti_storia: s.punti_storia ?? 10,
 		stesso_giorno: s.stesso_giorno ?? false,
 		// Un campo data vuoto arriva come stringa vuota, che Postgres rifiuta.
 		giorno: s.giorno || null,

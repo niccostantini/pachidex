@@ -194,12 +194,6 @@ begin
 end $$;`);
 
 scrivi(`
--- --- i capitoli gia' meritati -----------------------------------------------
--- In produzione li sblocca il cron; qui il cron non gira, e senza questa
--- chiamata la barra direbbe "mancano 0 al prossimo capitolo" per sempre.
-select sblocca_capitoli();`);
-
-scrivi(`
 -- --- i premi della cerimonia ------------------------------------------------
 -- Segnaposto per provare la premiazione in locale: quelli veri si scrivono
 -- dal pannello.

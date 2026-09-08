@@ -11,10 +11,8 @@
 	import CardScambio from '$lib/components/CardScambio.svelte';
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
-	import BarraStoria from '$lib/components/BarraStoria.svelte';
 	import GiroGuidato from '$lib/components/GiroGuidato.svelte';
 	import { browser } from '$app/environment';
-	import { caricaStoria, type StatoStoria } from '$lib/db/storia';
 	import { selfieDaFare } from '$lib/db/dex';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
 
@@ -23,11 +21,10 @@
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
 	let config = $state<Record<string, number>>({});
-	let storia = $state<StatoStoria | null>(null);
 
 	/**
 	 * Giro guidato al primo avvio. Parte solo quando i dati ci sono: la barra
-	 * della storia e' una delle tappe e non si puo' illuminare un elemento
+	 * il feed e' la prima tappa e non si puo' illuminare un elemento
 	 * che non e' ancora stato disegnato.
 	 */
 	const CHIAVE_GIRO = 'pachidex:giro-fatto';
@@ -45,7 +42,7 @@
 	}
 
 	$effect(() => {
-		if (!browser || stato !== 'ok' || !storia || !profilo.io) return;
+		if (!browser || stato !== 'ok' || !profilo.io) return;
 		if (localStorage.getItem(CHIAVE_GIRO)) return;
 		giroAperto = true;
 	});
@@ -61,13 +58,9 @@
 
 	async function carica() {
 		try {
-			const [res, st] = await Promise.all([
-				caricaFeed(profilo.io?.id ?? null),
-				caricaStoria()
-			]);
+			const res = await caricaFeed(profilo.io?.id ?? null);
 			fissati = res.fissati;
 			timeline = res.timeline;
-			storia = st;
 			stato = 'ok';
 			void profilo.aggiornaSaldi();
 		} catch (e) {
@@ -123,7 +116,6 @@
 <svelte:head><title>Feed — Pachino Express</title></svelte:head>
 
 <div class="feed stack">
-	<BarraStoria {storia} />
 
 	{#if coda.inAttesa.length}
 		<div class="coda">

@@ -14,7 +14,7 @@ export interface User {
 	created_at: string;
 	/** Account che guarda e basta: nessuna scrittura. */
 	sola_lettura: boolean;
-	/** Fuori da classifica, titoli e barra della storia. */
+	/** Fuori da classifica e titoli: guarda la partita da fuori. */
 	nascosto: boolean;
 }
 

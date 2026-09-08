@@ -81,9 +81,8 @@
 	</div>
 
 	<p class="spiega t-small t-muted">
-		Gruppi di sfiziosità che valgono un premio doppio: i Croquembouche vanno a te,
-		i puntini alla barra della storia, che è di tutti. Vale anche quello che hai
-		sbloccato facendoti taggare.
+		Gruppi di sfiziosità che, completati, valgono Croquembouche in più. Vale anche
+		quello che hai sbloccato facendoti taggare.
 	</p>
 
 	{#if stato === 'carico'}
@@ -127,7 +126,7 @@
 					</ul>
 
 					<div class="fondo">
-						<span class="premio t-label">{s.croquembouche} ✦ · {s.punti_storia} puntini</span>
+						<span class="premio t-label">{s.croquembouche} ✦</span>
 						{#if vincolo(s)}
 							<span class="vincolo t-label">{vincolo(s)}</span>
 						{/if}
