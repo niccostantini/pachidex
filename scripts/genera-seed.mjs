@@ -166,11 +166,11 @@ scrivi(`
 -- --- due scambi -------------------------------------------------------------
 insert into transfers (from_user_id, to_user_id, importo, causale)
 select a.id, b.id, 25, 'per la birra'
-from users a, users b where a.nome = 'Gu' and b.nome = 'BF';
+from users a, users b where a.nome = ${q(GIOCATORI[0])} and b.nome = ${q(GIOCATORI[1])};
 
 insert into transfers (from_user_id, to_user_id, importo, causale)
 select a.id, b.id, 10, 'scommessa persa'
-from users a, users b where a.nome = 'Nicco' and b.nome = 'Aliona';`);
+from users a, users b where a.nome = ${q(GIOCATORI[2])} and b.nome = ${q(GIOCATORI[3])};`);
 
 scrivi(`
 -- --- una contestazione gia' chiusa, cosi' si vede una cattura invalidata ----
@@ -179,15 +179,18 @@ declare v_c uuid; v_chi uuid;
 begin
 	select c.id into v_c from captures c
 	join users u on u.id = c.user_id
-	where u.nome = 'MirkoTheBest' order by c.timestamp desc limit 1;
-	select id into v_chi from users where nome = 'BF';
+	where u.nome = ${q(GIOCATORI[4])} order by c.timestamp desc limit 1;
+	select id into v_chi from users where nome = ${q(GIOCATORI[1])};
 	if v_c is not null then
-		perform apri_contestazione(v_c, v_chi, 'Questa foto non convince nessuno');
+		-- La funzione pubblica prende l'identita' da auth.uid(), che qui non
+		-- c'e': il seme gira come postgres senza sessione. Si chiama quella
+		-- interna, che l'autore lo riceve come parametro.
+		perform apri_contestazione_interna(v_c, v_chi, 'Questa foto non convince nessuno');
 		-- gli altri votano contro: la maggioranza la invalida
 		insert into votes (contest_id, user_id, voto)
 		select co.id, u.id, 'non_valido'
 		from contests co, users u
-		where co.capture_id = v_c and u.nome in ('Nicco', 'Gu', 'Aliona')
+		where co.capture_id = v_c and u.nome in (${[GIOCATORI[0], GIOCATORI[2], GIOCATORI[3]].map(q).join(', ')})
 		on conflict do nothing;
 		perform risolvi_contestazione((select id from contests where capture_id = v_c));
 	end if;
