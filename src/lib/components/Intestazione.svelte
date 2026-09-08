@@ -36,9 +36,15 @@
 		<div class="testata__dx">
 			<Notifiche />
 			<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
-			<a class="testata__io" href="/chi-sei" aria-label="Cambia profilo">
+			<button
+				class="testata__io"
+				aria-label="Esci"
+				onclick={() => {
+					if (confirm('Esci da Pachino Express?')) void profilo.esci();
+				}}
+			>
 				<Avatar utente={profilo.io} dimensione="sm" />
-			</a>
+			</button>
 		</div>
 	</div>
 </header>

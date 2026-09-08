@@ -134,8 +134,8 @@ class StatoCoda {
 		});
 		if (!rispPut.ok) throw new Error(`Upload della foto rifiutato (${rispPut.status})`);
 
+		// Niente p_user: chi cattura lo dice la sessione, non il telefono.
 		const { data: captureId, error: errRpc } = await supabase.rpc('registra_cattura', {
-			p_user: voce.userId,
 			p_item: voce.itemId,
 			p_foto: publicUrl,
 			p_nota: voce.nota,

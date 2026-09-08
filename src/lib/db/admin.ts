@@ -200,3 +200,34 @@ export async function azzeraGioco(): Promise<RigaAzzerata[]> {
 	if (error) throw error;
 	return (data ?? []) as RigaAzzerata[];
 }
+
+/**
+ * Crea un account nuovo. Passa dall'endpoint sul server perche' creare utenti
+ * richiede la chiave di servizio, che nel browser non puo' stare.
+ *
+ * Il token della sessione va mandato a mano: e' con quello che il server
+ * verifica che chi chiede sia davvero un admin.
+ */
+export async function creaAccount(dati: {
+	nome: string;
+	password: string;
+	is_admin?: boolean;
+	sola_lettura?: boolean;
+	nascosto?: boolean;
+}) {
+	const { data: sessione } = await supabase.auth.getSession();
+	const token = sessione.session?.access_token;
+	if (!token) throw new Error('Sessione scaduta: rientra');
+
+	const risposta = await fetch('/api/utenti', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+		body: JSON.stringify(dati)
+	});
+
+	if (!risposta.ok) {
+		const detto = await risposta.json().catch(() => null);
+		throw new Error(detto?.message ?? `L'account non si crea (${risposta.status})`);
+	}
+	return risposta.json();
+}

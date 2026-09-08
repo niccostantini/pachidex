@@ -13,17 +13,13 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const env = Object.fromEntries(
-	readFileSync(new URL('../.env', import.meta.url), 'utf8')
-		.split('\n')
-		.filter((r) => r.includes('=') && !r.trim().startsWith('#'))
-		.map((r) => {
-			const i = r.indexOf('=');
-			return [r.slice(0, i).trim(), r.slice(i + 1).trim().replace(/^["']|["']$/g, '')];
-		})
-);
-
-const GIOCATORI = ['Nicco', 'NickDeVita', 'Aliona', 'BF', 'MirkoTheBest', 'Gu'];
+/**
+ * Nomi inventati apposta: seed.sql sta nel repository, e il repository puo'
+ * diventare pubblico. I giocatori veri li crei dal pannello.
+ */
+const GIOCATORI = ['Vito', 'Rosa', 'Turi', 'Nina', 'Ciccio', 'Lella'];
+/** Password uguale per tutti in locale: e' un ambiente di prova. */
+const PAROLA = 'prova1234';
 const INIZIO = new Date('2026-08-28T09:00:00+02:00');
 const FINE = new Date('2026-09-01T22:00:00+02:00');
 
@@ -36,17 +32,19 @@ const scegli = (a) => a[fra(0, a.length)];
 const q = (v) => (v === null || v === undefined || v === '' ? 'null' : `'${String(v).replace(/'/g, "''")}'`);
 const n = (v) => (v === null || v === undefined || v === '' ? 'null' : Number(v));
 
-async function catalogo() {
-	const url = `${env.PUBLIC_SUPABASE_URL}/rest/v1/items?select=nome,categoria,rarita,croquembouche,ripetibile,validazione,note,lat,lng,riferimento&attivo=eq.true`;
-	const r = await fetch(url, { headers: { apikey: env.PUBLIC_SUPABASE_ANON_KEY } });
-	if (!r.ok) throw new Error(`Il catalogo non si scarica: ${r.status}`);
-	return r.json();
+/**
+ * Il catalogo si legge da un file e non piu' dalla produzione: quel progetto
+ * Supabase non esiste piu', e comunque un generatore che ha bisogno della
+ * rete per fare un ambiente locale e' un controsenso.
+ */
+function catalogo() {
+	return JSON.parse(readFileSync(new URL('../supabase/catalogo.json', import.meta.url), 'utf8'));
 }
 
 const righe = [];
 const scrivi = (s = '') => righe.push(s);
 
-const item = await catalogo();
+const item = catalogo();
 if (!item.length) throw new Error('Catalogo vuoto: controlla .env');
 
 scrivi(`-- ============================================================================
@@ -61,8 +59,42 @@ scrivi(`-- =====================================================================
 -- funziona anche senza rete e senza credenziali R2.
 -- ============================================================================
 
--- I giocatori e la configurazione arrivano dalle migrazioni (0004), i set
--- dalla 0020: qui si aggiunge solo il catalogo e cosa e' successo.
+-- I giocatori nascono da account veri: dalla 0027 ogni riga di users e'
+-- figlia di auth.users, quindi qui si creano prima gli account.
+--
+-- Password di tutti in locale: ${PAROLA}
+-- Si entra col NOME UTENTE: l'email tecnica non la vede nessuno.
+
+-- --- gli account ------------------------------------------------------------
+${[...GIOCATORI.map((g) => ({ nome: g, admin: g === 'Vito', spia: false })),
+   { nome: 'Spione', admin: false, spia: true }]
+	.map(
+		(u) => `
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		${q(u.nome.toLowerCase() + '@pachidex.local')}, crypt(${q(PAROLA)}, gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		${q(JSON.stringify({ nome: u.nome, is_admin: u.admin, sola_lettura: u.spia, nascosto: u.spia }))},
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;`
+	)
+	.join('\n')}
 
 -- --- il catalogo ------------------------------------------------------------`);
 

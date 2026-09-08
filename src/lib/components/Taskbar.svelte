@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Icona, { type NomeIcona } from './Icona.svelte';
+	import { profilo } from '$lib/state/profilo.svelte';
 
 	const voci: { href: string; label: string; icona: NomeIcona; giro: string }[] = [
 		{ href: '/', label: 'Feed', icona: 'feed', giro: 'feed' },
@@ -23,9 +24,13 @@
 		{/each}
 	</div>
 
-	<a class="fab" href="/cattura" aria-label="Cattura" data-giro="cattura">
-		<Icona nome="foto" dimensione={28} colore="var(--paper)" sfondo="var(--orange)" />
-	</a>
+	<!-- Chi ha un account di sola lettura non vede il pulsante: il server lo
+	     fermerebbe comunque, ma invitarlo a premere sarebbe scortese. -->
+	{#if !profilo.soloSguardo}
+		<a class="fab" href="/cattura" aria-label="Cattura" data-giro="cattura">
+			<Icona nome="foto" dimensione={28} colore="var(--paper)" sfondo="var(--orange)" />
+		</a>
+	{/if}
 
 	<div class="taskbar__lato">
 		{#each voci.slice(2) as v (v.href)}

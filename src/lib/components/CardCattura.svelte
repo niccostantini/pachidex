@@ -40,7 +40,10 @@
 	// Anche i posti si contestano: il GPS dimostra che c'eri, non che la foto
 	// valga qualcosa. Essere a Vendicari e fotografarsi il pollice non e'
 	// catturare Vendicari.
+	// Chi ha un account di sola lettura non contesta: il server lo fermerebbe,
+	// ma il pulsante non deve nemmeno comparire.
 	const contestabile = $derived(
+		!profilo.soloSguardo &&
 		!compatta && !mia && post.stato === 'valido' && !!profilo.io
 	);
 	const handle = $derived('@' + post.autore.nome.toLowerCase());
@@ -133,7 +136,12 @@
 
 	{#if !compatta}
 		<div class="post__azioni">
-			<button class="azione" class:azione--on={mioLike} onclick={like} disabled={!profilo.io}>
+			<button
+				class="azione"
+				class:azione--on={mioLike}
+				onclick={like}
+				disabled={!profilo.io || profilo.soloSguardo}
+			>
 				<!-- Niente "sfondo": serve solo a ritagliare i buchi, e questa
 				     scritta non ne ha. Il colore lo eredita dal pulsante, che
 				     diventa bianco su rosso quando il like e' tuo. -->

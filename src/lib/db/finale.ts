@@ -100,7 +100,6 @@ export async function vota(finaleId: string, premioId: string, ioId: string, vot
 	const { error } = await supabase.rpc('vota_premio', {
 		p_finale: finaleId,
 		p_premio: premioId,
-		p_votante: ioId,
 		p_votato: votatoId
 	});
 	if (error) throw error;

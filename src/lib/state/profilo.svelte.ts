@@ -1,18 +1,30 @@
-import { browser } from '$app/environment';
 import { supabase } from '$lib/supabase';
 import { conCache } from '$lib/db/cache';
 import type { Saldo, User } from '$lib/types';
 
-const CHIAVE = 'pachidex:profilo';
-
 /**
- * Chi sta usando il telefono. Nessuna password: la scelta si fa una volta e
- * resta in localStorage, che e' esattamente quanta sicurezza serve qui.
+ * Chi sta usando l'app.
+ *
+ * Prima era una scelta salvata sul telefono: si toccava il proprio nome in un
+ * elenco e bastava. Fra sei amici in vacanza andava bene; adesso che l'app
+ * resta in piedi e gira anche a chi non e' della partita, serve una sessione
+ * vera.
+ *
+ * Si entra con NOME UTENTE e password. Supabase Auth vuole un'email, quindi
+ * se ne costruisce una tecnica dal nome: nessuno la vede mai, vive solo qui
+ * dentro.
  */
+const DOMINIO = 'pachidex.local';
+
+/** Da "Vito" a "vito@pachidex.local", e senza sorprese sugli spazi. */
+export const emailDi = (nome: string) =>
+	`${nome.trim().toLowerCase().replace(/\s+/g, '')}@${DOMINIO}`;
+
 class StatoProfilo {
 	utenti = $state<User[]>([]);
 	io = $state<User | null>(null);
 	saldi = $state<Saldo[]>([]);
+	/** true quando si sa se c'e' una sessione: prima non si decide niente. */
 	pronto = $state(false);
 	errore = $state<string | null>(null);
 
@@ -24,12 +36,32 @@ class StatoProfilo {
 		return this.utenti.filter((u) => u.id !== this.io?.id);
 	}
 
+	/** Chi guarda e basta: niente catture, niente like, niente scambi. */
+	get soloSguardo(): boolean {
+		return this.io?.sola_lettura ?? false;
+	}
+
 	async carica() {
-		// Questa e' la lettura che apre l'app, ed era anche quella che la
-		// chiudeva: senza linea falliva e il layout copriva tutto con
-		// "Non riesco a parlare con il database", schermata di cattura
-		// compresa. Ora ripiega sull'elenco salvato e si va avanti.
+		const { data: sessione } = await supabase.auth.getSession();
+		await this.daSessione(sessione.session?.user?.id ?? null);
+
+		// Il token si rinnova da solo e la sessione puo' cadere: si sta in
+		// ascolto invece di fidarsi della fotografia presa all'avvio.
+		supabase.auth.onAuthStateChange((_evento, s) => {
+			void this.daSessione(s?.user?.id ?? null);
+		});
+	}
+
+	private async daSessione(id: string | null) {
+		if (!id) {
+			this.io = null;
+			this.pronto = true;
+			return;
+		}
+
 		try {
+			// L'elenco resta in cache: senza linea l'app deve aprirsi lo stesso,
+			// e chi e' entrato ieri e' ancora entrato oggi.
 			this.utenti = await conCache('utenti', async () => {
 				const { data, error } = await supabase.from('users').select('*').order('created_at');
 				if (error) throw error;
@@ -37,18 +69,12 @@ class StatoProfilo {
 			});
 			this.errore = null;
 		} catch (e) {
-			// Nemmeno in cache: e' il primo avvio senza rete, non c'e' niente
-			// da mostrare e tanto vale dirlo.
 			this.errore = e instanceof Error ? e.message : String(e);
 			this.pronto = true;
 			return;
 		}
 
-		if (browser) {
-			const salvato = localStorage.getItem(CHIAVE);
-			const trovato = this.utenti.find((u) => u.id === salvato);
-			if (trovato) this.io = trovato;
-		}
+		this.io = this.utenti.find((u) => u.id === id) ?? null;
 		this.pronto = true;
 		void this.aggiornaSaldi();
 	}
@@ -66,14 +92,23 @@ class StatoProfilo {
 		}
 	}
 
-	scegli(u: User) {
-		this.io = u;
-		if (browser) localStorage.setItem(CHIAVE, u.id);
+	/** Restituisce il messaggio d'errore, oppure null se si e' entrati. */
+	async entra(nome: string, password: string): Promise<string | null> {
+		const { error } = await supabase.auth.signInWithPassword({
+			email: emailDi(nome),
+			password
+		});
+		if (!error) return null;
+		// Il messaggio di Supabase parla di email e qui l'email non esiste:
+		// tradurlo evita di far cercare a qualcuno un indirizzo che non ha.
+		return /invalid login|credentials/i.test(error.message)
+			? 'Nome utente o password sbagliati'
+			: error.message;
 	}
 
-	esci() {
+	async esci() {
+		await supabase.auth.signOut();
 		this.io = null;
-		if (browser) localStorage.removeItem(CHIAVE);
 	}
 
 	saldoDi(userId: string): number {

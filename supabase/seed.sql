@@ -10,8 +10,181 @@
 -- funziona anche senza rete e senza credenziali R2.
 -- ============================================================================
 
--- I giocatori e la configurazione arrivano dalle migrazioni (0004), i set
--- dalla 0020: qui si aggiunge solo il catalogo e cosa e' successo.
+-- I giocatori nascono da account veri: dalla 0027 ogni riga di users e'
+-- figlia di auth.users, quindi qui si creano prima gli account.
+--
+-- Password di tutti in locale: prova1234
+-- Si entra col NOME UTENTE: l'email tecnica non la vede nessuno.
+
+-- --- gli account ------------------------------------------------------------
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'vito@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Vito","is_admin":true,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'rosa@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Rosa","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'turi@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Turi","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'nina@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Nina","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'ciccio@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Ciccio","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'lella@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Lella","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'spione@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(), '{"provider":"email","providers":["email"]}',
+		'{"nome":"Spione","is_admin":false,"sola_lettura":true,"nascosto":true}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
 
 -- --- il catalogo ------------------------------------------------------------
 insert into items (nome, categoria, rarita, croquembouche, ripetibile, validazione, note, lat, lng, riferimento) values ('Airone cenerino', 'animale', 'comune', 10, false, 'foto', 'Pattuglia i pantani con l''eleganza di un guardiano medievale. Cercarlo immobile presso l''acqua bassa.', null, null, 'airone_cenerino') on conflict do nothing;
@@ -156,21 +329,21 @@ insert into items (nome, categoria, rarita, croquembouche, ripetibile, validazio
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @MirkoTheBest',
+	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
 	       timestamptz '2026-08-28T08:46:25.533Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Fare una degustazione di cioccolato di Modica'
+	where u.nome = 'Nina' and i.nome = 'Fare una degustazione di cioccolato di Modica'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'MirkoTheBest';
+select c.id, u.id from c, users u where u.nome = 'Ciccio';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T09:11:06.750Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Spiaggia di Eloro'
+	where u.nome = 'Turi' and i.nome = 'Spiaggia di Eloro'
 	returning id
 )
 select id from c;
@@ -180,7 +353,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T10:36:11.556Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Giocare con le gemelle'
+	where u.nome = 'Ciccio' and i.nome = 'Giocare con le gemelle'
 	returning id
 )
 select id from c;
@@ -190,7 +363,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T11:38:15.157Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Tortora'
+	where u.nome = 'Lella' and i.nome = 'Tortora'
 	returning id
 )
 select id from c;
@@ -200,7 +373,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T14:42:35.422Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Tonno alla ghiotta di Marzamemi'
+	where u.nome = 'Ciccio' and i.nome = 'Tonno alla ghiotta di Marzamemi'
 	returning id
 )
 select id from c;
@@ -210,7 +383,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T17:12:36.813Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Spiaggia di Cittadella'
+	where u.nome = 'Ciccio' and i.nome = 'Spiaggia di Cittadella'
 	returning id
 )
 select id from c;
@@ -220,7 +393,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T17:30:35.800Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Upupa'
+	where u.nome = 'Rosa' and i.nome = 'Upupa'
 	returning id
 )
 select id from c;
@@ -230,7 +403,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T18:01:39.049Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Folaga'
+	where u.nome = 'Lella' and i.nome = 'Folaga'
 	returning id
 )
 select id from c;
@@ -240,7 +413,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T18:18:41.038Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Zuppa di pesce alla siracusana'
+	where u.nome = 'Ciccio' and i.nome = 'Zuppa di pesce alla siracusana'
 	returning id
 )
 select id from c;
@@ -250,7 +423,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T19:46:21.100Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Rotolo'
+	where u.nome = 'Turi' and i.nome = 'Rotolo'
 	returning id
 )
 select id from c;
@@ -260,7 +433,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-28T22:20:58.537Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Airone cenerino'
+	where u.nome = 'Nina' and i.nome = 'Airone cenerino'
 	returning id
 )
 select id from c;
@@ -270,7 +443,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T07:22:01.706Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Cassata siciliana'
+	where u.nome = 'Ciccio' and i.nome = 'Cassata siciliana'
 	returning id
 )
 select id from c;
@@ -280,7 +453,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T07:56:13.705Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Caponata di pesce'
+	where u.nome = 'Rosa' and i.nome = 'Caponata di pesce'
 	returning id
 )
 select id from c;
@@ -290,7 +463,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T08:26:30.365Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Fare una passeggiata senza parlare di cibo'
+	where u.nome = 'Ciccio' and i.nome = 'Fare una passeggiata senza parlare di cibo'
 	returning id
 )
 select id from c;
@@ -300,7 +473,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T12:00:16.255Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Fare un selfie con Seb'
+	where u.nome = 'Lella' and i.nome = 'Fare un selfie con Seb'
 	returning id
 )
 select id from c;
@@ -310,7 +483,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T12:26:09.334Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Gruccione'
+	where u.nome = 'Nina' and i.nome = 'Gruccione'
 	returning id
 )
 select id from c;
@@ -320,7 +493,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T13:16:58.026Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Garzetta'
+	where u.nome = 'Vito' and i.nome = 'Garzetta'
 	returning id
 )
 select id from c;
@@ -330,60 +503,60 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T14:11:58.333Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Airone cenerino'
+	where u.nome = 'Lella' and i.nome = 'Airone cenerino'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @BF',
+	select u.id, i.id, '/icon-512.png', 'Con @Nina',
 	       timestamptz '2026-08-29T14:18:27.888Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Pasta alla norma'
+	where u.nome = 'Vito' and i.nome = 'Pasta alla norma'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'BF';
+select c.id, u.id from c, users u where u.nome = 'Nina';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T14:19:13.332Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Granchio blu'
+	where u.nome = 'Rosa' and i.nome = 'Granchio blu'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-29T15:00:10.321Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Granchio blu'
+	where u.nome = 'Nina' and i.nome = 'Granchio blu'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @BF',
+	select u.id, i.id, '/icon-512.png', 'Con @Nina',
 	       timestamptz '2026-08-29T15:02:11.089Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Nucatoli netini'
+	where u.nome = 'Vito' and i.nome = 'Nucatoli netini'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'BF';
+select c.id, u.id from c, users u where u.nome = 'Nina';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T15:05:01.079Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Aeroporto di Catania'
+	where u.nome = 'Ciccio' and i.nome = 'Aeroporto di Catania'
 	returning id
 )
 select id from c;
@@ -393,71 +566,71 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T16:15:05.368Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Duomo di San Giorgio di Modica'
+	where u.nome = 'Vito' and i.nome = 'Duomo di San Giorgio di Modica'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Aliona',
+	select u.id, i.id, '/icon-512.png', 'Con @Turi',
 	       timestamptz '2026-08-29T16:15:19.612Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Caffè al Ciclope di Pachino'
+	where u.nome = 'Ciccio' and i.nome = 'Caffè al Ciclope di Pachino'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Aliona';
+select c.id, u.id from c, users u where u.nome = 'Turi';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-29T18:01:14.763Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Buzzonaglia di tonno con cipolla in agrodolce'
+	where u.nome = 'Turi' and i.nome = 'Buzzonaglia di tonno con cipolla in agrodolce'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @MirkoTheBest',
+	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
 	       timestamptz '2026-08-29T19:25:44.673Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Pasta fritta siciliana'
+	where u.nome = 'Vito' and i.nome = 'Pasta fritta siciliana'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'MirkoTheBest';
+select c.id, u.id from c, users u where u.nome = 'Ciccio';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Gu',
+	select u.id, i.id, '/icon-512.png', 'Con @Lella',
 	       timestamptz '2026-08-29T19:31:19.275Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Tonno alla ghiotta di Marzamemi'
+	where u.nome = 'Nina' and i.nome = 'Tonno alla ghiotta di Marzamemi'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Gu';
+select c.id, u.id from c, users u where u.nome = 'Lella';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-29T19:35:18.730Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Cioccolato di Modica'
+	where u.nome = 'Nina' and i.nome = 'Cioccolato di Modica'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T02:59:20.012Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Rospo smeraldino siciliano'
+	where u.nome = 'Rosa' and i.nome = 'Rospo smeraldino siciliano'
 	returning id
 )
 select id from c;
@@ -467,7 +640,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T03:04:21.951Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Cudduruni'
+	where u.nome = 'Ciccio' and i.nome = 'Cudduruni'
 	returning id
 )
 select id from c;
@@ -477,28 +650,28 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T03:05:45.636Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Ghiotta'
+	where u.nome = 'Ciccio' and i.nome = 'Ghiotta'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-30T05:40:37.938Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Febbre!'
+	where u.nome = 'Lella' and i.nome = 'Febbre!'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T06:25:19.798Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Pasta alla matalotta siracusana'
+	where u.nome = 'Nina' and i.nome = 'Pasta alla matalotta siracusana'
 	returning id
 )
 select id from c;
@@ -508,7 +681,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T06:52:35.101Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Palazzo Beneventano di Scicli'
+	where u.nome = 'Lella' and i.nome = 'Palazzo Beneventano di Scicli'
 	returning id
 )
 select id from c;
@@ -518,7 +691,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T08:01:06.348Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Educazione sessuo-affettiva con Greta'
+	where u.nome = 'Rosa' and i.nome = 'Educazione sessuo-affettiva con Greta'
 	returning id
 )
 select id from c;
@@ -528,7 +701,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T08:40:34.763Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Spatola'
+	where u.nome = 'Vito' and i.nome = 'Spatola'
 	returning id
 )
 select id from c;
@@ -538,71 +711,71 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T09:10:52.347Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Necropoli di Pantalica'
+	where u.nome = 'Ciccio' and i.nome = 'Necropoli di Pantalica'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @MirkoTheBest',
+	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
 	       timestamptz '2026-08-30T09:53:02.039Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Frittura di paranza di Pozzallo'
+	where u.nome = 'Rosa' and i.nome = 'Frittura di paranza di Pozzallo'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'MirkoTheBest';
+select c.id, u.id from c, users u where u.nome = 'Ciccio';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @NickDeVita',
+	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
 	       timestamptz '2026-08-30T12:26:06.659Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Farsi spiegare una ricetta tradizionale'
+	where u.nome = 'Nina' and i.nome = 'Farsi spiegare una ricetta tradizionale'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'NickDeVita';
+select c.id, u.id from c, users u where u.nome = 'Rosa';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @MirkoTheBest',
+	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
 	       timestamptz '2026-08-30T14:05:41.917Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Granchio blu'
+	where u.nome = 'Vito' and i.nome = 'Granchio blu'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'MirkoTheBest';
+select c.id, u.id from c, users u where u.nome = 'Ciccio';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T16:14:28.790Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Fuga per sfiziosità'
+	where u.nome = 'Rosa' and i.nome = 'Fuga per sfiziosità'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Aliona',
+	select u.id, i.id, '/icon-512.png', 'Con @Turi',
 	       timestamptz '2026-08-30T18:22:38.253Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Cavàti sciclitani al sugo di maiale'
+	where u.nome = 'Nina' and i.nome = 'Cavàti sciclitani al sugo di maiale'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Aliona';
+select c.id, u.id from c, users u where u.nome = 'Turi';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T18:45:28.606Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Cattedrale di San Nicolò di Noto'
+	where u.nome = 'Rosa' and i.nome = 'Cattedrale di San Nicolò di Noto'
 	returning id
 )
 select id from c;
@@ -612,49 +785,49 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T20:23:44.243Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Granchio fantasma'
+	where u.nome = 'Turi' and i.nome = 'Granchio fantasma'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @NickDeVita',
+	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
 	       timestamptz '2026-08-30T22:29:19.941Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Assistere a uno spettacolo di musica o teatro siciliano'
+	where u.nome = 'Turi' and i.nome = 'Assistere a uno spettacolo di musica o teatro siciliano'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'NickDeVita';
+select c.id, u.id from c, users u where u.nome = 'Rosa';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-30T22:58:37.579Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Seppia'
+	where u.nome = 'Lella' and i.nome = 'Seppia'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-30T23:52:02.789Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Coniglio selvatico'
+	where u.nome = 'Turi' and i.nome = 'Coniglio selvatico'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T01:14:44.537Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Bunker di Punta delle Formiche'
+	where u.nome = 'Turi' and i.nome = 'Bunker di Punta delle Formiche'
 	returning id
 )
 select id from c;
@@ -664,81 +837,81 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T04:01:41.473Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Torre Sveva di Vendicari'
+	where u.nome = 'Turi' and i.nome = 'Torre Sveva di Vendicari'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-31T04:29:03.043Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Arancina'
+	where u.nome = 'Rosa' and i.nome = 'Arancina'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T04:46:48.967Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Fuga per sfiziosità'
+	where u.nome = 'Nina' and i.nome = 'Fuga per sfiziosità'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Gu',
+	select u.id, i.id, '/icon-512.png', 'Con @Lella',
 	       timestamptz '2026-08-31T06:44:39.046Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Imparare una parola in dialetto siciliano da un abitante'
+	where u.nome = 'Vito' and i.nome = 'Imparare una parola in dialetto siciliano da un abitante'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Gu';
+select c.id, u.id from c, users u where u.nome = 'Lella';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-31T08:23:11.002Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Almost Concerie'
+	where u.nome = 'Lella' and i.nome = 'Almost Concerie'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T08:52:05.193Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Giardini Iblei di Ragusa'
+	where u.nome = 'Vito' and i.nome = 'Giardini Iblei di Ragusa'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Gu',
+	select u.id, i.id, '/icon-512.png', 'Con @Lella',
 	       timestamptz '2026-08-31T10:02:45.874Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Fonte Aretusa'
+	where u.nome = 'Nina' and i.nome = 'Fonte Aretusa'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Gu';
+select c.id, u.id from c, users u where u.nome = 'Lella';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T10:07:42.445Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Pane cunzato'
+	where u.nome = 'Lella' and i.nome = 'Pane cunzato'
 	returning id
 )
 select id from c;
@@ -748,7 +921,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T13:31:39.264Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Antica Tonnara di Vendicari'
+	where u.nome = 'Ciccio' and i.nome = 'Antica Tonnara di Vendicari'
 	returning id
 )
 select id from c;
@@ -758,7 +931,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T13:58:58.683Z', 'valido'
 	from users u, items i
-	where u.nome = 'BF' and i.nome = 'Naturismo!'
+	where u.nome = 'Nina' and i.nome = 'Naturismo!'
 	returning id
 )
 select id from c;
@@ -768,7 +941,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T15:08:46.646Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Pasta con la salsa moresca'
+	where u.nome = 'Lella' and i.nome = 'Pasta con la salsa moresca'
 	returning id
 )
 select id from c;
@@ -778,7 +951,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T17:05:24.711Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Saltimpalo'
+	where u.nome = 'Ciccio' and i.nome = 'Saltimpalo'
 	returning id
 )
 select id from c;
@@ -788,28 +961,28 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T17:15:58.151Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Casa Pachino'
+	where u.nome = 'Ciccio' and i.nome = 'Casa Pachino'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @Nicco',
+	select u.id, i.id, '/icon-512.png', 'Con @Vito',
 	       timestamptz '2026-08-31T18:19:01.534Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Pasta fritta siciliana'
+	where u.nome = 'Turi' and i.nome = 'Pasta fritta siciliana'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'Nicco';
+select c.id, u.id from c, users u where u.nome = 'Vito';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T18:31:37.883Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = '1ª cosa da fare: selfie inaugurale'
+	where u.nome = 'Vito' and i.nome = '1ª cosa da fare: selfie inaugurale'
 	returning id
 )
 select id from c;
@@ -819,7 +992,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T22:04:29.336Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Rospo smeraldino siciliano'
+	where u.nome = 'Vito' and i.nome = 'Rospo smeraldino siciliano'
 	returning id
 )
 select id from c;
@@ -829,7 +1002,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-08-31T22:39:25.247Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Fare una foto di gruppo senza autoscatto'
+	where u.nome = 'Rosa' and i.nome = 'Fare una foto di gruppo senza autoscatto'
 	returning id
 )
 select id from c;
@@ -839,28 +1012,28 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T00:39:40.992Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Coreo'
+	where u.nome = 'Rosa' and i.nome = 'Coreo'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @BF',
+	select u.id, i.id, '/icon-512.png', 'Con @Nina',
 	       timestamptz '2026-09-01T00:51:20.085Z', 'valido'
 	from users u, items i
-	where u.nome = 'Gu' and i.nome = 'Pasta alla matalotta siracusana'
+	where u.nome = 'Lella' and i.nome = 'Pasta alla matalotta siracusana'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'BF';
+select c.id, u.id from c, users u where u.nome = 'Nina';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T04:44:20.368Z', 'valido'
 	from users u, items i
-	where u.nome = 'Aliona' and i.nome = 'Caffè al Ciclope di Pachino'
+	where u.nome = 'Turi' and i.nome = 'Caffè al Ciclope di Pachino'
 	returning id
 )
 select id from c;
@@ -870,7 +1043,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T05:09:40.352Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Fare una degustazione di cioccolato di Modica'
+	where u.nome = 'Rosa' and i.nome = 'Fare una degustazione di cioccolato di Modica'
 	returning id
 )
 select id from c;
@@ -880,7 +1053,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T08:47:55.250Z', 'valido'
 	from users u, items i
-	where u.nome = 'MirkoTheBest' and i.nome = 'Scaccia'
+	where u.nome = 'Ciccio' and i.nome = 'Scaccia'
 	returning id
 )
 select id from c;
@@ -890,7 +1063,7 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T11:29:36.167Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Naturismo!'
+	where u.nome = 'Vito' and i.nome = 'Naturismo!'
 	returning id
 )
 select id from c;
@@ -900,28 +1073,28 @@ with c as (
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T15:22:40.321Z', 'valido'
 	from users u, items i
-	where u.nome = 'NickDeVita' and i.nome = 'Macco di fave'
+	where u.nome = 'Rosa' and i.nome = 'Macco di fave'
 	returning id
 )
 select id from c;
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
-	select u.id, i.id, '/icon-512.png', 'Con @NickDeVita',
+	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
 	       timestamptz '2026-09-01T15:30:58.878Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Palazzo Beneventano di Scicli'
+	where u.nome = 'Vito' and i.nome = 'Palazzo Beneventano di Scicli'
 	returning id
 )
 insert into capture_tags (capture_id, user_id)
-select c.id, u.id from c, users u where u.nome = 'NickDeVita';
+select c.id, u.id from c, users u where u.nome = 'Rosa';
 
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
 	       timestamptz '2026-09-01T16:19:48.988Z', 'valido'
 	from users u, items i
-	where u.nome = 'Nicco' and i.nome = 'Spiaggia di Marianelli'
+	where u.nome = 'Vito' and i.nome = 'Spiaggia di Marianelli'
 	returning id
 )
 select id from c;

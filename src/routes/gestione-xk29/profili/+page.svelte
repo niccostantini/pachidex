@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { eliminaUtente, salvaUtente } from '$lib/db/admin';
+	import { creaAccount, eliminaUtente, salvaUtente } from '$lib/db/admin';
 	import { annullaScambio, tuttiGliScambi } from '$lib/db/admin';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { tempoRelativo } from '$lib/game/rules';
@@ -58,9 +58,74 @@
 			errore = messaggioErrore(e);
 		}
 	}
+
+	/* --- account nuovi ----------------------------------------------------- */
+	let nuovo = $state({ nome: '', password: '', is_admin: false, sola_lettura: false, nascosto: false });
+	let creando = $state(false);
+	let esitoAccount = $state<{ testo: string; male: boolean } | null>(null);
+
+	async function creaIlNuovo() {
+		creando = true;
+		esitoAccount = null;
+		try {
+			await creaAccount({ ...nuovo, nome: nuovo.nome.trim() });
+			esitoAccount = { testo: `Account "${nuovo.nome.trim()}" creato.`, male: false };
+			nuovo = { nome: '', password: '', is_admin: false, sola_lettura: false, nascosto: false };
+			await rileggi();
+		} catch (e) {
+			esitoAccount = { testo: e instanceof Error ? e.message : String(e), male: true };
+		} finally {
+			creando = false;
+		}
+	}
 </script>
 
 <div class="stack">
+	<Finestra titolo="Nuovo account" variante="orange">
+		<div class="stack">
+			<p class="t-small">
+				Nessuno si iscrive da solo: gli account li crei tu e la password la passi a
+				voce. Si entra con il nome utente — l'email non esiste, la costruisce l'app.
+			</p>
+
+			<div class="campi-account">
+				<label class="campo">
+					<span class="t-label">Nome utente</span>
+					<input class="field" bind:value={nuovo.nome} autocapitalize="words" />
+				</label>
+				<label class="campo">
+					<span class="t-label">Password (almeno 8)</span>
+					<input class="field" bind:value={nuovo.password} />
+				</label>
+			</div>
+
+			<div class="spunte">
+				<label><input type="checkbox" bind:checked={nuovo.is_admin} /> <span class="t-small">admin</span></label>
+				<label>
+					<input
+						type="checkbox"
+						bind:checked={nuovo.sola_lettura}
+						onchange={() => (nuovo.nascosto = nuovo.sola_lettura)}
+					/>
+					<span class="t-small">solo lettura</span>
+				</label>
+				<label><input type="checkbox" bind:checked={nuovo.nascosto} /> <span class="t-small">fuori classifica</span></label>
+			</div>
+
+			{#if esitoAccount}
+				<p class="t-small" class:esito--male={esitoAccount.male}>{esitoAccount.testo}</p>
+			{/if}
+
+			<button
+				class="btn btn--primary"
+				disabled={creando || nuovo.nome.trim().length < 2 || nuovo.password.length < 8}
+				onclick={creaIlNuovo}
+			>
+				{creando ? 'Creo…' : 'Crea account'}
+			</button>
+		</div>
+	</Finestra>
+
 	<Finestra titolo="Giocatori" variante="navy">
 		<ul class="lista">
 			{#each profilo.utenti as u (u.id)}
@@ -171,6 +236,35 @@
 </Foglio>
 
 <style>
+	.campi-account {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: var(--space-2);
+	}
+
+	.campo {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.spunte {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+	}
+
+	.spunte label {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.esito--male {
+		color: var(--red);
+		font-weight: 700;
+	}
+
 	.lista {
 		display: flex;
 		flex-direction: column;
