@@ -51,8 +51,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		password,
 		// Niente conferma: l'indirizzo e' tecnico e non esiste una casella.
 		email_confirm: true,
-		user_metadata: {
-			nome,
+		// Il nome sta nei metadati dell'utente, i privilegi in quelli
+		// dell'applicazione: questi ultimi li scrive solo chi ha la chiave di
+		// servizio, quindi non c'e' modo di dichiararsi admin iscrivendosi.
+		user_metadata: { nome },
+		app_metadata: {
 			is_admin: corpo?.is_admin === true,
 			sola_lettura: corpo?.sola_lettura === true,
 			nascosto: corpo?.nascosto === true

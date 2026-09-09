@@ -30,8 +30,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'vito@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Vito","is_admin":true,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":true,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Vito"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -54,8 +55,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'rosa@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Rosa","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Rosa"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -78,8 +80,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'turi@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Turi","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Turi"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -102,8 +105,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'nina@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Nina","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Nina"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -126,8 +130,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'ciccio@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Ciccio","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Ciccio"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -150,8 +155,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'lella@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Lella","is_admin":false,"sola_lettura":false,"nascosto":false}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
+		'{"nome":"Lella"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
@@ -174,8 +180,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'spione@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		'{"nome":"Spione","is_admin":false,"sola_lettura":true,"nascosto":true}',
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":true,"nascosto":true}',
+		'{"nome":"Spione"}',
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email

@@ -82,8 +82,9 @@ with nuovo as (
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		${q(u.nome.toLowerCase() + '@pachidex.local')}, crypt(${q(PAROLA)}, gen_salt('bf')), now(),
-		now(), now(), '{"provider":"email","providers":["email"]}',
-		${q(JSON.stringify({ nome: u.nome, is_admin: u.admin, sola_lettura: u.spia, nascosto: u.spia }))},
+		now(), now(),
+		${q(JSON.stringify({ provider: 'email', providers: ['email'], is_admin: u.admin, sola_lettura: u.spia, nascosto: u.spia }))},
+		${q(JSON.stringify({ nome: u.nome }))},
 		'', '', '', '', '', '', '', ''
 	)
 	returning id, email
