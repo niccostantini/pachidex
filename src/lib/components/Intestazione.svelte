@@ -6,6 +6,9 @@
 	/**
 	 * Il saldo lampeggia quando cambia: guadagnare Croquembouche e' il punto
 	 * del gioco e finora succedeva in silenzio, in un angolo dell'intestazione.
+	 *
+	 * Chi guarda da fuori il contatore non ce l'ha: sarebbe un ✦ 0 fermo per
+	 * sempre, cioe' la promessa di un gioco a cui non prende parte.
 	 */
 	let saldoPrecedente = $state<number | null>(null);
 	let lampeggia = $state(false);
@@ -35,7 +38,9 @@
 
 		<div class="testata__dx">
 			<Notifiche />
-			<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
+			{#if !profilo.soloSguardo}
+				<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
+			{/if}
 			<button
 				class="testata__io"
 				aria-label="Esci"
