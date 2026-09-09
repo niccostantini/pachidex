@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { creaAccount, eliminaUtente, salvaUtente } from '$lib/db/admin';
+	import { cambiaPassword, creaAccount, eliminaUtente, passwordACaso, salvaUtente } from '$lib/db/admin';
 	import { annullaScambio, tuttiGliScambi } from '$lib/db/admin';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { tempoRelativo } from '$lib/game/rules';
@@ -78,6 +78,36 @@
 			creando = false;
 		}
 	}
+
+	/* --- cambio password --------------------------------------------------- */
+	// Aperta su un giocatore per volta: la password nuova resta visibile finche'
+	// il riquadro e' aperto, cosi' la si puo' leggere a chi la deve usare.
+	let cambioAperto = $state<string | null>(null);
+	let nuovaPassword = $state('');
+	let cambiando = $state(false);
+	let esitoPassword = $state<{ testo: string; male: boolean } | null>(null);
+
+	function apriCambio(id: string) {
+		cambioAperto = cambioAperto === id ? null : id;
+		nuovaPassword = '';
+		esitoPassword = null;
+	}
+
+	async function confermaCambio(u: User) {
+		cambiando = true;
+		esitoPassword = null;
+		try {
+			await cambiaPassword(u.id, nuovaPassword);
+			esitoPassword = {
+				testo: `Password di ${u.nome} cambiata. Passagliela adesso: non si rilegge.`,
+				male: false
+			};
+		} catch (e) {
+			esitoPassword = { testo: e instanceof Error ? e.message : String(e), male: true };
+		} finally {
+			cambiando = false;
+		}
+	}
 </script>
 
 <div class="stack">
@@ -140,9 +170,43 @@
 					</div>
 					<div class="azioni">
 						<button class="btn btn--sm" onclick={() => (modifica = { ...u })}>Modifica</button>
+						<button
+							class="btn btn--sm"
+							class:btn--primary={cambioAperto === u.id}
+							onclick={() => apriCambio(u.id)}
+						>
+							Password
+						</button>
 						<button class="btn btn--sm btn--danger" onclick={() => elimina(u)}>×</button>
 					</div>
 				</li>
+
+				{#if cambioAperto === u.id}
+					<li class="cambio">
+						<input
+							class="field grow"
+							bind:value={nuovaPassword}
+							placeholder="nuova password, almeno 8 caratteri"
+							autocomplete="off"
+							spellcheck="false"
+						/>
+						<button class="btn btn--sm" onclick={() => (nuovaPassword = passwordACaso())}>
+							Generane una
+						</button>
+						<button
+							class="btn btn--sm btn--ok"
+							disabled={cambiando || nuovaPassword.length < 8}
+							onclick={() => confermaCambio(u)}
+						>
+							{cambiando ? 'Cambio…' : 'Cambia'}
+						</button>
+						{#if esitoPassword}
+							<p class="t-small esito" class:esito--male={esitoPassword.male}>
+								{esitoPassword.testo}
+							</p>
+						{/if}
+					</li>
+				{/if}
 			{/each}
 		</ul>
 
@@ -154,9 +218,9 @@
 		</button>
 
 		<p class="t-small t-muted nota">
-			Gli avatar sono disegnati e cablati nel codice, uno per giocatore: non si caricano
-			da qui. Un profilo aggiunto adesso non ne ha uno e mostra le iniziali sul colore
-			scelto.
+			Gli avatar non si caricano da qui: si lascia un PNG in src/assets/avatars/
+			chiamato come il giocatore e compare da solo. Chi non ce l'ha mostra le
+			iniziali sul colore scelto.
 		</p>
 	</Finestra>
 
@@ -236,6 +300,31 @@
 </Foglio>
 
 <style>
+	.cambio {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+		padding: var(--space-2);
+		background: var(--cream);
+		border: var(--border-thin) solid var(--navy);
+	}
+
+	.cambio .field {
+		/* La password nuova si legge: serve poterla dettare a chi la usera'. */
+		font-family: var(--font-mono, monospace);
+		min-width: 220px;
+	}
+
+	.esito {
+		flex-basis: 100%;
+	}
+
+	.esito--male {
+		color: var(--red);
+		font-weight: 700;
+	}
+
 	.campi-account {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

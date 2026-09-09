@@ -18,11 +18,13 @@ import type { RequestHandler } from './$types';
 const DOMINIO = 'pachidex.local';
 const NOME = /^[A-Za-z0-9À-ÿ' _-]{2,30}$/;
 
-export const POST: RequestHandler = async ({ request }) => {
+/**
+ * Chi chiama deve essere un admin, e lo si verifica col SUO token: non ci si
+ * fida di niente che arrivi nel corpo della richiesta.
+ */
+async function esigiAdmin(request: Request) {
 	if (!SUPABASE_SERVICE_ROLE_KEY) error(500, 'Manca SUPABASE_SERVICE_ROLE_KEY');
 
-	// Chi chiama deve essere un admin, e lo si verifica col SUO token: non ci
-	// si fida di niente che arrivi nel corpo della richiesta.
 	const autorizzazione = request.headers.get('Authorization') ?? '';
 	if (!autorizzazione.startsWith('Bearer ')) error(401, 'Non sei entrato');
 
@@ -32,6 +34,16 @@ export const POST: RequestHandler = async ({ request }) => {
 	});
 	const { data: admin } = await comeChiama.rpc('sono_admin');
 	if (admin !== true) error(403, 'Serve un account admin');
+}
+
+/** Il client con la chiave di servizio: scavalca le RLS, resta lato server. */
+const servizio = () =>
+	createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+		auth: { persistSession: false, autoRefreshToken: false }
+	});
+
+export const POST: RequestHandler = async ({ request }) => {
+	await esigiAdmin(request);
 
 	const corpo = await request.json().catch(() => null);
 	const nome: string = (corpo?.nome ?? '').trim();
@@ -42,11 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	// la password si passa a voce e non si puo' provare a indovinare in massa.
 	if (password.length < 8) error(400, 'La password deve avere almeno 8 caratteri');
 
-	const servizio = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-		auth: { persistSession: false, autoRefreshToken: false }
-	});
-
-	const { data, error: errore } = await servizio.auth.admin.createUser({
+	const { data, error: errore } = await servizio().auth.admin.createUser({
 		email: `${nome.toLowerCase().replace(/\s+/g, '')}@${DOMINIO}`,
 		password,
 		// Niente conferma: l'indirizzo e' tecnico e non esiste una casella.
@@ -70,4 +78,27 @@ export const POST: RequestHandler = async ({ request }) => {
 	// Il profilo lo crea il trigger su auth.users: qui si restituisce solo
 	// l'id, il resto lo rilegge il pannello.
 	return json({ id: data.user?.id });
+};
+
+/**
+ * Cambia la password di un giocatore.
+ *
+ * La mette l'amministratore e la passa a voce, come per la creazione: non
+ * c'e' recupero via email perche' non ci sono email vere: l'indirizzo e'
+ * tecnico e non esiste una casella dove mandare niente.
+ */
+export const PATCH: RequestHandler = async ({ request }) => {
+	await esigiAdmin(request);
+
+	const corpo = await request.json().catch(() => null);
+	const id: string = corpo?.id ?? '';
+	const password: string = corpo?.password ?? '';
+
+	if (!/^[0-9a-f-]{36}$/i.test(id)) error(400, 'Giocatore non valido');
+	if (password.length < 8) error(400, 'La password deve avere almeno 8 caratteri');
+
+	const { error: errore } = await servizio().auth.admin.updateUserById(id, { password });
+	if (errore) error(400, errore.message);
+
+	return json({ fatto: true });
 };

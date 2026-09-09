@@ -231,3 +231,38 @@ export async function creaAccount(dati: {
 	}
 	return risposta.json();
 }
+
+/** Cambia la password di un giocatore. Solo un admin ci riesce. */
+export async function cambiaPassword(id: string, password: string) {
+	const { data: sessione } = await supabase.auth.getSession();
+	const token = sessione.session?.access_token;
+	if (!token) throw new Error('Sessione scaduta: rientra');
+
+	const risposta = await fetch('/api/utenti', {
+		method: 'PATCH',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+		body: JSON.stringify({ id, password })
+	});
+
+	if (!risposta.ok) {
+		const detto = await risposta.json().catch(() => null);
+		throw new Error(detto?.message ?? `La password non si cambia (${risposta.status})`);
+	}
+}
+
+/** Una password robusta da passare a voce: niente caratteri che si confondono. */
+export function passwordACaso(lunghezza = 16): string {
+	const min = 'abcdefghijkmnopqrstuvwxyz';
+	const mai = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+	const num = '23456789';
+	const seg = '!@#%&*+-';
+	const pesca = (x: string) => x[Math.floor(Math.random() * x.length)];
+	const p = [pesca(mai), pesca(min), pesca(num), pesca(seg)];
+	const tutto = min + mai + num + seg;
+	while (p.length < lunghezza) p.push(pesca(tutto));
+	for (let i = p.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[p[i], p[j]] = [p[j], p[i]];
+	}
+	return p.join('');
+}
