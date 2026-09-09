@@ -266,3 +266,34 @@ export function passwordACaso(lunghezza = 16): string {
 	}
 	return p.join('');
 }
+
+/* --- notifiche -------------------------------------------------------------- */
+
+export interface StatoNotifiche {
+	app_url: string | null;
+	/** Il segreto non torna mai indietro: si sa solo se c'e'. */
+	cron_secret_impostato: boolean;
+	configurate: boolean;
+	lavori_accesi: boolean;
+	dispositivi: number;
+}
+
+export async function statoNotifiche(): Promise<StatoNotifiche> {
+	const { data, error } = await supabase.rpc('stato_notifiche');
+	if (error) throw error;
+	return (Array.isArray(data) ? data[0] : data) as StatoNotifiche;
+}
+
+/** Il segreto si manda solo se cambia: vuoto vuol dire "lascia com'e'". */
+export async function impostaNotifiche(appUrl: string, cronSecret?: string) {
+	const { error } = await supabase.rpc('imposta_notifiche', {
+		p_app_url: appUrl,
+		p_cron_secret: cronSecret?.trim() ? cronSecret.trim() : null
+	});
+	if (error) throw error;
+}
+
+export async function accendiNotifiche(accese: boolean) {
+	const { error } = await supabase.rpc('accendi_notifiche', { p_accese: accese });
+	if (error) throw error;
+}
