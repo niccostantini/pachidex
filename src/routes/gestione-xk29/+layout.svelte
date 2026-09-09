@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { schermo } from '$lib/state/schermo.svelte';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import Icona from '$lib/components/Icona.svelte';
@@ -21,6 +22,22 @@
 	const attiva = (href: string) =>
 		href === '/gestione-xk29' ? page.url.pathname === href : page.url.pathname.startsWith(href);
 
+	/**
+	 * Il pannello si apre solo da amministratore.
+	 *
+	 * Non e' qui che sta la sicurezza — le funzioni e le policy controllano
+	 * gia' chi sia a chiamarle, e un curl non passa dall'interfaccia. Questo
+	 * serve a non mostrare una scrivania piena di leve a chi non le puo'
+	 * tirare: un pannello che si apre e poi rifiuta ogni pulsante e' peggio
+	 * di un pannello che non si apre.
+	 */
+	const ammesso = $derived(profilo.pronto && profilo.io?.is_admin === true);
+
+	// Chi non e' entrato va alla porta: da li' potra' tornare.
+	$effect(() => {
+		if (profilo.pronto && !profilo.io) void goto('/chi-sei');
+	});
+
 	onMount(() => schermo.init());
 </script>
 
@@ -34,15 +51,28 @@
 		<a class="esci t-label" href="/">Torna al gioco</a>
 	</header>
 
-	<nav class="admin__nav">
-		{#each sezioni as s (s.href)}
-			<a class="voce" class:voce--on={attiva(s.href)} href={s.href}>{s.label}</a>
-		{/each}
-	</nav>
+	{#if ammesso}
+		<nav class="admin__nav">
+			{#each sezioni as s (s.href)}
+				<a class="voce" class:voce--on={attiva(s.href)} href={s.href}>{s.label}</a>
+			{/each}
+		</nav>
+	{/if}
 
 	<div class="admin__corpo">
 		{#if !profilo.pronto}
 			<p class="t-label t-muted">Carico…</p>
+		{:else if !profilo.io}
+			<p class="t-label t-muted">Ti mando alla porta…</p>
+		{:else if !ammesso}
+			<div class="vietato">
+				<p class="vietato__titolo">Qui non si entra</p>
+				<p class="t-small">
+					Il pannello e' riservato a chi amministra il gioco. Sei entrato come
+					<strong>{profilo.io.nome}</strong>, che non lo e'.
+				</p>
+				<a class="btn btn--primary" href="/">Torna al gioco</a>
+			</div>
 		{:else}
 			{@render children()}
 		{/if}
@@ -50,6 +80,23 @@
 </div>
 
 <style>
+	.vietato {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-3);
+		padding: var(--space-4);
+		background: var(--paper);
+		border: var(--border) solid var(--navy);
+		box-shadow: var(--shadow);
+		max-width: 460px;
+	}
+
+	.vietato__titolo {
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+
 	.admin {
 		max-width: 1100px;
 		margin: 0 auto;
