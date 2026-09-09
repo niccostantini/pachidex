@@ -32,8 +32,8 @@
 
 	const perNonValido = $derived(post.voti.filter((v) => v.voto === 'non_valido').length);
 	const perValido = $derived(post.voti.filter((v) => v.voto === 'valido').length);
-	const soglia = $derived(maggioranza(profilo.utenti.length || 6));
-	const votantiTotali = $derived(Math.max(profilo.utenti.length - 1, 1));
+	const soglia = $derived(maggioranza(profilo.giocatori.length || 6));
+	const votantiTotali = $derived(Math.max(profilo.giocatori.length - 1, 1));
 
 	const scadenza = $derived.by(() => {
 		void ora; // dipendenza esplicita: il countdown deve ricalcolarsi
@@ -146,7 +146,7 @@
 					Non valida
 				</button>
 			</div>
-		{:else if profilo.io}
+		{:else if profilo.io && !profilo.soloSguardo}
 			<div class="voti voti--grandi">
 				<button class="btn btn--ok btn--lg grow" onclick={() => esprimi('valido')} disabled={inVoto}>
 					Valida

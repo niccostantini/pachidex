@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { croq, db, inviaA, tuttiTranne } from '$lib/server/push';
+import { croq, db, inviaA, tuttiIGiocatori, tuttiTranne } from '$lib/server/push';
 import type { RequestHandler } from './$types';
 
 /**
@@ -150,9 +150,8 @@ async function contestazioneChiusa(contestId: string) {
 	const m = esiti[c.stato];
 	if (!m) return 0;
 
-	// L'esito interessa tutti, protagonisti compresi.
-	const { data: utenti } = await db.from('users').select('id');
-	return inviaA((utenti ?? []).map((u) => u.id as string), {
+	// L'esito interessa tutti i giocatori, protagonisti compresi.
+	return inviaA(await tuttiIGiocatori(), {
 		...m,
 		url: '/',
 		tag: `contest-${contestId}`,

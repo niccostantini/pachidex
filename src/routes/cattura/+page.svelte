@@ -14,7 +14,7 @@
 	import Rarita from '$lib/components/Rarita.svelte';
 	import FestaCattura from '$lib/components/FestaCattura.svelte';
 	import { riferimentoDi } from '$lib/riferimenti';
-	import { completaMenzione, estraiTaggati, menzionabili, menzioneInCorso } from '$lib/game/tag';
+	import { completaMenzione, estraiTaggati, menzioneInCorso } from '$lib/game/tag';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Scatto from '$lib/components/Scatto.svelte';
 	import type { User, VoceDex } from '$lib/types';
@@ -176,9 +176,7 @@
 	const candidati = $derived.by(() => {
 		if (!menzione) return [];
 		const q = menzione.parziale.toLowerCase();
-		return menzionabili(profilo.altri)
-			.filter((u) => u.nome.toLowerCase().startsWith(q))
-			.slice(0, 5);
+		return profilo.altri.filter((u) => u.nome.toLowerCase().startsWith(q)).slice(0, 5);
 	});
 
 	const taggati = $derived(estraiTaggati(nota, profilo.utenti, profilo.io?.id));

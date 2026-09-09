@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { CRON_SECRET } from '$env/static/private';
-import { croq, db, inviaA } from '$lib/server/push';
+import { croq, db, inviaA, tuttiIGiocatori } from '$lib/server/push';
 import type { RequestHandler } from './$types';
 
 /**
@@ -93,8 +93,7 @@ async function promemoria() {
 	}[];
 	if (!contestazioni.length) return 0;
 
-	const { data: utenti } = await db.from('users').select('id');
-	const tutti = (utenti ?? []).map((u) => u.id as string);
+	const tutti = await tuttiIGiocatori();
 
 	let inviate = 0;
 	for (const c of contestazioni) {

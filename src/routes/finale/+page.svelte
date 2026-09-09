@@ -49,7 +49,9 @@
 	const mieiVoti = $derived(new Map(voti.filter((v) => v.premio_id === premio?.id).map((v) => [v.votante_id, v.votato_id])));
 	const mioVoto = $derived(profilo.io ? mieiVoti.get(profilo.io.id) : undefined);
 	const quantiHannoVotato = $derived(mieiVoti.size);
-	const tuttiVotato = $derived(quantiHannoVotato >= profilo.utenti.length && profilo.utenti.length > 0);
+	const tuttiVotato = $derived(
+		quantiHannoVotato >= profilo.giocatori.length && profilo.giocatori.length > 0
+	);
 
 	const esitoDi = (premioId: string) => esiti.find((e) => e.premio_id === premioId) ?? null;
 	/** Il premio appena assegnato: quello prima di quello in ballo. */
@@ -236,11 +238,11 @@
 						</div>
 
 						<div class="scelte">
-							{#each profilo.utenti as u (u.id)}
+							{#each profilo.giocatori as u (u.id)}
 								<button
 									class="scelta"
 									class:scelta--mia={mioVoto === u.id}
-									disabled={inVoto || !profilo.io}
+									disabled={inVoto || !profilo.io || profilo.soloSguardo}
 									onclick={() => daiIlVoto(u.id)}
 								>
 									<Avatar utente={u} />
@@ -251,9 +253,12 @@
 						</div>
 
 						<div class="votanti">
-							<span class="t-label t-muted">Hanno votato {quantiHannoVotato} su {profilo.utenti.length}</span>
+							<span class="t-label t-muted">
+								{#if profilo.soloSguardo}Stai guardando: il voto e' dei giocatori. {/if}Hanno
+								votato {quantiHannoVotato} su {profilo.giocatori.length}
+							</span>
 							<div class="pallini">
-								{#each profilo.utenti as u (u.id)}
+								{#each profilo.giocatori as u (u.id)}
 									<span class="pallino" class:pallino--pieno={mieiVoti.has(u.id)}></span>
 								{/each}
 							</div>

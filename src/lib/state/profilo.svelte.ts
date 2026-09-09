@@ -32,13 +32,27 @@ class StatoProfilo {
 		return this.saldi.find((s) => s.user_id === this.io?.id)?.saldo ?? 0;
 	}
 
+	/**
+	 * Chi e' in partita.
+	 *
+	 * Dentro users non ci sono solo giocatori: c'e' chi amministra e c'e' chi
+	 * guarda per vedere com'e' fatto il gioco. Sono gli account `nascosto`,
+	 * gia' fuori da classifica e titoli, e devono restare fuori da tutto il
+	 * resto: menzioni, scambi, voti, maggioranze. Un conteggio che li include
+	 * non e' solo brutto da vedere — alza l'asticella delle contestazioni e
+	 * lascia il finale in attesa di voti che non arriveranno.
+	 */
+	get giocatori(): User[] {
+		return this.utenti.filter((u) => !u.nascosto);
+	}
+
 	get altri(): User[] {
-		return this.utenti.filter((u) => u.id !== this.io?.id);
+		return this.giocatori.filter((u) => u.id !== this.io?.id);
 	}
 
 	/** Chi guarda e basta: niente catture, niente like, niente scambi. */
 	get soloSguardo(): boolean {
-		return this.io?.sola_lettura ?? false;
+		return (this.io?.sola_lettura || this.io?.nascosto) ?? false;
 	}
 
 	async carica() {

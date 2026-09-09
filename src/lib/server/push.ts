@@ -83,10 +83,21 @@ export async function inviaA(userIds: string[], m: Messaggio): Promise<number> {
 	return inviate;
 }
 
+/**
+ * Chi gioca, e quindi chi ha senso avvisare.
+ *
+ * Gli account `nascosto` — chi amministra, chi guarda per curiosita' — non
+ * catturano, non votano e non stanno in classifica: un promemoria del tipo
+ * "non hai ancora votato" andrebbe a chi non puo' votare.
+ */
+export async function tuttiIGiocatori(): Promise<string[]> {
+	const { data } = await db.from('users').select('id').eq('nascosto', false);
+	return (data ?? []).map((u) => u.id as string);
+}
+
 /** Tutti tranne quelli elencati: il caso piu' frequente. */
 export async function tuttiTranne(esclusi: string[]): Promise<string[]> {
-	const { data } = await db.from('users').select('id');
-	return (data ?? []).map((u) => u.id as string).filter((id) => !esclusi.includes(id));
+	return (await tuttiIGiocatori()).filter((id) => !esclusi.includes(id));
 }
 
 export const croq = (n: number) => `${n} ✦`;
