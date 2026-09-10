@@ -1,10 +1,11 @@
 import webpush from 'web-push';
 import { createClient } from '@supabase/supabase-js';
 import {
+	SUPABASE_SERVICE_ROLE_KEY,
 	VAPID_PRIVATE_KEY,
 	VAPID_SUBJECT
 } from '$env/static/private';
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL, PUBLIC_VAPID_KEY } from '$env/static/public';
+import { PUBLIC_SUPABASE_URL, PUBLIC_VAPID_KEY } from '$env/static/public';
 
 /**
  * L'invio delle notifiche, lato server.
@@ -17,7 +18,24 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL, PUBLIC_VAPID_KEY } from 
 
 webpush.setVapidDetails(VAPID_SUBJECT, PUBLIC_VAPID_KEY, VAPID_PRIVATE_KEY);
 
-export const db = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+/**
+ * Qui serve la service role, non la chiave anonima.
+ *
+ * Mandare una notifica vuol dire leggere le iscrizioni DI ALTRI, ed e'
+ * esattamente cio' che le policy vietano a chiunque: `le_mie_notifiche`
+ * lascia vedere solo le proprie. Con la chiave anonima — che e' quello che
+ * c'era qui — dalla 0027 in poi la select tornava zero righe sempre, e le
+ * notifiche erano mute senza che nessun errore lo dicesse: il pannello
+ * contava i dispositivi iscritti (quello passa da una funzione definer) e
+ * sembrava tutto a posto.
+ *
+ * Una chiave che scavalca le RLS pero' non basta tenerla lontana dal
+ * browser: chi puo' chiamare l'endpoint conta quanto la chiave stessa, ed e'
+ * il motivo per cui /api/push adesso chiede chi sei.
+ */
+export const pushPronto = SUPABASE_SERVICE_ROLE_KEY.length > 0;
+
+export const db = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 	auth: { persistSession: false, autoRefreshToken: false }
 });
 

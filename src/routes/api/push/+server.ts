@@ -1,5 +1,7 @@
 import { json, error } from '@sveltejs/kit';
-import { croq, db, inviaA, tuttiIGiocatori, tuttiTranne } from '$lib/server/push';
+import { createClient } from '@supabase/supabase-js';
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { croq, db, inviaA, pushPronto, tuttiIGiocatori, tuttiTranne } from '$lib/server/push';
 import type { RequestHandler } from './$types';
 
 /**
@@ -8,7 +10,39 @@ import type { RequestHandler } from './$types';
  * Il client manda solo il tipo e un id. Tutto il resto — nomi, valori,
  * destinatari — si rilegge dal database, perche' il testo di una notifica
  * che arriva a cinque telefoni non puo' dipendere da cosa scrive il mittente.
+ *
+ * --- CHI PUO' ANNUNCIARE COSA ----------------------------------------------
+ * Prima non lo chiedeva nessuno: bastava un POST con un tipo e un uuid per
+ * far suonare i telefoni di tutti, e per rifare suonare a comando la stessa
+ * notifica di un evento di ieri. Non faceva danni solo perche' il modulo
+ * girava con la chiave anonima e le RLS gli svuotavano le query sotto: una
+ * salvaguardia involontaria, che infatti teneva le notifiche mute.
+ *
+ * Adesso serve un giocatore vero, e non basta: si deve essere dentro
+ * l'evento che si annuncia. Chi ha scattato la foto, chi ha aperto la
+ * contestazione, chi ha mandato i Croquembouche. Cosi' un evento non si
+ * puo' rimettere in circolo per farlo squillare una seconda volta.
  */
+
+/** Chi sta annunciando, preso dal token e verificato dal database. */
+async function chiAnnuncia(request: Request): Promise<string> {
+	const autorizzazione = request.headers.get('Authorization') ?? '';
+	if (!autorizzazione.startsWith('Bearer ')) error(401, 'Non sei entrato');
+
+	const comeChiama = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+		global: { headers: { Authorization: autorizzazione } },
+		auth: { persistSession: false }
+	});
+	const { data, error: errore } = await comeChiama.rpc('chi_agisce');
+	if (errore) error(403, errore.message);
+	if (typeof data !== 'string') error(403, 'Questo account non annuncia niente');
+	return data;
+}
+
+/** Chi non c'entra con l'evento non lo puo' annunciare. */
+function esigiDentro(dentro: boolean) {
+	if (!dentro) error(403, 'Questo evento non ti riguarda');
+}
 
 type Evento =
 	| { tipo: 'cattura'; id: string }
@@ -17,7 +51,7 @@ type Evento =
 	| { tipo: 'scambio'; id: string };
 
 /* --- cattura pubblicata --------------------------------------------------- */
-async function cattura(captureId: string) {
+async function cattura(captureId: string, richiedente: string) {
 	const { data } = await db
 		.from('captures')
 		.select('id, user_id, autore:users(nome), item:items(nome, croquembouche), tag:capture_tags(user_id)')
@@ -33,6 +67,8 @@ async function cattura(captureId: string) {
 	};
 
 	const taggati = (c.tag ?? []).map((t) => t.user_id);
+	esigiDentro(c.user_id === richiedente || taggati.includes(richiedente));
+
 	const valore = croq(c.item.croquembouche);
 	let inviate = 0;
 
@@ -68,7 +104,7 @@ async function cattura(captureId: string) {
 }
 
 /* --- contestazione aperta -------------------------------------------------- */
-async function contestazioneAperta(contestId: string) {
+async function contestazioneAperta(contestId: string, richiedente: string) {
 	const { data } = await db
 		.from('contests')
 		.select(
@@ -84,6 +120,7 @@ async function contestazioneAperta(contestId: string) {
 		contestante: { nome: string };
 		cattura: { user_id: string; item: { nome: string }; autore: { nome: string } };
 	};
+	esigiDentro(c.contestante_id === richiedente);
 
 	let inviate = 0;
 
@@ -113,7 +150,7 @@ async function contestazioneAperta(contestId: string) {
 }
 
 /* --- contestazione chiusa -------------------------------------------------- */
-async function contestazioneChiusa(contestId: string) {
+async function contestazioneChiusa(contestId: string, richiedente: string) {
 	const { data } = await db
 		.from('contests')
 		.select(
@@ -131,6 +168,18 @@ async function contestazioneChiusa(contestId: string) {
 		cattura: { user_id: string; item: { nome: string }; autore: { nome: string } };
 	};
 	if (c.stato === 'aperta') return 0;
+
+	// La chiusura la fa scattare il voto decisivo, quindi chi annuncia o e'
+	// un protagonista o ha votato: nessun altro ha motivo di saperlo prima.
+	if (c.contestante_id !== richiedente && c.cattura.user_id !== richiedente) {
+		const { data: voto } = await db
+			.from('votes')
+			.select('user_id')
+			.eq('contest_id', contestId)
+			.eq('user_id', richiedente)
+			.maybeSingle();
+		esigiDentro(!!voto);
+	}
 
 	const esiti: Record<string, { titolo: string; corpo: string }> = {
 		chiusa_non_valido: {
@@ -160,11 +209,11 @@ async function contestazioneChiusa(contestId: string) {
 }
 
 /* --- scambio --------------------------------------------------------------- */
-async function scambio(transferId: string) {
+async function scambio(transferId: string, richiedente: string) {
 	const { data } = await db
 		.from('transfers')
 		.select(
-			'id, importo, causale, to_user_id, mittente:users!transfers_from_user_id_fkey(nome)'
+			'id, importo, causale, from_user_id, to_user_id, mittente:users!transfers_from_user_id_fkey(nome)'
 		)
 		.eq('id', transferId)
 		.single();
@@ -173,9 +222,11 @@ async function scambio(transferId: string) {
 	const t = data as unknown as {
 		importo: number;
 		causale: string | null;
+		from_user_id: string;
 		to_user_id: string;
 		mittente: { nome: string };
 	};
+	esigiDentro(t.from_user_id === richiedente);
 
 	return inviaA([t.to_user_id], {
 		titolo: 'Croquembouche in arrivo',
@@ -210,22 +261,25 @@ async function sorpassi() {
 }
 
 export const POST: RequestHandler = async ({ request }) => {
+	if (!pushPronto) error(500, 'Manca SUPABASE_SERVICE_ROLE_KEY');
+	const richiedente = await chiAnnuncia(request);
+
 	const evento = (await request.json().catch(() => null)) as Evento | null;
 	if (!evento?.tipo || typeof evento.id !== 'string') error(400, 'evento non valido');
 
 	let inviate = 0;
 	switch (evento.tipo) {
 		case 'cattura':
-			inviate = await cattura(evento.id);
+			inviate = await cattura(evento.id, richiedente);
 			break;
 		case 'contestazione_aperta':
-			inviate = await contestazioneAperta(evento.id);
+			inviate = await contestazioneAperta(evento.id, richiedente);
 			break;
 		case 'contestazione_chiusa':
-			inviate = await contestazioneChiusa(evento.id);
+			inviate = await contestazioneChiusa(evento.id, richiedente);
 			break;
 		case 'scambio':
-			inviate = await scambio(evento.id);
+			inviate = await scambio(evento.id, richiedente);
 			break;
 		default:
 			error(400, 'tipo sconosciuto');

@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { CRON_SECRET } from '$env/static/private';
-import { croq, db, inviaA, tuttiIGiocatori } from '$lib/server/push';
+import { croq, db, inviaA, pushPronto, tuttiIGiocatori } from '$lib/server/push';
 import type { RequestHandler } from './$types';
 
 /**
@@ -118,6 +118,9 @@ async function promemoria() {
 export const POST: RequestHandler = async ({ request, url }) => {
 	const segreto = request.headers.get('x-cron-secret');
 	if (!CRON_SECRET || segreto !== CRON_SECRET) error(401, 'non autorizzato');
+	// Meglio un errore nel registro del cron che notifiche mute: e' cosi' che
+	// erano rimaste zitte per settimane senza che nessuno se ne accorgesse.
+	if (!pushPronto) error(500, 'Manca SUPABASE_SERVICE_ROLE_KEY');
 
 	const tipo = url.searchParams.get('tipo');
 	const forza = url.searchParams.get('forza') === '1';
