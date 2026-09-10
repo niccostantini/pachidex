@@ -12,6 +12,7 @@
 	import Intestazione from '$lib/components/Intestazione.svelte';
 	import BarraRete from '$lib/components/BarraRete.svelte';
 	import Taskbar from '$lib/components/Taskbar.svelte';
+	import PremioPresenza from '$lib/components/PremioPresenza.svelte';
 
 	let { children } = $props();
 
@@ -77,6 +78,7 @@
 {#if inGioco}
 	<Intestazione />
 	<BarraRete />
+	<PremioPresenza />
 {/if}
 
 <main class="app" class:app--libera={!inGioco}>

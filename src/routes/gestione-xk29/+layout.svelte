@@ -17,6 +17,7 @@
 		{ href: '/gestione-xk29/contestazioni', label: 'Contestazioni' },
 		{ href: '/gestione-xk29/profili', label: 'Giocatori' },
 		{ href: '/gestione-xk29/notifiche', label: 'Notifiche' },
+		{ href: '/gestione-xk29/presenze', label: 'Presenze' },
 		{ href: '/gestione-xk29/finale', label: 'Premiazione' }
 	];
 
