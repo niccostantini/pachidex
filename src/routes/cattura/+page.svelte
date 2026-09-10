@@ -204,7 +204,6 @@
 		try {
 			const pronta = await comprimiFoto(file);
 			await coda.accoda({
-				userId: profilo.io.id,
 				itemId: scelta.item_id,
 				nomeItem: scelta.nome,
 				blob: pronta.blob,

@@ -11,7 +11,6 @@ import { notificaEvento } from '$lib/notifica';
  */
 export interface CatturaInCoda {
 	id: string;
-	userId: string;
 	itemId: string;
 	nomeItem: string;
 	blob: Blob;
@@ -119,10 +118,18 @@ class StatoCoda {
 		// si chiede un URL fresco a ogni tentativo, cosi' una firma scaduta
 		// (coda rimasta ferma per ore senza rete) si risolve da sola al
 		// prossimo giro invece di restare bloccata per sempre.
+		// Il token va allegato: l'endpoint firma solo per chi e' entrato, e la
+		// cartella la decide lui dall'identita' della sessione. Senza sessione
+		// si lancia e basta: la voce resta in coda e riparte dopo il login,
+		// come dopo un buco di rete.
+		const { data: sessione } = await supabase.auth.getSession();
+		const token = sessione.session?.access_token;
+		if (!token) throw new Error('Sessione scaduta: rientra e la foto parte da sola');
+
 		const risp = await fetch('/api/upload-url', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ userId: voce.userId, estensione: voce.estensione })
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ estensione: voce.estensione })
 		});
 		if (!risp.ok) throw new Error(`Non riesco a preparare l'upload (${risp.status})`);
 		const { uploadUrl, contentType, publicUrl } = await risp.json();
