@@ -15,6 +15,23 @@ export const COLONNE_CSV = [
 	'riferimento'
 ] as const;
 
+/**
+ * I caratteri ammessi in un nome: lettere di qualsiasi alfabeto, cifre,
+ * spazi e la punteggiatura che i nomi veri usano davvero — "Cavaliere
+ * d'Italia", "1ª cosa da fare: selfie inaugurale".
+ *
+ * Fuori restano soprattutto < > " e =, cioe' quello che serve a scrivere un
+ * tag. Il CSV e' il punto in cui il catalogo entra da fuori: chi compila il
+ * modello non e' per forza chi amministra il gioco, e un nome viaggia fino
+ * al fumetto della mappa. Quel fumetto adesso e' a prova di HTML, ma la
+ * serratura giusta sta anche qui, sul confine da cui il dato entra.
+ *
+ * Il nome utente ha una regola simile in src/routes/api/utenti/+server.ts:
+ * quella e' piu' stretta (trenta caratteri) perche' un nome utente e' corto
+ * per forza; qui i nomi arrivano a cinquantasei.
+ */
+const NOME_ITEM = /^[\p{L}\p{N} '’·°ª,.:;!?()\-–]{2,80}$/u;
+
 export interface RigaItem {
 	nome: string;
 	categoria: Categoria;
@@ -139,7 +156,15 @@ export function validaCSV(testo: string): EsitoImport {
 		const avvisi: string[] = [];
 
 		const nome = cella('nome');
-		if (!nome) errori.push('nome mancante');
+		if (!nome) {
+			errori.push('nome mancante');
+		} else if (!NOME_ITEM.test(nome)) {
+			errori.push(
+				nome.length > 80
+					? `nome troppo lungo (${nome.length} caratteri, il massimo e' 80)`
+					: `nome "${nome}" contiene caratteri non ammessi`
+			);
+		}
 
 		const categoria = normalizza(cella('categoria'));
 		if (!['posto', 'pietanza', 'animale', 'attivita'].includes(categoria)) {

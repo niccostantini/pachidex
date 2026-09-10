@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { caricaDex, mieCatture, type MiaVoce } from '$lib/db/dex';
 	import { profilo } from '$lib/state/profilo.svelte';
+	import { RARITA } from '$lib/game/rules';
 	import { messaggioErrore } from '$lib/supabase';
 	import type { VoceDex } from '$lib/types';
 
@@ -9,6 +10,27 @@
 	let stato = $state<'carico' | 'ok' | 'errore' | 'vuota'>('carico');
 	let errore = $state<string | null>(null);
 	let quanti = $state({ presi: 0, totali: 0 });
+
+	/**
+	 * Il fumetto si costruisce a nodi, non a stringa.
+	 *
+	 * Leaflet mette l'HTML che gli passi dentro innerHTML, quindi qui
+	 * l'escape di Svelte non arriva: era l'unico punto dell'app in cui il
+	 * nome di una sfiziosita' — che entra anche da un CSV che qualcuno ti
+	 * passa — poteva diventare codice invece che testo. Con textContent la
+	 * domanda non si pone piu'.
+	 */
+	function fumetto(p: VoceDex, preso: boolean): HTMLElement {
+		const box = document.createElement('div');
+		const titolo = document.createElement('strong');
+		titolo.textContent = p.nome;
+		const valore = document.createElement('span');
+		valore.textContent = `${p.rarita} · ${p.croquembouche} ✦`;
+		const stato = document.createElement('span');
+		stato.textContent = preso ? 'Sbloccato' : 'Ancora da prendere';
+		box.append(titolo, document.createElement('br'), valore, document.createElement('br'), stato);
+		return box;
+	}
 
 	onMount(() => {
 		let mappa: import('leaflet').Map | undefined;
@@ -49,18 +71,16 @@
 
 				for (const p of punti) {
 					const preso = mie.has(p.item_id);
+					// La rarita' passa da un elenco chiuso invece che dal database:
+					// finisce dentro un nome di classe, e un nome di classe e' HTML.
+					const rarita = RARITA.some((r) => r.valore === p.rarita) ? p.rarita : 'comune';
 					const icona = L.divIcon({
 						className: 'pin-wrap',
-						html: `<span class="pin pin--${p.rarita} ${preso ? 'pin--preso' : 'pin--libero'}"></span>`,
+						html: `<span class="pin pin--${rarita} ${preso ? 'pin--preso' : 'pin--libero'}"></span>`,
 						iconSize: [22, 22],
 						iconAnchor: [11, 11]
 					});
-					L.marker([p.lat, p.lng], { icon: icona })
-						.addTo(mappa)
-						.bindPopup(
-							`<strong>${p.nome}</strong><br>${p.rarita} · ${p.croquembouche} ✦<br>` +
-								(preso ? 'Sbloccato' : 'Ancora da prendere')
-						);
+					L.marker([p.lat, p.lng], { icon: icona }).addTo(mappa).bindPopup(fumetto(p, preso));
 				}
 
 				mappa.fitBounds(
