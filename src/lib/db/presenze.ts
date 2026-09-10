@@ -15,6 +15,8 @@ export interface Presenza {
 	croquembouche: number;
 	/** Quanto varrebbe domani, se si torna. */
 	prossimo: number;
+	/** Quante volte si e' gia' salita la scala: 1 la prima, 2 dopo il giro. */
+	giro: number;
 	/** false se oggi era gia' stata segnata: niente festa una seconda volta. */
 	nuova: boolean;
 }

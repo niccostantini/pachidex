@@ -14,6 +14,9 @@
 	let premio = $state<Presenza | null>(null);
 	let chiesto = false;
 
+	/** Domani si prende meno di oggi: vuol dire che la scala ricomincia. */
+	const ricomincia = $derived(!!premio && premio.prossimo < premio.croquembouche);
+
 	$effect(() => {
 		// soloSguardo copre Admin e Spione: per loro il database non
 		// risponderebbe niente comunque, ma cosi' non si chiede nemmeno.
@@ -40,13 +43,19 @@
 			<p class="giorni t-num">{premio.striscia}</p>
 			<p class="t-label">
 				{premio.striscia === 1 ? 'primo giorno' : 'giorni di fila'}
+				{#if premio.giro > 1}<span class="t-muted"> · giro {premio.giro}</span>{/if}
 			</p>
 
 			<p class="vinti t-num">+{premio.croquembouche} ✦</p>
 
 			<p class="t-small">
-				Torna domani e sono <strong>{premio.prossimo} ✦</strong>. Salti un giorno e si
-				riparte dal primo.
+				{#if ricomincia}
+					Sei in cima alla scala: domani ricomincia da <strong>{premio.prossimo} ✦</strong>
+					e si risale.
+				{:else}
+					Torna domani e sono <strong>{premio.prossimo} ✦</strong>.
+				{/if}
+				Salti un giorno e si riparte dal primo.
 			</p>
 
 			<button class="btn btn--primary btn--lg btn--block" onclick={() => (premio = null)}>

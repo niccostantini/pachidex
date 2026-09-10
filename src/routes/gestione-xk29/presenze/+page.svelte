@@ -21,6 +21,7 @@
 	let esito = $state<string | null>(null);
 
 	const ultimo = $derived(scala.length ? scala[scala.length - 1].croquembouche : 0);
+	const primo = $derived(scala.length ? scala[0].croquembouche : 0);
 
 	async function rileggi() {
 		errore = null;
@@ -119,9 +120,10 @@
 	<Finestra titolo="La scala" variante="blue">
 		<div class="stack">
 			<p class="t-small">
-				Quanto vale ogni giorno di fila. Oltre l'ultimo gradino si resta lì:
-				chi arriva al giorno {scala.length || '—'} continua a prendere
-				<strong>{ultimo} ✦</strong> ogni giorno.
+				Quanto vale ogni giorno di fila. Dopo l'ultimo gradino la scala
+				<strong>riparte da capo</strong>: chi arriva al giorno {scala.length || '—'}
+				prende {ultimo} ✦, e il giorno dopo si ricomincia da {primo} ✦. La striscia
+				invece continua a contare.
 			</p>
 
 			<ul class="scala">
