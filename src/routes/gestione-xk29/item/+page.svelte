@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { attivaItem, eliminaItem, salvaItem, tuttiGliItem } from '$lib/db/admin';
 	import { caricaConfig } from '$lib/db/dex';
-	import { CATEGORIE, RARITA, etichettaCategoria } from '$lib/game/rules';
+	import { CATEGORIE, RARITA, etichettaCategoria, problemaNome } from '$lib/game/rules';
 	import { schermo } from '$lib/state/schermo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import Finestra from '$lib/components/Finestra.svelte';
@@ -23,6 +23,16 @@
 	const anteprimaRif = $derived(riferimentoDi(modifica?.riferimento));
 	let salvando = $state(false);
 	let erroreForm = $state<string | null>(null);
+
+	/**
+	 * Il nome si controlla mentre lo si scrive, non al salvataggio.
+	 *
+	 * E' la stessa regola dell'import CSV — sta in un posto solo — e serve a
+	 * dire subito quale carattere non va, invece di far scrivere tutto e poi
+	 * rifiutare. Un nome finisce nel fumetto della mappa: li' deve restare
+	 * testo, e i caratteri con cui si scrive un tag non passano.
+	 */
+	const guaioNome = $derived(modifica ? problemaNome(modifica.nome ?? '') : null);
 
 	const visibili = $derived(
 		item
@@ -78,8 +88,9 @@
 	}
 
 	async function salva() {
-		if (!modifica?.nome?.trim()) {
-			erroreForm = 'Il nome serve.';
+		if (!modifica) return;
+		if (guaioNome) {
+			erroreForm = guaioNome;
 			return;
 		}
 		if (modifica.validazione === 'foto_gps' && (modifica.lat == null || modifica.lng == null)) {
@@ -89,7 +100,7 @@
 		salvando = true;
 		erroreForm = null;
 		try {
-			await salvaItem({ ...(modifica as Item), nome: modifica.nome.trim() });
+			await salvaItem({ ...(modifica as Item), nome: (modifica.nome ?? '').trim() });
 			modifica = null;
 			await rileggi();
 		} catch (e) {
@@ -221,7 +232,17 @@
 		<div class="stack">
 			<div class="field-row">
 				<label class="field-label" for="f-nome">Nome</label>
-				<input id="f-nome" class="field" bind:value={modifica.nome} />
+				<input
+					id="f-nome"
+					class="field"
+					class:field--storto={!!modifica.nome && !!guaioNome}
+					bind:value={modifica.nome}
+					aria-invalid={!!modifica.nome && !!guaioNome}
+					aria-describedby="f-nome-guaio"
+				/>
+				{#if modifica.nome && guaioNome}
+					<p id="f-nome-guaio" class="guaio t-small">{guaioNome}</p>
+				{/if}
 			</div>
 
 			<div class="due">
@@ -355,7 +376,7 @@
 
 			<div class="due">
 				<button class="btn" onclick={() => (modifica = null)}>Annulla</button>
-				<button class="btn btn--primary" onclick={salva} disabled={salvando}>
+				<button class="btn btn--primary" onclick={salva} disabled={salvando || !!guaioNome}>
 					{salvando ? 'Salvo…' : 'Salva'}
 				</button>
 			</div>
@@ -364,6 +385,15 @@
 </Foglio>
 
 <style>
+	.field--storto {
+		border-color: var(--red);
+	}
+
+	.guaio {
+		color: var(--red);
+		margin-top: 4px;
+	}
+
 	.filtri {
 		display: flex;
 		gap: var(--space-2);

@@ -19,6 +19,35 @@ export const CROQ_DEFAULT: Record<Rarita, number> = {
 	leggendario: 60
 };
 
+/**
+ * I caratteri ammessi nel nome di una sfiziosita': lettere di qualsiasi
+ * alfabeto, cifre, spazi e la punteggiatura che i nomi veri usano davvero —
+ * "Cavaliere d'Italia", "1ª cosa da fare: selfie inaugurale".
+ *
+ * Fuori restano soprattutto < > " = e &, cioe' quello che serve a scrivere un
+ * tag: un nome finisce nel fumetto della mappa, e li' deve restare testo.
+ * La regola sta qui e non dentro l'import perche' la usano in due — il CSV e
+ * il modulo del pannello — e due copie che si scostano sono peggio di niente.
+ */
+const NOME_ITEM = /^[\p{L}\p{N} '’·°ª,.:;!?()\-–]{2,80}$/u;
+
+/** I caratteri che l'utente ha scritto e che non sono ammessi. */
+const fuoriRegola = (nome: string) => [...new Set([...nome].filter((c) => !NOME_ITEM.test(`a${c}`)))];
+
+/**
+ * Cosa c'e' che non va in questo nome, detto a chi lo sta scrivendo.
+ * null quando va bene.
+ */
+export function problemaNome(nome: string): string | null {
+	const pulito = nome.trim();
+	if (!pulito) return 'Il nome serve.';
+	if (pulito.length < 2) return 'Il nome e\' troppo corto: almeno due caratteri.';
+	if (pulito.length > 80) return `Il nome e' troppo lungo: ${pulito.length} caratteri invece di 80.`;
+	if (NOME_ITEM.test(pulito)) return null;
+	const strani = fuoriRegola(pulito);
+	return `Questi caratteri non si possono usare in un nome: ${strani.join(' ')}`;
+}
+
 export const varCategoria = (c: Categoria) => `var(--cat-${c})`;
 export const varRarita = (r: Rarita) => `var(--rarity-${r})`;
 

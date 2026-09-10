@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { importaItem } from '$lib/db/admin';
-	import { COLONNE_CSV, scaricaTemplate, validaCSV, type EsitoImport } from '$lib/game/csv';
+	import {
+		COLONNE_CSV,
+		scaricaTemplate,
+		validaCSV,
+		type EsitoImport,
+		type EsitoRiga
+	} from '$lib/game/csv';
 	import { etichettaCategoria } from '$lib/game/rules';
 	import { schermo } from '$lib/state/schermo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
@@ -11,9 +17,17 @@
 	let sopra = $state(false);
 	let importando = $state(false);
 	let progresso = $state({ fatte: 0, totali: 0 });
-	let risultato = $state<{ inserite: number; falliti: { nome: string; motivo: string }[] } | null>(
-		null
-	);
+	/**
+	 * Le righe scartate dalla validazione se le porta dietro anche il
+	 * risultato: prima l'anteprima spariva insieme a loro, e dopo l'import
+	 * restava scritto "130 elementi importati" senza piu' traccia dei sei che
+	 * non erano nemmeno stati provati. Uno se ne accorgeva a catalogo aperto.
+	 */
+	let risultato = $state<{
+		inserite: number;
+		falliti: { nome: string; motivo: string }[];
+		scartate: EsitoRiga[];
+	} | null>(null);
 	let errore = $state<string | null>(null);
 
 	async function leggi(file: File) {
@@ -43,11 +57,13 @@
 		if (!esito?.valide.length) return;
 		importando = true;
 		progresso = { fatte: 0, totali: esito.valide.length };
+		const scartate = esito.invalide;
 		try {
-			risultato = await importaItem(
+			const esitoImport = await importaItem(
 				esito.valide.map((r) => r.dati!),
 				(fatte, totali) => (progresso = { fatte, totali })
 			);
+			risultato = { ...esitoImport, scartate };
 			esito = null;
 		} catch (e) {
 			errore = messaggioErrore(e);
@@ -182,23 +198,44 @@
 				<button class="btn btn--primary btn--block" onclick={importa} disabled={importando}>
 					{importando
 						? `Importo ${progresso.fatte}/${progresso.totali}…`
-						: `Importa ${esito.valide.length} elementi`}
+						: esito.invalide.length
+							? `Importa ${esito.valide.length} elementi (${esito.invalide.length} ${esito.invalide.length === 1 ? 'resta' : 'restano'} fuori)`
+							: `Importa ${esito.valide.length} elementi`}
 				</button>
 			{/if}
 		</Finestra>
 	{/if}
 
 	{#if risultato}
-		<Finestra titolo="Fatto" variante="green">
+		<Finestra
+			titolo={risultato.falliti.length || risultato.scartate.length ? 'Fatto, ma non tutto' : 'Fatto'}
+			variante={risultato.falliti.length || risultato.scartate.length ? 'orange' : 'green'}
+		>
 			<p><strong>{risultato.inserite}</strong> elementi importati.</p>
+
+			{#if risultato.scartate.length}
+				<p class="t-small">
+					<strong>{risultato.scartate.length}</strong>
+					{risultato.scartate.length === 1 ? 'riga non è' : 'righe non sono'} nemmeno
+					{risultato.scartate.length === 1 ? 'stata provata' : 'state provate'}: il file va
+					corretto e ricaricato.
+				</p>
+				<ul class="t-small errori-lista">
+					{#each risultato.scartate as r (r.numero)}
+						<li><strong>Riga {r.numero}</strong> — {r.errori.join(' · ')}</li>
+					{/each}
+				</ul>
+			{/if}
+
 			{#if risultato.falliti.length}
-				<p class="t-small">Questi no:</p>
+				<p class="t-small">Queste le ha rifiutate il database:</p>
 				<ul class="t-small errori-lista">
 					{#each risultato.falliti as f (f.nome)}
 						<li><strong>{f.nome}</strong> — {f.motivo}</li>
 					{/each}
 				</ul>
 			{/if}
+
 			<a class="btn btn--sm" href="/gestione-xk29/item">Vai agli elementi</a>
 		</Finestra>
 	{/if}
