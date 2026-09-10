@@ -1,7 +1,7 @@
 /**
  * Genera supabase/seed.sql: il catalogo vero piu' una vacanza finta.
  *
- * Il catalogo si scarica dall'API di produzione (sono contenuti di gioco,
+ * Il catalogo si legge da supabase/catalogo.json (sono contenuti di gioco,
  * niente di personale) cosi' l'ambiente locale ha le stesse 136 sfiziosita' e
  * i set e i titoli hanno qualcosa su cui lavorare davvero.
  *
@@ -18,6 +18,20 @@ import { readFileSync, writeFileSync } from 'node:fs';
  * diventare pubblico. I giocatori veri li crei dal pannello.
  */
 const GIOCATORI = ['Vito', 'Rosa', 'Turi', 'Nina', 'Ciccio', 'Lella'];
+
+/**
+ * Gli account, come in produzione: chi gioca, chi amministra e chi guarda.
+ *
+ * Admin e Spione stanno fuori dalla partita (`nascosto`) e non prendono parte
+ * a niente. Un admin che gioca falserebbe proprio le cose che in locale si
+ * vogliono provare: le maggioranze delle contestazioni, i conteggi dei set,
+ * la premiazione.
+ */
+const ACCOUNT = [
+	{ nome: 'Admin', admin: true, solaLettura: false, nascosto: true },
+	...GIOCATORI.map((nome) => ({ nome, admin: false, solaLettura: false, nascosto: false })),
+	{ nome: 'Spione', admin: false, solaLettura: true, nascosto: true }
+];
 /** Password uguale per tutti in locale: e' un ambiente di prova. */
 const PAROLA = 'prova1234';
 const INIZIO = new Date('2026-08-28T09:00:00+02:00');
@@ -52,7 +66,7 @@ scrivi(`-- =====================================================================
 --
 -- GENERATO DA scripts/genera-seed.mjs — non modificarlo a mano, si rifa'.
 --
--- Il catalogo e' quello vero, scaricato dall'API di produzione. La vacanza
+-- Il catalogo e' quello vero, tenuto in supabase/catalogo.json. La vacanza
 -- qui sotto e' inventata ma deterministica: stesso seme, stessa partita.
 --
 -- Le foto puntano a un'icona statica servita dal dev server: cosi' il feed
@@ -66,8 +80,7 @@ scrivi(`-- =====================================================================
 -- Si entra col NOME UTENTE: l'email tecnica non la vede nessuno.
 
 -- --- gli account ------------------------------------------------------------
-${[...GIOCATORI.map((g) => ({ nome: g, admin: g === 'Vito', spia: false })),
-   { nome: 'Spione', admin: false, spia: true }]
+${ACCOUNT
 	.map(
 		(u) => `
 with nuovo as (
@@ -83,7 +96,7 @@ with nuovo as (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		${q(u.nome.toLowerCase() + '@pachidex.local')}, crypt(${q(PAROLA)}, gen_salt('bf')), now(),
 		now(), now(),
-		${q(JSON.stringify({ provider: 'email', providers: ['email'], is_admin: u.admin, sola_lettura: u.spia, nascosto: u.spia }))},
+		${q(JSON.stringify({ provider: 'email', providers: ['email'], is_admin: u.admin, sola_lettura: u.solaLettura, nascosto: u.nascosto }))},
 		${q(JSON.stringify({ nome: u.nome }))},
 		'', '', '', '', '', '', '', ''
 	)

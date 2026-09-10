@@ -3,7 +3,7 @@
 --
 -- GENERATO DA scripts/genera-seed.mjs — non modificarlo a mano, si rifa'.
 --
--- Il catalogo e' quello vero, scaricato dall'API di produzione. La vacanza
+-- Il catalogo e' quello vero, tenuto in supabase/catalogo.json. La vacanza
 -- qui sotto e' inventata ma deterministica: stesso seme, stessa partita.
 --
 -- Le foto puntano a un'icona statica servita dal dev server: cosi' il feed
@@ -29,9 +29,34 @@ with nuovo as (
 		email_change_token_current, phone_change, phone_change_token, reauthentication_token
 	) values (
 		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+		'admin@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
+		now(), now(),
+		'{"provider":"email","providers":["email"],"is_admin":true,"sola_lettura":false,"nascosto":true}',
+		'{"nome":"Admin"}',
+		'', '', '', '', '', '', '', ''
+	)
+	returning id, email
+)
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), n.id,
+       json_build_object('sub', n.id::text, 'email', n.email)::jsonb,
+       'email', n.id::text, now(), now(), now()
+from nuovo n;
+
+with nuovo as (
+	insert into auth.users (
+		instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+		created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+		-- Queste colonne vanno a stringa vuota e non a NULL: chi legge gli
+		-- account le mette in campi di testo non nullable e su NULL si pianta
+		-- con un "Database error querying schema" che non dice niente.
+		confirmation_token, recovery_token, email_change_token_new, email_change,
+		email_change_token_current, phone_change, phone_change_token, reauthentication_token
+	) values (
+		'00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
 		'vito@pachidex.local', crypt('prova1234', gen_salt('bf')), now(),
 		now(), now(),
-		'{"provider":"email","providers":["email"],"is_admin":true,"sola_lettura":false,"nascosto":false}',
+		'{"provider":"email","providers":["email"],"is_admin":false,"sola_lettura":false,"nascosto":false}',
 		'{"nome":"Vito"}',
 		'', '', '', '', '', '', '', ''
 	)
