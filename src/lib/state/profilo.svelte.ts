@@ -24,7 +24,13 @@ class StatoProfilo {
 	utenti = $state<User[]>([]);
 	io = $state<User | null>(null);
 	saldi = $state<Saldo[]>([]);
-	/** true quando si sa se c'e' una sessione: prima non si decide niente. */
+	/**
+	 * true quando si sa CHI e' entrato, non solo che c'e' una sessione.
+	 *
+	 * La guardia del layout manda alla porta chiunque risulti pronto e senza
+	 * profilo: finche' il profilo e' in volo la risposta giusta e' "non lo so
+	 * ancora", altrimenti si viene rimbalzati indietro appena entrati.
+	 */
 	pronto = $state(false);
 	errore = $state<string | null>(null);
 
@@ -73,6 +79,11 @@ class StatoProfilo {
 			return;
 		}
 
+		// Chi e' questo id non si sa ancora. Se invece e' gia' quello di
+		// adesso — il token si rinnova da solo ogni ora — non si torna
+		// indietro: farebbe sfarfallare le pagine che aspettano "pronto".
+		if (this.io?.id !== id) this.pronto = false;
+
 		try {
 			// L'elenco resta in cache: senza linea l'app deve aprirsi lo stesso,
 			// e chi e' entrato ieri e' ancora entrato oggi.
@@ -108,11 +119,20 @@ class StatoProfilo {
 
 	/** Restituisce il messaggio d'errore, oppure null se si e' entrati. */
 	async entra(nome: string, password: string): Promise<string | null> {
-		const { error } = await supabase.auth.signInWithPassword({
+		const { data, error } = await supabase.auth.signInWithPassword({
 			email: emailDi(nome),
 			password
 		});
-		if (!error) return null;
+		if (!error) {
+			// Il profilo si carica qui e non si aspetta l'evento di Supabase:
+			// quello arriva quando arriva, e chi ha chiamato entra() naviga
+			// subito. Con il profilo ancora in volo la guardia del layout
+			// rimandava alla porta, e le credenziali andavano scritte due
+			// volte — la seconda funzionava perche' nel frattempo era
+			// arrivato.
+			await this.daSessione(data.user?.id ?? null);
+			return null;
+		}
 		// Il messaggio di Supabase parla di email e qui l'email non esiste:
 		// tradurlo evita di far cercare a qualcuno un indirizzo che non ha.
 		return /invalid login|credentials/i.test(error.message)
