@@ -17,6 +17,7 @@
 	} from '$lib/db/finale';
 	import { caricaClassifica } from '$lib/db/dex';
 	import { profilo } from '$lib/state/profilo.svelte';
+	import { cerimonia } from '$lib/state/cerimonia.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Finestra from '$lib/components/Finestra.svelte';
@@ -80,6 +81,10 @@
 	async function rileggi() {
 		try {
 			stato = await statoFinale();
+			// Prima si aggiorna lo stato condiviso, poi si va via: il layout
+			// legge di li' per decidere se riportare tutti dentro, e se lo
+			// sapesse un attimo dopo ci rispingerebbe appena usciti.
+			cerimonia.inCorso = stato !== null;
 			if (!stato) {
 				// Nessuna cerimonia in corso: qui non c'e' niente da vedere.
 				void goto('/', { replaceState: true });

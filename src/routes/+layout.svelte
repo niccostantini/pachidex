@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { profilo } from '$lib/state/profilo.svelte';
+	import { cerimonia } from '$lib/state/cerimonia.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import { rete } from '$lib/state/rete.svelte';
 	import { sottoscriviFinale, statoFinale } from '$lib/db/finale';
@@ -26,11 +27,9 @@
 	 * minuti di "ma io cosa devo guardare?". Il pannello e la scelta del
 	 * profilo restano fuori: da li' si deve poter avviare e rimediare.
 	 */
-	let finaleAttiva = $state(false);
-
 	async function cercaLaFinale() {
 		try {
-			finaleAttiva = (await statoFinale()) !== null;
+			cerimonia.inCorso = (await statoFinale()) !== null;
 		} catch {
 			/* senza rete si resta dove si e': la cerimonia vuole la linea */
 		}
@@ -41,7 +40,7 @@
 	// mount e' gia' passato. Prima si controllava una volta sola e chi non
 	// aveva ancora scelto restava fuori dalla premiazione.
 	$effect(() => {
-		if (finaleAttiva && inGioco && page.url.pathname !== '/finale') void goto('/finale');
+		if (cerimonia.inCorso && inGioco && page.url.pathname !== '/finale') void goto('/finale');
 	});
 
 	onMount(() => {
