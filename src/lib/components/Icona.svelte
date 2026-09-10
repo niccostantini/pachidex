@@ -168,6 +168,15 @@
 			],
 			// Venticinque colonne per cinque righe: e' una scritta, non un'icona.
 			griglia: [25, 5]
+		},
+		// Vista di fronte, non in diagonale: su dodici pixel una diagonale
+		// diventa una scaletta, e la scaletta non somiglia a niente.
+		chiaveinglese: {
+			pieni: [
+				[3, 0, 6, 5], // la testa
+				[5, 5, 2, 7] // il manico
+			],
+			buchi: [[5, 0, 2, 3]] // la bocca, che lascia due ganasce da 2px
 		}
 	} satisfies Record<string, Forma>;
 

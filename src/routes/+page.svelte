@@ -11,7 +11,7 @@
 	import CardScambio from '$lib/components/CardScambio.svelte';
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
-	import GiroGuidato from '$lib/components/GiroGuidato.svelte';
+	import GiroGuidato, { TAPPE } from '$lib/components/GiroGuidato.svelte';
 	import { browser } from '$app/environment';
 	import { selfieDaFare } from '$lib/db/dex';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
@@ -35,8 +35,10 @@
 		if (browser) localStorage.setItem(CHIAVE_GIRO, '1');
 
 		// Il giro finisce mandando a fare la prima cosa, se non e' gia' fatta:
-		// un invito concreto vale piu' di un "buon divertimento".
-		if (!profilo.io) return;
+		// un invito concreto vale piu' di un "buon divertimento". Ma solo a chi
+		// puo' farla: chi guarda da fuori finirebbe sulla schermata di cattura
+		// con un pulsante che il database gli rifiuta.
+		if (!profilo.io || profilo.soloSguardo) return;
 		const selfie = await selfieDaFare(profilo.io.id);
 		if (selfie) void goto('/cattura?benvenuto=1');
 	}
@@ -46,6 +48,15 @@
 		if (localStorage.getItem(CHIAVE_GIRO)) return;
 		giroAperto = true;
 	});
+
+	/**
+	 * L'ultima tappa illumina il pulsante della cattura, che chi guarda da
+	 * fuori non ha: il riflettore non troverebbe il bersaglio e resterebbe un
+	 * velo scuro con sotto un invito a fare una cosa che non puo' fare.
+	 */
+	const tappeDelGiro = $derived(
+		profilo.soloSguardo ? TAPPE.filter((t) => t.bersaglio !== 'cattura') : TAPPE
+	);
 
 	// Contestazione in preparazione
 	let daContestare = $state<PostCattura | null>(null);
@@ -181,7 +192,7 @@
 </div>
 
 {#if giroAperto}
-	<GiroGuidato onFine={chiudiGiro} />
+	<GiroGuidato tappe={tappeDelGiro} onFine={chiudiGiro} />
 {/if}
 
 <Foglio

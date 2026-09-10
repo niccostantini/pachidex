@@ -2,6 +2,8 @@
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import Avatar from './Avatar.svelte';
+	import Notifiche from './Notifiche.svelte';
+	import Icona from './Icona.svelte';
 
 	/**
 	 * Il saldo lampeggia quando cambia: guadagnare Croquembouche e' il punto
@@ -23,7 +25,9 @@
 		}
 		saldoPrecedente = ora;
 	});
-	import Notifiche from './Notifiche.svelte';
+
+	/** La scorciatoia al pannello: stessa domanda che si fa il pannello stesso. */
+	const ammesso = $derived(profilo.pronto && profilo.io?.is_admin === true);
 </script>
 
 <header class="testata">
@@ -41,6 +45,13 @@
 			{#if !profilo.soloSguardo}
 				<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
 			{/if}
+
+			{#if ammesso}
+				<a class="gestione" href="/gestione-xk29" aria-label="Pannello di gestione">
+					<Icona nome="chiaveinglese" dimensione={15} colore="var(--paper)" sfondo="var(--orange)" />
+				</a>
+			{/if}
+
 			<button
 				class="testata__io"
 				aria-label="Esci"
@@ -121,5 +132,16 @@
 	.testata__io {
 		display: block;
 		line-height: 0;
+		cursor: pointer;
+	}
+	/* Vestita come la campanella qui accanto: e' l'altro pulsante della barra. */
+	.gestione {
+		display: grid;
+		place-items: center;
+		width: 26px;
+		height: 26px;
+		background: var(--orange);
+		border: var(--border-thin) solid var(--navy);
+		-webkit-tap-highlight-color: transparent;
 	}
 </style>
