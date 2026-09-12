@@ -54,13 +54,26 @@
 				fotoStagione(dati.stagione)
 			]);
 			stato = 'ok';
-			// Il segno si mette all'apertura, non alla fine: chi la chiude a
-			// meta' l'ha vista lo stesso, e non e' giusto tenere ferme le foto
-			// di tutti perche' qualcuno non e' arrivato in fondo.
-			await segnaWrappedVisto(dati.stagione);
 		} catch (e) {
 			errore = messaggioErrore(e);
 			stato = 'errore';
+		}
+
+		// Il segno si mette all'apertura, non alla fine: chi la chiude a meta'
+		// l'ha vista lo stesso, e non e' giusto tenere ferme le foto di tutti
+		// perche' qualcuno non e' arrivato in fondo.
+		//
+		// E sta fuori dal blocco di sopra, con il suo silenzio: e' una casella
+		// da spuntare, non il contenuto della pagina. Stando dentro, una rete
+		// ballerina sostituiva il Wrapped gia' caricato con una schermata di
+		// errore — per una chiamata che al lettore non interessa. Se non
+		// arriva, pazienza: dopo ventiquattr'ore si cancella lo stesso.
+		if (dati) {
+			try {
+				await segnaWrappedVisto(dati.stagione);
+			} catch {
+				/* riproveremo alla prossima apertura */
+			}
 		}
 	});
 </script>
