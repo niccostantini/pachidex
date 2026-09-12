@@ -5,11 +5,13 @@
 	import { catturePersona } from '$lib/db/feed';
 	import { caricaClassifica } from '$lib/db/dex';
 	import { caricaTitoli, TITOLI, type VoceTitolo } from '$lib/db/titoli';
+	import { coccardeDi, type Coccarda } from '$lib/db/coccarde';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import CardCattura from '$lib/components/CardCattura.svelte';
 	import Finestra from '$lib/components/Finestra.svelte';
+	import Coccarde from '$lib/components/Coccarde.svelte';
 	import type { PostCattura, RigaClassifica } from '$lib/types';
 
 	const id = $derived(page.params.id as string);
@@ -20,6 +22,7 @@
 	let taggata = $state<PostCattura[]>([]);
 	let righe = $state<RigaClassifica[]>([]);
 	let titoli = $state<VoceTitolo[]>([]);
+	let coccarde = $state<Coccarda[]>([]);
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
 	let scheda = $state<'suoi' | 'taggata'>('suoi');
@@ -55,12 +58,17 @@
 			return;
 		}
 
-		// Numeri e titoli sono contorno: se non arrivano, il feed resta.
+		// Numeri, titoli e coccarde sono contorno: se non arrivano, il feed resta.
 		try {
-			[righe, titoli] = await Promise.all([caricaClassifica(), caricaTitoli()]);
+			[righe, titoli, coccarde] = await Promise.all([
+				caricaClassifica(),
+				caricaTitoli(),
+				coccardeDi(id)
+			]);
 		} catch {
 			righe = [];
 			titoli = [];
+			coccarde = [];
 		}
 	}
 
@@ -99,6 +107,15 @@
 				{#each suoiTitoli as t (t.titolo)}
 					<span class="targhetta t-label">{t.nome}</span>
 				{/each}
+			</div>
+		{/if}
+
+		<!-- I titoli qui sopra sono quelli di adesso e si possono perdere; le
+		     coccarde sono quelle vinte, e non si perdono mai. -->
+		{#if coccarde.length}
+			<div class="albo">
+				<p class="t-label t-muted">Coccarde</p>
+				<Coccarde {coccarde} />
 			</div>
 		{/if}
 
@@ -183,6 +200,12 @@
 
 	.numero .t-muted {
 		color: rgba(247, 243, 232, 0.72);
+	}
+
+	.albo {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
 	}
 
 	.titoli {
