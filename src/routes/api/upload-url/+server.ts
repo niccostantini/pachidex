@@ -1,14 +1,6 @@
 import { json, error } from '@sveltejs/kit';
-import { AwsClient } from 'aws4fetch';
 import { createClient } from '@supabase/supabase-js';
-import {
-	R2_ACCOUNT_ID,
-	R2_ACCESS_KEY_ID,
-	R2_SECRET_ACCESS_KEY,
-	R2_BUCKET,
-	R2_PUBLIC_BASE_URL,
-	R2_JURISDICTION
-} from '$env/static/private';
+import { BASE_PUBBLICA, BUCKET, R2_HOST, r2 } from '$lib/server/r2';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { idUnico } from '$lib/id';
 import type { RequestHandler } from './$types';
@@ -41,21 +33,6 @@ const ESTENSIONI: Record<string, string> = {
 // Path del giocatore: solo esadecimale con trattini, come un uuid v4.
 const UUID = /^[0-9a-f-]{36}$/i;
 
-const client = new AwsClient({
-	accessKeyId: R2_ACCESS_KEY_ID,
-	secretAccessKey: R2_SECRET_ACCESS_KEY,
-	service: 's3',
-	region: 'auto'
-});
-
-/**
- * R2 espone endpoint diversi per giurisdizione: un bucket creato con
- * giurisdizione EU non e' raggiungibile da quello standard, e risponde
- * AccessDenied — indistinguibile da una chiave sbagliata, quindi vale la
- * pena tenerlo esplicito invece di scoprirlo a tentativi.
- */
-const SOTTODOMINIO = R2_JURISDICTION ? `${R2_JURISDICTION}.` : '';
-const HOST = `${R2_ACCOUNT_ID}.${SOTTODOMINIO}r2.cloudflarestorage.com`;
 
 /** L'id di chi sta caricando, preso dal token e non dal corpo. */
 async function chiCarica(request: Request): Promise<string> {
@@ -91,12 +68,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	const nomeFile = `${idUnico()}.${estensione}`;
 	const chiave = `catture/${utente}/${nomeFile}`;
 
-	const endpoint = new URL(`https://${HOST}/${R2_BUCKET}/${chiave}`);
+	const endpoint = new URL(`https://${R2_HOST}/${BUCKET}/${chiave}`);
 	// Cinque minuti bastano e avanzano: la foto e' gia' pronta sul dispositivo
 	// quando si chiede l'URL, l'upload parte subito dopo.
 	endpoint.searchParams.set('X-Amz-Expires', '300');
 
-	const firmata = await client.sign(endpoint, {
+	const firmata = await r2.sign(endpoint, {
 		method: 'PUT',
 		headers: { 'Content-Type': contentType },
 		// allHeaders serve a far entrare il Content-Type NELLA firma. Senza,
@@ -109,6 +86,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	return json({
 		uploadUrl: firmata.url,
 		contentType,
-		publicUrl: `${R2_PUBLIC_BASE_URL}/${chiave}`
+		publicUrl: `${BASE_PUBBLICA}/${chiave}`
 	});
 };
