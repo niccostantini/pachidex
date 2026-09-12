@@ -6,24 +6,33 @@
 	import Icona from './Icona.svelte';
 
 	/**
-	 * Il saldo lampeggia quando cambia: guadagnare Croquembouche e' il punto
-	 * del gioco e finora succedeva in silenzio, in un angolo dell'intestazione.
+	 * I due numeri.
 	 *
-	 * Chi guarda da fuori il contatore non ce l'ha: sarebbe un ✦ 0 fermo per
-	 * sempre, cioe' la promessa di un gioco a cui non prende parte.
+	 * A sinistra quello della gara: i Croquembouche acquisiti in questa
+	 * stagione, meno le penalita'. Riparte da zero ogni due settimane.
+	 * A destra il portacroque, che invece non si azzera mai — quello che hai
+	 * davvero da spendere.
+	 *
+	 * Lampeggia quello di classifica: guadagnare e' il punto del gioco, e
+	 * finora succedeva in silenzio in un angolo. Il portacroque no: si muove
+	 * anche quando spendi, e un lampo a ogni spesa sarebbe una festa per una
+	 * cosa che festa non e'.
+	 *
+	 * Chi guarda da fuori non li ha: sarebbero due zeri fermi per sempre,
+	 * cioe' la promessa di un gioco a cui non prende parte.
 	 */
-	let saldoPrecedente = $state<number | null>(null);
+	let puntiPrecedenti = $state<number | null>(null);
 	let lampeggia = $state(false);
 
 	$effect(() => {
-		const ora = profilo.saldo;
-		if (saldoPrecedente !== null && ora !== saldoPrecedente) {
+		const ora = profilo.punti;
+		if (puntiPrecedenti !== null && ora !== puntiPrecedenti) {
 			lampeggia = true;
 			const t = setTimeout(() => (lampeggia = false), 700);
-			saldoPrecedente = ora;
+			puntiPrecedenti = ora;
 			return () => clearTimeout(t);
 		}
-		saldoPrecedente = ora;
+		puntiPrecedenti = ora;
 	});
 
 	/** La scorciatoia al pannello: stessa domanda che si fa il pannello stesso. */
@@ -43,7 +52,16 @@
 		<div class="testata__dx">
 			<Notifiche />
 			{#if !profilo.soloSguardo}
-				<span class="saldo t-num" class:saldo--cambia={lampeggia}>✦ {profilo.saldo}</span>
+				<a class="conti" href="/classifica" aria-label="Classifica e portacroque">
+					<span class="chip chip--gara" class:chip--cambia={lampeggia}>
+						<span class="chip__n t-num">{profilo.punti} ✦</span>
+						<span class="chip__che">CLASSIFICA</span>
+					</span>
+					<span class="chip chip--tasca">
+						<span class="chip__n t-num">{profilo.saldo} ✦</span>
+						<span class="chip__che">PORTACROQUE</span>
+					</span>
+				</a>
 			{/if}
 
 			{#if ammesso}
@@ -90,7 +108,7 @@
 		margin-left: auto;
 	}
 
-	.saldo--cambia {
+	.chip--cambia {
 		animation: lampeggia 700ms steps(1, end);
 	}
 
@@ -106,18 +124,44 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.saldo--cambia {
+		.chip--cambia {
 			animation: none;
 		}
 	}
 
-	.saldo {
-		font-size: 0.8125rem;
-		font-weight: 700;
+	.conti {
+		display: flex;
+		gap: 4px;
+		text-decoration: none;
+	}
+
+	.chip {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.05;
+		padding: 2px 6px;
+	}
+
+	.chip--gara {
 		background: var(--navy);
-		color: var(--yellow);
-		border: var(--border-thin) solid var(--navy);
-		padding: 1px 6px;
+		color: var(--paper);
+	}
+
+	.chip--tasca {
+		background: var(--paper);
+		color: var(--navy);
+	}
+
+	.chip__n {
+		font-size: 0.8125rem;
+	}
+
+	/* Sotto gli 8px la scritta non si legge piu': e' il limite, non una scelta. */
+	.chip__che {
+		font-size: 0.5rem;
+		letter-spacing: 0.04em;
+		opacity: 0.8;
 	}
 
 	.attesa {

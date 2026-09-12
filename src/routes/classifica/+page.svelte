@@ -17,12 +17,12 @@
 
 	const ordinate = $derived(
 		[...righe].sort((a, b) =>
-			tab === 'croq' ? b.saldo - a.saldo : b.item_unici - a.item_unici || b.saldo - a.saldo
+			tab === 'croq' ? b.punti - a.punti : b.item_unici - a.item_unici || b.punti - a.punti
 		)
 	);
 
 	const massimo = $derived(
-		Math.max(1, ...ordinate.map((r) => (tab === 'croq' ? r.saldo : r.item_unici)))
+		Math.max(1, ...ordinate.map((r) => (tab === 'croq' ? r.punti : r.item_unici)))
 	);
 
 	onMount(async () => {
@@ -59,13 +59,14 @@
 
 	<p class="spiega t-small t-muted">
 		{#if tab === 'croq'}
-			Il saldo tiene conto degli scambi: qui vince chi commercia meglio.
+			Contano i Croquembouche acquisiti in questa stagione, meno le penalità. Gli
+			scambi non spostano la classifica: quelli sono affari del portacroque.
 		{:else}
 			Solo elementi diversi, le ripetizioni non contano: qui vince chi colleziona.
 		{/if}
 	</p>
 
-	<Finestra titolo={tab === 'croq' ? 'Saldo Croquembouche' : 'Collezione'} variante="navy">
+	<Finestra titolo={tab === 'croq' ? 'Punti di stagione' : 'Collezione'} variante="navy">
 		{#if stato === 'carico'}
 			<p class="t-label t-muted">Conto…</p>
 		{:else if stato === 'errore'}
@@ -73,7 +74,7 @@
 		{:else}
 			<ol class="podio">
 				{#each ordinate as r, i (r.user_id)}
-					{@const valore = tab === 'croq' ? r.saldo : r.item_unici}
+					{@const valore = tab === 'croq' ? r.punti : r.item_unici}
 					<li class="riga" class:riga--io={r.user_id === profilo.io?.id}>
 						<span class="pos t-num" class:pos--primo={i === 0}>{i + 1}</span>
 						<Avatar utente={profilo.utenti.find((u) => u.id === r.user_id)} />

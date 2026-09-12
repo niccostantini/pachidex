@@ -1,6 +1,6 @@
 import { supabase } from '$lib/supabase';
 import { conCache } from '$lib/db/cache';
-import type { Saldo, User } from '$lib/types';
+import type { RigaClassifica, User } from '$lib/types';
 
 /**
  * Chi sta usando l'app.
@@ -23,7 +23,7 @@ export const emailDi = (nome: string) =>
 class StatoProfilo {
 	utenti = $state<User[]>([]);
 	io = $state<User | null>(null);
-	saldi = $state<Saldo[]>([]);
+	saldi = $state<RigaClassifica[]>([]);
 	/**
 	 * true quando si sa CHI e' entrato, non solo che c'e' una sessione.
 	 *
@@ -34,8 +34,14 @@ class StatoProfilo {
 	pronto = $state(false);
 	errore = $state<string | null>(null);
 
+	/** Quanto hai in tasca: le stagioni chiuse, piu' questa, meno lo speso. */
 	get saldo(): number {
 		return this.saldi.find((s) => s.user_id === this.io?.id)?.saldo ?? 0;
+	}
+
+	/** Quanto vali in classifica adesso: acquisito in questa stagione, meno le penalita'. */
+	get punti(): number {
+		return this.saldi.find((s) => s.user_id === this.io?.id)?.punti ?? 0;
 	}
 
 	/**
@@ -106,10 +112,12 @@ class StatoProfilo {
 
 	async aggiornaSaldi() {
 		try {
+			// v_classifica e non v_saldi: porta i due numeri insieme — i punti
+			// della stagione e il portacroque — e ne servono due in testata.
 			this.saldi = await conCache('saldi', async () => {
-				const { data, error } = await supabase.from('v_saldi').select('*');
+				const { data, error } = await supabase.from('v_classifica').select('*');
 				if (error) throw error;
-				return (data ?? []) as Saldo[];
+				return (data ?? []) as RigaClassifica[];
 			});
 		} catch {
 			// Senza linea e senza cache i saldi restano a zero: e' un numero

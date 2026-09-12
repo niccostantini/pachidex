@@ -103,6 +103,9 @@ export interface Saldo {
 }
 
 export interface RigaClassifica extends Saldo {
+	/** I punti della stagione: quello che hai acquisito, meno le penalita'. */
+	punti: number;
+	acquisiti: number;
 	item_unici: number;
 	catture_totali: number;
 }
