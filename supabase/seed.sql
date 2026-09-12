@@ -1168,6 +1168,17 @@ begin
 		where co.capture_id = v_c and u.nome in ('Vito', 'Turi', 'Nina')
 		on conflict do nothing;
 		perform risolvi_contestazione((select id from contests where capture_id = v_c));
+
+		-- E la si ridata dentro la vacanza finta, il giorno dopo la cattura
+		-- che punisce. Altrimenti resta timbrata al momento in cui gira il
+		-- seme: aprendo una stagione, quella penalita' di quindici cadrebbe
+		-- nella settimana in corso per una cattura di dieci giorni prima, e
+		-- qualcuno si ritroverebbe a -10 senza aver fatto niente. E' successo.
+		update contests set
+			created_at = (select c.timestamp + interval '20 hours' from captures c where c.id = v_c),
+			scadenza   = (select c.timestamp + interval '44 hours' from captures c where c.id = v_c),
+			risolta_at = (select c.timestamp + interval '26 hours' from captures c where c.id = v_c)
+		where capture_id = v_c;
 	end if;
 end $$;
 
