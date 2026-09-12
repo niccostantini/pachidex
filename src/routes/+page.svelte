@@ -12,6 +12,7 @@
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
 	import GiroGuidato, { TAPPE } from '$lib/components/GiroGuidato.svelte';
+	import { wrapped, type Wrapped } from '$lib/db/stagioni';
 	import { browser } from '$app/environment';
 	import { selfieDaFare } from '$lib/db/dex';
 	import type { PostCattura, PostContestazione, PostFeed } from '$lib/types';
@@ -47,6 +48,21 @@
 		if (!browser || stato !== 'ok' || !profilo.io) return;
 		if (localStorage.getItem(CHIAVE_GIRO)) return;
 		giroAperto = true;
+	});
+
+	/** Il Wrapped di una stagione appena chiusa, se non l'ho ancora guardato. */
+	let daGuardare = $state<Wrapped | null>(null);
+
+	$effect(() => {
+		if (!profilo.io) return;
+		void (async () => {
+			try {
+				const w = await wrapped();
+				daGuardare = w && !w.visto_da_me ? w : null;
+			} catch {
+				/* senza linea se ne riparla al prossimo giro */
+			}
+		})();
 	});
 
 	/**
@@ -127,6 +143,16 @@
 <svelte:head><title>Feed — Pachino Express</title></svelte:head>
 
 <div class="feed stack">
+	<!-- L'avviso e non un dirottamento: portare qualcuno di peso su un'altra
+	     pagina appena apre l'app e' il modo piu' rapido per farsi chiudere in
+	     faccia. Chi non lo guarda entro il giorno vale come se l'avesse
+	     visto, quindi non blocca nessuno. -->
+	{#if daGuardare}
+		<a class="wrapped" href="/queste-siete">
+			<span class="t-label">È uscito «Queste siete»</span>
+			<span class="t-small">La stagione {daGuardare.stagione} si è chiusa — guarda com'è andata</span>
+		</a>
+	{/if}
 
 	{#if coda.inAttesa.length}
 		<div class="coda">
@@ -258,6 +284,17 @@
 	.finto {
 		height: 240px;
 		border: var(--border) solid var(--navy);
+	}
+
+	.wrapped {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: var(--space-2);
+		background: var(--yellow);
+		color: var(--navy);
+		border: var(--border) solid var(--navy);
+		text-decoration: none;
 	}
 
 	.coda {
