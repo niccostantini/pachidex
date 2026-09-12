@@ -16,6 +16,7 @@
 	import { messaggioErrore } from '$lib/supabase';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Finestra from '$lib/components/Finestra.svelte';
+	import Coriandoli from '$lib/components/Coriandoli.svelte';
 
 	/**
 	 * «Queste siete»: la stagione che si e' appena chiusa, una cosa per volta.
@@ -37,6 +38,20 @@
 	const nome = (id: string) => chi(id)?.nome ?? '?';
 
 	const titoli = $derived(coccarde.filter((c) => c.tipo === 'titolo'));
+
+	/**
+	 * Quanta festa fare, tappa per tappa.
+	 *
+	 * Non la stessa dappertutto: se i coriandoli cadono uguali dall'inizio
+	 * alla fine smettono di voler dire qualcosa dopo dieci secondi. Il podio
+	 * apre in grande, i titoli sono scoppiettii secchi sul nome di chi ha
+	 * vinto, e le foto finali tornano a una pioggia larga per chiudere.
+	 */
+	const festa = $derived.by(() => {
+		if (tappa === 0) return { quanti: 60, scoppi: 4, larghezza: 'piena' as const };
+		if (tappa <= titoli.length) return { quanti: 18, scoppi: 3, larghezza: 'centro' as const };
+		return { quanti: 70, scoppi: 5, larghezza: 'piena' as const };
+	});
 	/** Podio, poi un titolo per volta, poi le foto. */
 	const tappe = $derived(2 + titoli.length);
 	const ultima = $derived(tappa >= tappe - 1);
@@ -95,6 +110,13 @@
 			<p class="t-small">{errore}</p>
 		</Finestra>
 	{:else if dati}
+		<!-- Rimontare e' il modo piu' semplice di rigiocare trenta animazioni
+		     insieme: si ributta via tutto e riparte, invece di rincorrere
+		     ognuna per riavvolgerla. -->
+		{#key tappa}
+			<Coriandoli quanti={festa.quanti} scoppi={festa.scoppi} larghezza={festa.larghezza} />
+		{/key}
+
 		<div class="testa">
 			<p class="t-label t-muted">Stagione {dati.stagione}</p>
 			<h1>Queste siete</h1>
