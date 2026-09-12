@@ -34,8 +34,37 @@ const ACCOUNT = [
 ];
 /** Password uguale per tutti in locale: e' un ambiente di prova. */
 const PAROLA = 'prova1234';
-const INIZIO = new Date('2026-08-28T09:00:00+02:00');
-const FINE = new Date('2026-09-01T22:00:00+02:00');
+/**
+ * La vacanza finta si muove col calendario, invece di stare ferma ad agosto.
+ *
+ * Serve perche' il seme apre anche una stagione, e una stagione e' una
+ * finestra sugli ultimi giorni: con date fissate a un anno fa le catture
+ * cadrebbero tutte fuori, e il locale partirebbe con una classifica vuota e
+ * nessun titolo assegnato — cioe' senza niente da guardare.
+ *
+ * Cosi' invece si apre l'app e si trova una stagione al tredicesimo giorno su
+ * quattordici: classifica piena, titoli in ballo, e la chiusura a un giorno
+ * di distanza, che e' esattamente la cosa piu' scomoda da provare a mano.
+ *
+ * Il contenuto resta deterministico — stesso seme, stessa partita — a
+ * muoversi sono solo le date.
+ */
+const GIORNI_STAGIONE = 14;
+const APERTA_DA = 13;
+
+const giorniFa = (quanti, ora) => {
+	const d = new Date();
+	d.setDate(d.getDate() - quanti);
+	d.setHours(ora, 0, 0, 0);
+	return d;
+};
+/** "2026-09-13": la data com'e' scritta in un campo date. */
+const giorno = (d) =>
+	`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const INIZIO = giorniFa(APERTA_DA, 9);
+const FINE = giorniFa(APERTA_DA - 4, 22);
+const SCADENZA = giorniFa(APERTA_DA - GIORNI_STAGIONE, 0);
 
 /** Numeri a caso ma sempre gli stessi: un generatore con seme. */
 let seme = 20260828;
@@ -234,6 +263,36 @@ insert into premi (numero, domanda, croquembouche) values
 	(6, 'CHI HA DETTO LA COSA PIÙ SCEMA?', 40),
 	(7, 'CHI CI HA TENUTI INSIEME?', 60)
 on conflict (numero) do nothing;`);
+
+scrivi(`
+-- --- e una stagione gia' in corso -------------------------------------------
+-- Il locale si apre su una partita a meta' strada: tredici giorni su
+-- quattordici, con dentro tutto quello che e' successo qui sopra. Cosi' la
+-- classifica ha dei numeri, i titoli hanno un padrone, e la chiusura — con le
+-- coccarde e «Queste siete» — si prova premendo un pulsante invece di
+-- aspettare due settimane.
+--
+-- Prima la stagione zero, come farebbe apri_stagione: il passato congelato.
+-- Qui e' vuota per definizione, visto che la vacanza finta comincia con la
+-- stagione, ma esserci cambia la forma dei conti e vale la pena che il locale
+-- abbia la stessa forma della produzione.
+insert into stagioni (numero, inizio, fine, chiusa_at)
+values (0, '-infinity', date '${giorno(INIZIO)}', now());
+select congela_stagione(0);
+
+insert into stagioni (numero, inizio, fine)
+values (1, date '${giorno(INIZIO)}', date '${giorno(SCADENZA)}');
+
+-- In gioco c'e' tutto il catalogo, non il terzo sorteggiato: il seme deve
+-- mostrare i nove set che funzionano, e con un terzo la meta' non si
+-- potrebbe chiudere. Il sorteggio vero si vede aprendo una stagione dal
+-- pannello.
+select sorteggia_catalogo(1, 1.0);
+
+-- "Il primo giorno" e' un set legato a una data precisa, scritta nella 0020
+-- quando la vacanza era ad agosto. Si sposta sul primo giorno di questa,
+-- altrimenti resta li' a non potersi chiudere mai.
+update game_sets set giorno = date '${giorno(INIZIO)}' where nome = 'Il primo giorno';`);
 
 writeFileSync(new URL('../supabase/seed.sql', import.meta.url), righe.join('\n') + '\n');
 console.log(`seed.sql scritto: ${item.length} elementi, ${catture.length} catture`);

@@ -362,7 +362,7 @@ insert into items (nome, categoria, rarita, croquembouche, ripetibile, validazio
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
-	       timestamptz '2026-08-28T08:46:25.533Z', 'valido'
+	       timestamptz '2026-08-31T08:46:25.533Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Fare una degustazione di cioccolato di Modica'
 	returning id
@@ -373,7 +373,7 @@ select c.id, u.id from c, users u where u.nome = 'Ciccio';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T09:11:06.750Z', 'valido'
+	       timestamptz '2026-08-31T09:11:06.750Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Spiaggia di Eloro'
 	returning id
@@ -383,7 +383,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T10:36:11.556Z', 'valido'
+	       timestamptz '2026-08-31T10:36:11.556Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Giocare con le gemelle'
 	returning id
@@ -393,7 +393,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T11:38:15.157Z', 'valido'
+	       timestamptz '2026-08-31T11:38:15.157Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Tortora'
 	returning id
@@ -403,7 +403,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T14:42:35.422Z', 'valido'
+	       timestamptz '2026-08-31T14:42:35.422Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Tonno alla ghiotta di Marzamemi'
 	returning id
@@ -413,7 +413,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T17:12:36.813Z', 'valido'
+	       timestamptz '2026-08-31T17:12:36.813Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Spiaggia di Cittadella'
 	returning id
@@ -423,7 +423,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T17:30:35.800Z', 'valido'
+	       timestamptz '2026-08-31T17:30:35.800Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Upupa'
 	returning id
@@ -433,7 +433,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T18:01:39.049Z', 'valido'
+	       timestamptz '2026-08-31T18:01:39.049Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Folaga'
 	returning id
@@ -443,7 +443,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T18:18:41.038Z', 'valido'
+	       timestamptz '2026-08-31T18:18:41.038Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Zuppa di pesce alla siracusana'
 	returning id
@@ -453,7 +453,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T19:46:21.100Z', 'valido'
+	       timestamptz '2026-08-31T19:46:21.100Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Rotolo'
 	returning id
@@ -463,7 +463,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-28T22:20:58.537Z', 'valido'
+	       timestamptz '2026-08-31T22:20:58.537Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Airone cenerino'
 	returning id
@@ -473,7 +473,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T07:22:01.706Z', 'valido'
+	       timestamptz '2026-09-01T07:22:01.706Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Cassata siciliana'
 	returning id
@@ -483,7 +483,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T07:56:13.705Z', 'valido'
+	       timestamptz '2026-09-01T07:56:13.705Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Caponata di pesce'
 	returning id
@@ -493,7 +493,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T08:26:30.365Z', 'valido'
+	       timestamptz '2026-09-01T08:26:30.365Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Fare una passeggiata senza parlare di cibo'
 	returning id
@@ -503,7 +503,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T12:00:16.255Z', 'valido'
+	       timestamptz '2026-09-01T12:00:16.255Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Fare un selfie con Seb'
 	returning id
@@ -513,7 +513,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T12:26:09.334Z', 'valido'
+	       timestamptz '2026-09-01T12:26:09.334Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Gruccione'
 	returning id
@@ -523,7 +523,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T13:16:58.026Z', 'valido'
+	       timestamptz '2026-09-01T13:16:58.026Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Garzetta'
 	returning id
@@ -533,7 +533,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T14:11:58.333Z', 'valido'
+	       timestamptz '2026-09-01T14:11:58.333Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Airone cenerino'
 	returning id
@@ -543,7 +543,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Nina',
-	       timestamptz '2026-08-29T14:18:27.888Z', 'valido'
+	       timestamptz '2026-09-01T14:18:27.888Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Pasta alla norma'
 	returning id
@@ -554,7 +554,7 @@ select c.id, u.id from c, users u where u.nome = 'Nina';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T14:19:13.332Z', 'valido'
+	       timestamptz '2026-09-01T14:19:13.332Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Granchio blu'
 	returning id
@@ -564,7 +564,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-29T15:00:10.321Z', 'valido'
+	       timestamptz '2026-09-01T15:00:10.321Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Granchio blu'
 	returning id
@@ -575,7 +575,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Nina',
-	       timestamptz '2026-08-29T15:02:11.089Z', 'valido'
+	       timestamptz '2026-09-01T15:02:11.089Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Nucatoli netini'
 	returning id
@@ -586,7 +586,7 @@ select c.id, u.id from c, users u where u.nome = 'Nina';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T15:05:01.079Z', 'valido'
+	       timestamptz '2026-09-01T15:05:01.079Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Aeroporto di Catania'
 	returning id
@@ -596,7 +596,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T16:15:05.368Z', 'valido'
+	       timestamptz '2026-09-01T16:15:05.368Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Duomo di San Giorgio di Modica'
 	returning id
@@ -606,7 +606,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Turi',
-	       timestamptz '2026-08-29T16:15:19.612Z', 'valido'
+	       timestamptz '2026-09-01T16:15:19.612Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Caffè al Ciclope di Pachino'
 	returning id
@@ -617,7 +617,7 @@ select c.id, u.id from c, users u where u.nome = 'Turi';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-29T18:01:14.763Z', 'valido'
+	       timestamptz '2026-09-01T18:01:14.763Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Buzzonaglia di tonno con cipolla in agrodolce'
 	returning id
@@ -627,7 +627,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
-	       timestamptz '2026-08-29T19:25:44.673Z', 'valido'
+	       timestamptz '2026-09-01T19:25:44.673Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Pasta fritta siciliana'
 	returning id
@@ -638,7 +638,7 @@ select c.id, u.id from c, users u where u.nome = 'Ciccio';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Lella',
-	       timestamptz '2026-08-29T19:31:19.275Z', 'valido'
+	       timestamptz '2026-09-01T19:31:19.275Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Tonno alla ghiotta di Marzamemi'
 	returning id
@@ -649,7 +649,7 @@ select c.id, u.id from c, users u where u.nome = 'Lella';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-29T19:35:18.730Z', 'valido'
+	       timestamptz '2026-09-01T19:35:18.730Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Cioccolato di Modica'
 	returning id
@@ -660,7 +660,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T02:59:20.012Z', 'valido'
+	       timestamptz '2026-09-02T02:59:20.012Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Rospo smeraldino siciliano'
 	returning id
@@ -670,7 +670,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T03:04:21.951Z', 'valido'
+	       timestamptz '2026-09-02T03:04:21.951Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Cudduruni'
 	returning id
@@ -680,7 +680,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T03:05:45.636Z', 'valido'
+	       timestamptz '2026-09-02T03:05:45.636Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Ghiotta'
 	returning id
@@ -690,7 +690,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-30T05:40:37.938Z', 'valido'
+	       timestamptz '2026-09-02T05:40:37.938Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Febbre!'
 	returning id
@@ -701,7 +701,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T06:25:19.798Z', 'valido'
+	       timestamptz '2026-09-02T06:25:19.798Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Pasta alla matalotta siracusana'
 	returning id
@@ -711,7 +711,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T06:52:35.101Z', 'valido'
+	       timestamptz '2026-09-02T06:52:35.101Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Palazzo Beneventano di Scicli'
 	returning id
@@ -721,7 +721,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T08:01:06.348Z', 'valido'
+	       timestamptz '2026-09-02T08:01:06.348Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Educazione sessuo-affettiva con Greta'
 	returning id
@@ -731,7 +731,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T08:40:34.763Z', 'valido'
+	       timestamptz '2026-09-02T08:40:34.763Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Spatola'
 	returning id
@@ -741,7 +741,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T09:10:52.347Z', 'valido'
+	       timestamptz '2026-09-02T09:10:52.347Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Necropoli di Pantalica'
 	returning id
@@ -751,7 +751,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
-	       timestamptz '2026-08-30T09:53:02.039Z', 'valido'
+	       timestamptz '2026-09-02T09:53:02.039Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Frittura di paranza di Pozzallo'
 	returning id
@@ -762,7 +762,7 @@ select c.id, u.id from c, users u where u.nome = 'Ciccio';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
-	       timestamptz '2026-08-30T12:26:06.659Z', 'valido'
+	       timestamptz '2026-09-02T12:26:06.659Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Farsi spiegare una ricetta tradizionale'
 	returning id
@@ -773,7 +773,7 @@ select c.id, u.id from c, users u where u.nome = 'Rosa';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Ciccio',
-	       timestamptz '2026-08-30T14:05:41.917Z', 'valido'
+	       timestamptz '2026-09-02T14:05:41.917Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Granchio blu'
 	returning id
@@ -784,7 +784,7 @@ select c.id, u.id from c, users u where u.nome = 'Ciccio';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T16:14:28.790Z', 'valido'
+	       timestamptz '2026-09-02T16:14:28.790Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Fuga per sfiziosità'
 	returning id
@@ -794,7 +794,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Turi',
-	       timestamptz '2026-08-30T18:22:38.253Z', 'valido'
+	       timestamptz '2026-09-02T18:22:38.253Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Cavàti sciclitani al sugo di maiale'
 	returning id
@@ -805,7 +805,7 @@ select c.id, u.id from c, users u where u.nome = 'Turi';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T18:45:28.606Z', 'valido'
+	       timestamptz '2026-09-02T18:45:28.606Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Cattedrale di San Nicolò di Noto'
 	returning id
@@ -815,7 +815,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T20:23:44.243Z', 'valido'
+	       timestamptz '2026-09-02T20:23:44.243Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Granchio fantasma'
 	returning id
@@ -825,7 +825,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
-	       timestamptz '2026-08-30T22:29:19.941Z', 'valido'
+	       timestamptz '2026-09-02T22:29:19.941Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Assistere a uno spettacolo di musica o teatro siciliano'
 	returning id
@@ -836,7 +836,7 @@ select c.id, u.id from c, users u where u.nome = 'Rosa';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-30T22:58:37.579Z', 'valido'
+	       timestamptz '2026-09-02T22:58:37.579Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Seppia'
 	returning id
@@ -846,7 +846,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-30T23:52:02.789Z', 'valido'
+	       timestamptz '2026-09-02T23:52:02.789Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Coniglio selvatico'
 	returning id
@@ -857,7 +857,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T01:14:44.537Z', 'valido'
+	       timestamptz '2026-09-03T01:14:44.537Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Bunker di Punta delle Formiche'
 	returning id
@@ -867,7 +867,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T04:01:41.473Z', 'valido'
+	       timestamptz '2026-09-03T04:01:41.473Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Torre Sveva di Vendicari'
 	returning id
@@ -877,7 +877,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-31T04:29:03.043Z', 'valido'
+	       timestamptz '2026-09-03T04:29:03.043Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Arancina'
 	returning id
@@ -888,7 +888,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T04:46:48.967Z', 'valido'
+	       timestamptz '2026-09-03T04:46:48.967Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Fuga per sfiziosità'
 	returning id
@@ -898,7 +898,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Lella',
-	       timestamptz '2026-08-31T06:44:39.046Z', 'valido'
+	       timestamptz '2026-09-03T06:44:39.046Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Imparare una parola in dialetto siciliano da un abitante'
 	returning id
@@ -909,7 +909,7 @@ select c.id, u.id from c, users u where u.nome = 'Lella';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-31T08:23:11.002Z', 'valido'
+	       timestamptz '2026-09-03T08:23:11.002Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Almost Concerie'
 	returning id
@@ -920,7 +920,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T08:52:05.193Z', 'valido'
+	       timestamptz '2026-09-03T08:52:05.193Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Giardini Iblei di Ragusa'
 	returning id
@@ -930,7 +930,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Lella',
-	       timestamptz '2026-08-31T10:02:45.874Z', 'valido'
+	       timestamptz '2026-09-03T10:02:45.874Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Fonte Aretusa'
 	returning id
@@ -941,7 +941,7 @@ select c.id, u.id from c, users u where u.nome = 'Lella';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T10:07:42.445Z', 'valido'
+	       timestamptz '2026-09-03T10:07:42.445Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Pane cunzato'
 	returning id
@@ -951,7 +951,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T13:31:39.264Z', 'valido'
+	       timestamptz '2026-09-03T13:31:39.264Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Antica Tonnara di Vendicari'
 	returning id
@@ -961,7 +961,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T13:58:58.683Z', 'valido'
+	       timestamptz '2026-09-03T13:58:58.683Z', 'valido'
 	from users u, items i
 	where u.nome = 'Nina' and i.nome = 'Naturismo!'
 	returning id
@@ -971,7 +971,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T15:08:46.646Z', 'valido'
+	       timestamptz '2026-09-03T15:08:46.646Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Pasta con la salsa moresca'
 	returning id
@@ -981,7 +981,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T17:05:24.711Z', 'valido'
+	       timestamptz '2026-09-03T17:05:24.711Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Saltimpalo'
 	returning id
@@ -991,7 +991,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T17:15:58.151Z', 'valido'
+	       timestamptz '2026-09-03T17:15:58.151Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Casa Pachino'
 	returning id
@@ -1001,7 +1001,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Vito',
-	       timestamptz '2026-08-31T18:19:01.534Z', 'valido'
+	       timestamptz '2026-09-03T18:19:01.534Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Pasta fritta siciliana'
 	returning id
@@ -1012,7 +1012,7 @@ select c.id, u.id from c, users u where u.nome = 'Vito';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T18:31:37.883Z', 'valido'
+	       timestamptz '2026-09-03T18:31:37.883Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = '1ª cosa da fare: selfie inaugurale'
 	returning id
@@ -1022,7 +1022,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T22:04:29.336Z', 'valido'
+	       timestamptz '2026-09-03T22:04:29.336Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Rospo smeraldino siciliano'
 	returning id
@@ -1032,7 +1032,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-08-31T22:39:25.247Z', 'valido'
+	       timestamptz '2026-09-03T22:39:25.247Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Fare una foto di gruppo senza autoscatto'
 	returning id
@@ -1042,7 +1042,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T00:39:40.992Z', 'valido'
+	       timestamptz '2026-09-04T00:39:40.992Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Coreo'
 	returning id
@@ -1052,7 +1052,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Nina',
-	       timestamptz '2026-09-01T00:51:20.085Z', 'valido'
+	       timestamptz '2026-09-04T00:51:20.085Z', 'valido'
 	from users u, items i
 	where u.nome = 'Lella' and i.nome = 'Pasta alla matalotta siracusana'
 	returning id
@@ -1063,7 +1063,7 @@ select c.id, u.id from c, users u where u.nome = 'Nina';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T04:44:20.368Z', 'valido'
+	       timestamptz '2026-09-04T04:44:20.368Z', 'valido'
 	from users u, items i
 	where u.nome = 'Turi' and i.nome = 'Caffè al Ciclope di Pachino'
 	returning id
@@ -1073,7 +1073,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T05:09:40.352Z', 'valido'
+	       timestamptz '2026-09-04T05:09:40.352Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Fare una degustazione di cioccolato di Modica'
 	returning id
@@ -1083,7 +1083,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T08:47:55.250Z', 'valido'
+	       timestamptz '2026-09-04T08:47:55.250Z', 'valido'
 	from users u, items i
 	where u.nome = 'Ciccio' and i.nome = 'Scaccia'
 	returning id
@@ -1093,7 +1093,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T11:29:36.167Z', 'valido'
+	       timestamptz '2026-09-04T11:29:36.167Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Naturismo!'
 	returning id
@@ -1103,7 +1103,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T15:22:40.321Z', 'valido'
+	       timestamptz '2026-09-04T15:22:40.321Z', 'valido'
 	from users u, items i
 	where u.nome = 'Rosa' and i.nome = 'Macco di fave'
 	returning id
@@ -1113,7 +1113,7 @@ select id from c;
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', 'Con @Rosa',
-	       timestamptz '2026-09-01T15:30:58.878Z', 'valido'
+	       timestamptz '2026-09-04T15:30:58.878Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Palazzo Beneventano di Scicli'
 	returning id
@@ -1124,7 +1124,7 @@ select c.id, u.id from c, users u where u.nome = 'Rosa';
 with c as (
 	insert into captures (user_id, item_id, foto_url, nota, timestamp, stato)
 	select u.id, i.id, '/icon-512.png', null,
-	       timestamptz '2026-09-01T16:19:48.988Z', 'valido'
+	       timestamptz '2026-09-04T16:19:48.988Z', 'valido'
 	from users u, items i
 	where u.nome = 'Vito' and i.nome = 'Spiaggia di Marianelli'
 	returning id
@@ -1194,3 +1194,32 @@ insert into premi (numero, domanda, croquembouche) values
 	(6, 'CHI HA DETTO LA COSA PIÙ SCEMA?', 40),
 	(7, 'CHI CI HA TENUTI INSIEME?', 60)
 on conflict (numero) do nothing;
+
+-- --- e una stagione gia' in corso -------------------------------------------
+-- Il locale si apre su una partita a meta' strada: tredici giorni su
+-- quattordici, con dentro tutto quello che e' successo qui sopra. Cosi' la
+-- classifica ha dei numeri, i titoli hanno un padrone, e la chiusura — con le
+-- coccarde e «Queste siete» — si prova premendo un pulsante invece di
+-- aspettare due settimane.
+--
+-- Prima la stagione zero, come farebbe apri_stagione: il passato congelato.
+-- Qui e' vuota per definizione, visto che la vacanza finta comincia con la
+-- stagione, ma esserci cambia la forma dei conti e vale la pena che il locale
+-- abbia la stessa forma della produzione.
+insert into stagioni (numero, inizio, fine, chiusa_at)
+values (0, '-infinity', date '2026-08-31', now());
+select congela_stagione(0);
+
+insert into stagioni (numero, inizio, fine)
+values (1, date '2026-08-31', date '2026-09-14');
+
+-- In gioco c'e' tutto il catalogo, non il terzo sorteggiato: il seme deve
+-- mostrare i nove set che funzionano, e con un terzo la meta' non si
+-- potrebbe chiudere. Il sorteggio vero si vede aprendo una stagione dal
+-- pannello.
+select sorteggia_catalogo(1, 1.0);
+
+-- "Il primo giorno" e' un set legato a una data precisa, scritta nella 0020
+-- quando la vacanza era ad agosto. Si sposta sul primo giorno di questa,
+-- altrimenti resta li' a non potersi chiudere mai.
+update game_sets set giorno = date '2026-08-31' where nome = 'Il primo giorno';
