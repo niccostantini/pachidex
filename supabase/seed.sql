@@ -1140,12 +1140,15 @@ where (extract(epoch from c.timestamp)::bigint + length(u.nome)) % 5 = 0
 on conflict do nothing;
 
 -- --- due scambi -------------------------------------------------------------
-insert into transfers (from_user_id, to_user_id, importo, causale)
-select a.id, b.id, 25, 'per la birra'
+-- Datati dentro la vacanza, non al momento in cui gira il seme: altrimenti
+-- cadono fuori dalla stagione che li contiene e restano nel feed anche dopo
+-- averla svuotata, che e' esattamente come si e' scoperto il problema.
+insert into transfers (from_user_id, to_user_id, importo, causale, created_at)
+select a.id, b.id, 25, 'per la birra', timestamptz '2026-09-02T07:00:00.000Z'
 from users a, users b where a.nome = 'Vito' and b.nome = 'Rosa';
 
-insert into transfers (from_user_id, to_user_id, importo, causale)
-select a.id, b.id, 10, 'scommessa persa'
+insert into transfers (from_user_id, to_user_id, importo, causale, created_at)
+select a.id, b.id, 10, 'scommessa persa', timestamptz '2026-09-03T07:00:00.000Z'
 from users a, users b where a.nome = 'Turi' and b.nome = 'Nina';
 
 -- --- una contestazione gia' chiusa, cosi' si vede una cattura invalidata ----

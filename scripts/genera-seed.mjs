@@ -207,12 +207,15 @@ on conflict do nothing;`);
 
 scrivi(`
 -- --- due scambi -------------------------------------------------------------
-insert into transfers (from_user_id, to_user_id, importo, causale)
-select a.id, b.id, 25, 'per la birra'
+-- Datati dentro la vacanza, non al momento in cui gira il seme: altrimenti
+-- cadono fuori dalla stagione che li contiene e restano nel feed anche dopo
+-- averla svuotata, che e' esattamente come si e' scoperto il problema.
+insert into transfers (from_user_id, to_user_id, importo, causale, created_at)
+select a.id, b.id, 25, 'per la birra', timestamptz ${q(new Date(INIZIO.getTime() + 2 * 86400000).toISOString())}
 from users a, users b where a.nome = ${q(GIOCATORI[0])} and b.nome = ${q(GIOCATORI[1])};
 
-insert into transfers (from_user_id, to_user_id, importo, causale)
-select a.id, b.id, 10, 'scommessa persa'
+insert into transfers (from_user_id, to_user_id, importo, causale, created_at)
+select a.id, b.id, 10, 'scommessa persa', timestamptz ${q(new Date(INIZIO.getTime() + 3 * 86400000).toISOString())}
 from users a, users b where a.nome = ${q(GIOCATORI[2])} and b.nome = ${q(GIOCATORI[3])};`);
 
 scrivi(`

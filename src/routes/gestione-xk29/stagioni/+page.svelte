@@ -92,7 +92,7 @@
 	function svuota(n: number, catture: number) {
 		if (
 			!confirm(
-				`Cancellare ${catture} catture della stagione ${n}, foto comprese? Restano solo quelle di «Queste siete». Se non hai ancora archiviato, fallo prima: non si torna indietro.`
+				`Cancellare ${catture} fra catture e scambi della stagione ${n}, foto comprese? Delle foto restano solo quelle di «Queste siete». Se non hai ancora archiviato, fallo prima: non si torna indietro.`
 			)
 		) {
 			return;
@@ -196,7 +196,7 @@
 				<ul class="da-fare t-small">
 					{#each svuotabili as s (s.stagione)}
 						<li>
-							<strong>Stagione {s.stagione}</strong> — {s.catture} catture · visto da
+							<strong>Stagione {s.stagione}</strong> — {s.catture} fra catture e scambi · visto da
 							{s.visto_da}/{s.giocatori}
 							{#if s.pronta}
 								<button
