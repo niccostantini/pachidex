@@ -9,25 +9,55 @@
 
 	let { titoli }: Props = $props();
 
-	const perTitolo = $derived(new Map(titoli.map((t) => [t.titolo, t])));
+	/**
+	 * Un titolo puo' essere di piu' di una persona.
+	 *
+	 * A sette pietanze pari non c'e' niente da soffiare a nessuno: ci sei gia'
+	 * anche tu. Prima la bacheca ne mostrava una sola — quella arrivata prima —
+	 * e poi la premiazione dava la coccarda a tutte e due: due settimane a
+	 * leggere una cosa e l'ultimo giorno un'altra. La sfida resta uguale, chi
+	 * e' a sei ne cattura una ed entra: e adesso entrarci si vede.
+	 */
+	const perTitolo = $derived.by(() => {
+		const m = new Map<string, VoceTitolo[]>();
+		for (const t of titoli) m.set(t.titolo, [...(m.get(t.titolo) ?? []), t]);
+		return m;
+	});
+
+	const chiDi = (voci: VoceTitolo[]) =>
+		voci.map((v) => profilo.utenti.find((u) => u.id === v.user_id)).filter((u) => u !== undefined);
+
+	/** «Nina», «Ciccio e Nina», «Ciccio, Nina e Turi». */
+	function elenca(nomi: string[]) {
+		if (nomi.length <= 1) return nomi[0] ?? '';
+		return `${nomi.slice(0, -1).join(', ')} e ${nomi[nomi.length - 1]}`;
+	}
 </script>
 
 <ul class="bacheca">
 	{#each TITOLI as t (t.titolo)}
-		{@const vinto = perTitolo.get(t.titolo)}
-		{@const chi = vinto ? profilo.utenti.find((u) => u.id === vinto.user_id) : null}
-		<li class="riga" class:riga--mia={chi && chi.id === profilo.io?.id}>
+		{@const vinto = perTitolo.get(t.titolo) ?? []}
+		{@const chi = chiDi(vinto)}
+		{@const mio = chi.some((u) => u.id === profilo.io?.id)}
+		<li class="riga" class:riga--mia={mio}>
 			<div class="grow">
 				<p class="titolo">{t.nome}</p>
 				<p class="come t-small t-muted">{t.come}</p>
 			</div>
 
-			{#if chi && vinto}
+			{#if chi.length}
 				<div class="chi">
-					<Avatar utente={chi} dimensione="sm" />
+					<div class="facce">
+						{#each chi as u (u.id)}
+							<Avatar utente={u} dimensione="sm" />
+						{/each}
+					</div>
 					<div class="chi__testo">
-						<span class="chi__nome t-small">{chi.nome}</span>
-						<span class="chi__conta t-num t-small">{t.unita(vinto.conteggio)}</span>
+						<span class="chi__nome t-small">{elenca(chi.map((u) => u.nome))}</span>
+						<span class="chi__conta t-num t-small">{t.unita(vinto[0].conteggio)}</span>
+						{#if chi.length > 1}
+							<span class="pari t-label">a pari merito</span>
+						{/if}
 					</div>
 				</div>
 			{:else}
@@ -77,6 +107,21 @@
 		flex-shrink: 0;
 	}
 
+	/*
+	 * Le facce si sovrappongono di un paio di pixel invece di allinearsi: tre
+	 * avatar in fila su un telefono mangiano tutta la riga e spingono il nome
+	 * del titolo a capo. Sovrapposte restano un gruppetto, che e' anche cio'
+	 * che vogliono dire.
+	 */
+	.facce {
+		display: flex;
+		flex-shrink: 0;
+	}
+
+	.facce > :global(* + *) {
+		margin-left: -6px;
+	}
+
 	.chi__testo {
 		display: flex;
 		flex-direction: column;
@@ -86,11 +131,16 @@
 
 	.chi__nome {
 		font-weight: 700;
+		text-align: right;
 	}
 
 	.chi__conta {
 		color: var(--orange-dark);
 		font-weight: 700;
+	}
+
+	.pari {
+		color: var(--navy-soft);
 	}
 
 	.palio {

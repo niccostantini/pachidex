@@ -37,7 +37,23 @@
 	const chi = (id: string) => profilo.utenti.find((u) => u.id === id) ?? null;
 	const nome = (id: string) => chi(id)?.nome ?? '?';
 
-	const titoli = $derived(coccarde.filter((c) => c.tipo === 'titolo'));
+	/**
+	 * Un titolo per tappa, non una coccarda per tappa.
+	 *
+	 * A pari merito le coccarde sono due ma il titolo e' uno: mostrarle di
+	 * fila vorrebbe dire due schermate identiche una dopo l'altra, e la
+	 * seconda sembrerebbe un errore invece che meta' della notizia. Si
+	 * raggruppano per titolo e si annunciano insieme, che e' anche il modo in
+	 * cui e' successo.
+	 */
+	const titoli = $derived.by(() => {
+		const per = new Map<string, Coccarda[]>();
+		for (const c of coccarde) {
+			if (c.tipo !== 'titolo') continue;
+			per.set(c.chiave, [...(per.get(c.chiave) ?? []), c]);
+		}
+		return [...per.values()];
+	});
 
 	/**
 	 * Quanta festa fare, tappa per tappa.
@@ -143,13 +159,23 @@
 				</p>
 			</Finestra>
 		{:else if tappa <= titoli.length}
-			{@const t = titoli[tappa - 1]}
-			<Finestra titolo="Un titolo" variante="blue">
+			{@const gruppo = titoli[tappa - 1]}
+			{@const t = gruppo[0]}
+			<Finestra titolo={gruppo.length > 1 ? 'Un titolo, in due' : 'Un titolo'} variante="blue">
 				<div class="titolo">
 					<p class="titolo__che">{t.etichetta}</p>
-					<Avatar utente={chi(t.user_id)} dimensione="lg" />
-					<p class="titolo__chi">{nome(t.user_id)}</p>
+					<div class="vincitrici">
+						{#each gruppo as c (c.id)}
+							<div class="vincitrice">
+								<Avatar utente={chi(c.user_id)} dimensione="lg" />
+								<p class="titolo__chi">{nome(c.user_id)}</p>
+							</div>
+						{/each}
+					</div>
 					{#if t.quanto}<p class="t-label t-muted">{t.quanto}</p>{/if}
+					{#if gruppo.length > 1}
+						<p class="t-small t-muted">Stesso numero, stesso titolo: è di tutte e due.</p>
+					{/if}
 					{#if t.foto_url}
 						<img class="scatto" src={t.foto_url} alt="" />
 					{/if}
@@ -244,6 +270,20 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
+	}
+
+	.vincitrici {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-4);
+	}
+
+	.vincitrice {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-2);
 	}
 
 	.titolo__chi {

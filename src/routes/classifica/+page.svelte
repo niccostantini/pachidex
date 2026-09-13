@@ -25,6 +25,20 @@
 		Math.max(1, ...ordinate.map((r) => (tab === 'croq' ? r.punti : r.item_unici)))
 	);
 
+	/**
+	 * Le posizioni, con i pari merito.
+	 *
+	 * Non "la riga numero tre e' terza": a parita' di punti la posizione e' la
+	 * stessa, e dopo due prime viene il terzo. E' quello che fa gia' il conto
+	 * congelato di fine stagione — `rank()` e non `row_number()` — e se qui si
+	 * contassero le righe la classifica direbbe per due settimane una cosa che
+	 * la premiazione poi smentisce.
+	 */
+	const posizioni = $derived.by(() => {
+		const v = ordinate.map((r) => (tab === 'croq' ? r.punti : r.item_unici));
+		return v.map((x) => v.findIndex((y) => y === x) + 1);
+	});
+
 	onMount(async () => {
 		try {
 			righe = await caricaClassifica();
@@ -75,8 +89,9 @@
 			<ol class="podio">
 				{#each ordinate as r, i (r.user_id)}
 					{@const valore = tab === 'croq' ? r.punti : r.item_unici}
+					{@const posto = posizioni[i]}
 					<li class="riga" class:riga--io={r.user_id === profilo.io?.id}>
-						<span class="pos t-num" class:pos--primo={i === 0}>{i + 1}</span>
+						<span class="pos t-num" class:pos--primo={posto === 1}>{posto}</span>
 						<Avatar utente={profilo.utenti.find((u) => u.id === r.user_id)} />
 						<div class="grow">
 							<p class="nome"><a class="chi" href="/profilo/{r.user_id}">{r.nome}</a></p>
@@ -84,7 +99,7 @@
 								<div
 									class="barra__riempi"
 									style:width="{Math.max((valore / massimo) * 100, 2)}%"
-									class:barra__riempi--primo={i === 0}
+									class:barra__riempi--primo={posto === 1}
 								></div>
 							</div>
 						</div>
@@ -102,8 +117,8 @@
 		<Finestra titolo="I titoli" variante="orange">
 			<BachecaTitoli {titoli} />
 			<p class="spiega t-small t-muted">
-				Uno per titolo, sempre a chi è in testa adesso. A pari merito lo tiene
-				chi ci è arrivata prima — e si perdono.
+				Sempre a chi è in testa adesso, e se in testa ci sono in due il titolo è
+				di tutte e due. Si perdono: è il bello.
 			</p>
 		</Finestra>
 
