@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import Icona, { type NomeIcona } from './Icona.svelte';
 	import { profilo } from '$lib/state/profilo.svelte';
+	import { visto } from '$lib/state/visto.svelte';
 
 	const voci: { href: string; label: string; icona: NomeIcona; giro: string }[] = [
 		{ href: '/', label: 'Feed', icona: 'feed', giro: 'feed' },
@@ -12,13 +13,30 @@
 
 	const attivo = (href: string) =>
 		href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
+
+	/**
+	 * Il pallino sul feed: c'e' roba che non hai visto.
+	 *
+	 * Senza numero. Un "12" li' sopra diventa un compito da smaltire, e
+	 * questo non e' un lavoro arretrato: e' una vacanza di cui ti sei perso
+	 * un pezzo. Che ci sia qualcosa basta a farti guardare.
+	 *
+	 * Sul feed non si mostra mai: se lo stai guardando, il puntino ti sta
+	 * dicendo una cosa che hai gia' sotto gli occhi.
+	 */
+	const pallino = $derived(visto.nuovi > 0 && page.url.pathname !== '/');
 </script>
 
 <nav class="taskbar" aria-label="Navigazione principale">
 	<div class="taskbar__lato">
 		{#each voci.slice(0, 2) as v (v.href)}
 			<a class="tab" class:tab--attivo={attivo(v.href)} href={v.href} data-giro={v.giro}>
-				<Icona nome={v.icona} dimensione={18} sfondo="var(--navy)" />
+				<span class="tab__icona">
+					<Icona nome={v.icona} dimensione={18} sfondo="var(--navy)" />
+					{#if v.href === '/' && pallino}
+						<span class="pallino" aria-label="C'è qualcosa di nuovo"></span>
+					{/if}
+				</span>
 				<span class="tab__label">{v.label}</span>
 			</a>
 		{/each}
@@ -64,6 +82,26 @@
 		background: var(--navy);
 		border-top: var(--border) solid var(--navy);
 		box-shadow: 0 -3px 0 rgba(22, 27, 61, 0.15);
+	}
+
+	.tab__icona {
+		position: relative;
+		display: block;
+		line-height: 0;
+	}
+
+	/*
+	 * Arancione su blu scuro, quadrato come tutto il resto: un cerchietto qui
+	 * sarebbe l'unica cosa tonda dell'interfaccia.
+	 */
+	.pallino {
+		position: absolute;
+		top: -3px;
+		right: -5px;
+		width: 8px;
+		height: 8px;
+		background: var(--orange);
+		border: 1px solid var(--navy);
 	}
 
 	.taskbar__lato {

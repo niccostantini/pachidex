@@ -32,6 +32,25 @@
 	let campo: HTMLTextAreaElement | undefined = $state();
 	let cursore = $state(0);
 
+	/**
+	 * Il campo cresce con quello che ci scrivi.
+	 *
+	 * Due righe fisse e poi la barra di scorrimento vuol dire scrivere dentro
+	 * una feritoia: a meta' frase non vedi piu' l'inizio, e per rileggerti devi
+	 * scorrere un campo alto quanto due righe. Qui si arriva a 280 caratteri,
+	 * che sono sei o sette righe: ci stanno tutte.
+	 *
+	 * Si rimisura a ogni cambio del testo, azzerando prima l'altezza —
+	 * altrimenti scrollHeight resta quello di prima e il campo cresce e non
+	 * torna piu' indietro quando cancelli.
+	 */
+	$effect(() => {
+		void testo;
+		if (!campo) return;
+		campo.style.height = 'auto';
+		campo.style.height = `${campo.scrollHeight}px`;
+	});
+
 	const menzione = $derived(menzioneInCorso(testo, cursore));
 
 	const candidati = $derived.by(() => {
@@ -82,7 +101,7 @@
 			<div class="grow campo">
 				<textarea
 					class="field"
-					rows="2"
+					rows="1"
 					maxlength={LIMITE + 40}
 					enterkeyhint="done"
 					bind:value={testo}
@@ -155,14 +174,27 @@
 		gap: 6px;
 	}
 
+	/*
+	 * L'avatar si allinea con la PRIMA RIGA di testo, non con il bordo del
+	 * campo. Il campo ha tre pixel di bordo e nove di aria sopra: senza
+	 * questo scarto la faccia galleggia sopra la frase, e con un campo che
+	 * ora cresce si vedeva ogni volta di piu'.
+	 */
+	.comp__riga :global(.avatar) {
+		margin-top: calc(var(--border) + 9px);
+	}
+
 	.campo {
 		position: relative;
 	}
 
 	.campo textarea {
 		width: 100%;
+		/* L'altezza la decide l'effetto: il manico per tirarla a mano non
+		   servirebbe piu' a niente, e su un telefono non c'e' nemmeno. */
 		resize: none;
-		min-height: 2.6rem;
+		overflow: hidden;
+		line-height: 1.35;
 	}
 
 	/*

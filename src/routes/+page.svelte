@@ -6,6 +6,7 @@
 	import { apriContestazione } from '$lib/db/azioni';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { coda } from '$lib/state/coda.svelte';
+	import { visto } from '$lib/state/visto.svelte';
 	import { messaggioErrore } from '$lib/supabase';
 	import CardCattura from '$lib/components/CardCattura.svelte';
 	import CardScambio from '$lib/components/CardScambio.svelte';
@@ -24,6 +25,19 @@
 	let stato = $state<'carico' | 'ok' | 'errore'>('carico');
 	let errore = $state<string | null>(null);
 	let config = $state<Record<string, number>>({});
+
+	/**
+	 * Dove eri arrivata l'ultima volta.
+	 *
+	 * Si fotografa al primo caricamento e poi non si muove piu': il feed si
+	 * ricarica da solo a ogni cosa che succede, e se la soglia lo seguisse la
+	 * riga scivolerebbe sotto i piedi mentre stai leggendo.
+	 *
+	 * Subito dopo il segnaposto si sposta a adesso — hai aperto il feed, l'hai
+	 * visto — cosi' il pallino si spegne e la prossima volta la riga sta al
+	 * punto giusto.
+	 */
+	let soglia = $state<string | null>(null);
 
 	/**
 	 * Giro guidato al primo avvio. Parte solo quando i dati ci sono: la barra
@@ -82,6 +96,21 @@
 	let inInvio = $state(false);
 	let erroreContesta = $state<string | null>(null);
 
+	/**
+	 * Quante cose stanno sopra la riga.
+	 *
+	 * Il feed va dal piu' recente al piu' vecchio, quindi il nuovo sta in
+	 * cima: la riga cade DOPO l'ultima cosa che non avevi visto, e dice che
+	 * da li' in giu' ci sei gia' passata. Se e' zero non si disegna — non
+	 * c'e' niente di nuovo — e se e' tutta la lista nemmeno, perche' una riga
+	 * in fondo al feed non divide niente.
+	 */
+	const quantiNuovi = $derived.by(() => {
+		const da = soglia;
+		if (da === null) return 0;
+		return timeline.filter((p) => p.at > da).length;
+	});
+
 	const costoContestazione = $derived(config.costo_apertura_contestazione ?? 1);
 	const penalita = $derived(config.penalita_extra_contestazione ?? 15);
 
@@ -91,6 +120,10 @@
 			fissati = res.fissati;
 			timeline = res.timeline;
 			stato = 'ok';
+			if (soglia === null) {
+				soglia = visto.marcatore;
+				visto.segna();
+			}
 			void profilo.aggiornaSaldi();
 		} catch (e) {
 			errore = messaggioErrore(e);
@@ -212,7 +245,10 @@
 			</div>
 		</div>
 	{:else}
-		{#each timeline as post (post.tipo + post.id)}
+		{#each timeline as post, i (post.tipo + post.id)}
+			{#if i === quantiNuovi && quantiNuovi > 0}
+				<p class="segnaposto t-label">Da qui in giù l'avevi già visto</p>
+			{/if}
 			{#if post.tipo === 'cattura'}
 				<CardCattura {post} onContesta={(p) => ((daContestare = p), (motivo = ''))} />
 			{:else if post.tipo === 'scambio'}
@@ -304,6 +340,26 @@
 		color: var(--navy);
 		border: var(--border) solid var(--navy);
 		text-decoration: none;
+	}
+
+	/*
+	 * Una riga e basta, non una finestra: e' un segno sul margine, non un
+	 * annuncio. Il tratteggio la distingue dai bordi pieni di tutto il resto,
+	 * che qui vogliono dire "questo e' un oggetto".
+	 */
+	.segnaposto {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		color: var(--navy-soft);
+		white-space: nowrap;
+	}
+
+	.segnaposto::before,
+	.segnaposto::after {
+		content: '';
+		flex: 1;
+		border-top: var(--border-thin) dashed var(--navy-soft);
 	}
 
 	.coda {

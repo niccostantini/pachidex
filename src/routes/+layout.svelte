@@ -8,7 +8,9 @@
 	import { cerimonia } from '$lib/state/cerimonia.svelte';
 	import { coda } from '$lib/state/coda.svelte';
 	import { rete } from '$lib/state/rete.svelte';
+	import { visto } from '$lib/state/visto.svelte';
 	import { sottoscriviFinale, statoFinale } from '$lib/db/finale';
+	import { sottoscriviFeed } from '$lib/db/feed';
 	import Intestazione from '$lib/components/Intestazione.svelte';
 	import BarraRete from '$lib/components/BarraRete.svelte';
 	import Taskbar from '$lib/components/Taskbar.svelte';
@@ -65,7 +67,28 @@
 		}
 
 		void cercaLaFinale();
-		return sottoscriviFinale(() => void cercaLaFinale(), 'cerimonia-guardia');
+
+		// Il pallino del feed si aggiorna anche stando altrove: e' li' che
+		// serve. Il canale ha un nome suo perche' il feed ne tiene gia' uno,
+		// e due iscrizioni sullo stesso nome si pestano i piedi.
+		let attesa: ReturnType<typeof setTimeout>;
+		const stopCronaca = sottoscriviFeed(() => {
+			clearTimeout(attesa);
+			attesa = setTimeout(() => void visto.ricontrolla(), 400);
+		}, 'cronaca-pallino');
+
+		const stopFinale = sottoscriviFinale(() => void cercaLaFinale(), 'cerimonia-guardia');
+		return () => {
+			clearTimeout(attesa);
+			stopCronaca();
+			stopFinale();
+		};
+	});
+
+	// Il segnaposto e' di chi sta usando il telefono adesso: cambiando
+	// giocatore riparte dal suo.
+	$effect(() => {
+		if (profilo.io) visto.init(profilo.io.id);
 	});
 
 	// Nessun profilo scelto: si passa dalla porta "Chi sei?". L'admin no, cosi'

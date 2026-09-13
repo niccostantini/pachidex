@@ -226,8 +226,8 @@ export async function chiudiScadute() {
  * Realtime su tutto cio' che genera cronaca. Un solo canale: meno socket
  * aperti, meno batteria, meno traffico su una rete gia' incerta.
  */
-export function sottoscriviFeed(onCambio: () => void) {
-	const canale = supabase.channel('cronaca');
+export function sottoscriviFeed(onCambio: () => void, nome = 'cronaca') {
+	const canale = supabase.channel(nome);
 	for (const table of [
 		'captures',
 		'transfers',
