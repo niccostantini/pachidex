@@ -4,10 +4,10 @@ import { conCache } from '$lib/db/cache';
 /**
  * I titoli contesi.
  *
- * Uno solo per titolo, sempre a chi e' in testa adesso. Si perdono, ed e'
- * tutto il punto: una medaglia la prendi il terzo giorno e da li' in poi e'
- * arredamento, un titolo che qualcuno ti puo' soffiare resta vivo fino
- * all'ultimo giorno.
+ * A chi e' in testa adesso — e se in testa ci sono in due, a tutte e due. Si
+ * perdono, ed e' tutto il punto: una medaglia la prendi il terzo giorno e da
+ * li' in poi e' arredamento, un titolo che qualcuno ti puo' soffiare resta
+ * vivo fino all'ultimo giorno.
  *
  * Il calcolo sta tutto in v_titoli, che non ha una tabella dietro: si
  * ricalcola a ogni lettura da cio' che e' gia' successo.
@@ -18,7 +18,9 @@ export type Titolo =
 	| 'camminatrice'
 	| 'scopritrice'
 	| 'businessperson'
-	| 'piaciona';
+	| 'piaciona'
+	| 'influencer'
+	| 'reietta';
 
 export interface VoceTitolo {
 	titolo: Titolo;
@@ -71,6 +73,18 @@ export const TITOLI: {
 		nome: 'La piaciona',
 		come: 'più like ricevuti',
 		unita: (n) => (n === 1 ? '1 like' : `${n} like`)
+	},
+	{
+		titolo: 'influencer',
+		nome: 'La influencer',
+		come: 'più CHIC in giro, foto comprese',
+		unita: (n) => (n === 1 ? '1 chic' : `${n} chic`)
+	},
+	{
+		titolo: 'reietta',
+		nome: 'La reietta',
+		come: 'più CHEAP ricevuti',
+		unita: (n) => (n === 1 ? '1 cheap' : `${n} cheap`)
 	}
 ];
 

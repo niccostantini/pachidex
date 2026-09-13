@@ -169,6 +169,42 @@
 			// Venticinque colonne per cinque righe: e' una scritta, non un'icona.
 			griglia: [25, 5]
 		},
+		// La gemella di chic, stessa altezza e stesse regole: le due parole
+		// stanno una accanto all'altra sotto ogni oversharing, e se non fossero
+		// disegnate uguali si vedrebbe subito quale delle due e' arrivata dopo.
+		cheap: {
+			pieni: [
+				// C
+				[1, 0, 3, 1],
+				[0, 1, 1, 3],
+				[4, 1, 1, 1],
+				[1, 4, 3, 1],
+				// H
+				[6, 0, 1, 5],
+				[10, 0, 1, 5],
+				[7, 2, 3, 1],
+				// E
+				[12, 0, 1, 5],
+				[13, 0, 4, 1],
+				[13, 2, 3, 1],
+				[13, 4, 4, 1],
+				// A
+				[19, 0, 3, 1],
+				[18, 1, 1, 4],
+				[22, 1, 1, 4],
+				[19, 2, 3, 1],
+				// P
+				[24, 0, 1, 5],
+				[25, 0, 3, 1],
+				[28, 1, 1, 1],
+				[25, 2, 3, 1],
+				// !
+				[30, 0, 1, 3],
+				[30, 4, 1, 1]
+			],
+			// Trentuno colonne per cinque righe: anche questa e' una scritta.
+			griglia: [31, 5]
+		},
 		// Vista di fronte, non in diagonale: su dodici pixel una diagonale
 		// diventa una scaletta, e la scaletta non somiglia a niente.
 		chiaveinglese: {

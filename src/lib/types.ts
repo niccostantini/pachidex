@@ -162,4 +162,28 @@ export interface PostContestazione {
 	at: string;
 }
 
-export type PostFeed = PostCattura | PostScambio | PostContestazione;
+/** Una formula di introduzione: la X e' il posto dove va il nome. */
+export interface Formula {
+	id: string;
+	testo: string;
+	ordine: number;
+	attiva: boolean;
+	created_at: string;
+}
+
+export interface PostOversharing {
+	tipo: 'oversharing';
+	id: string;
+	user_id: string;
+	testo: string;
+	autore: User;
+	/** Gia' risolta: quella del post, o quella di ripiego. */
+	formula: string;
+	chic: number;
+	cheap: number;
+	mio_voto: 'chic' | 'cheap' | null;
+	created_at: string;
+	at: string;
+}
+
+export type PostFeed = PostCattura | PostScambio | PostContestazione | PostOversharing;

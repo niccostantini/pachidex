@@ -1,5 +1,6 @@
 import { supabase } from '$lib/supabase';
 import { conCache } from '$lib/db/cache';
+import { caricaOversharing } from '$lib/db/oversharing';
 import type {
 	Contest,
 	PostCattura,
@@ -140,10 +141,13 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	timeline: PostFeed[];
 }> {
 	return conCache(`feed:${ioId ?? 'anonimo'}`, async () => {
-	const [catture, scambi, contestazioni, primati] = await Promise.all([
+	const [catture, scambi, contestazioni, frasi, primati] = await Promise.all([
 		caricaCatture(ioId),
 		caricaScambi(),
 		caricaContestazioni(ioId),
+		// Se Fa' Oversharing inciampa, il feed resta: sono chiacchiere, e non
+		// vale la pena perderci sopra la cronaca della vacanza.
+		caricaOversharing(ioId).catch(() => []),
 		idPrimati()
 	]);
 
@@ -153,7 +157,9 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	const fissati = contestazioni.filter((c) => c.contest.stato === 'aperta');
 	const chiuse = contestazioni.filter((c) => c.contest.stato !== 'aperta');
 
-	const timeline = [...catture, ...scambi, ...chiuse].sort((a, b) => b.at.localeCompare(a.at));
+	const timeline = [...catture, ...scambi, ...chiuse, ...frasi].sort((a, b) =>
+		b.at.localeCompare(a.at)
+	);
 
 	return { fissati, timeline };
 	});
@@ -222,7 +228,15 @@ export async function chiudiScadute() {
  */
 export function sottoscriviFeed(onCambio: () => void) {
 	const canale = supabase.channel('cronaca');
-	for (const table of ['captures', 'transfers', 'contests', 'votes', 'reactions']) {
+	for (const table of [
+		'captures',
+		'transfers',
+		'contests',
+		'votes',
+		'reactions',
+		'oversharing',
+		'oversharing_voti'
+	]) {
 		canale.on('postgres_changes', { event: '*', schema: 'public', table }, onCambio);
 	}
 	canale.subscribe();

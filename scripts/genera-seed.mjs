@@ -209,6 +209,46 @@ join users u on u.id <> c.user_id
 where (extract(epoch from c.timestamp)::bigint + length(u.nome)) % 5 = 0
 on conflict do nothing;`);
 
+// --- Fa' Oversharing --------------------------------------------------------
+// Le frasi della vacanza. Datate dentro la stagione come tutto il resto — e
+// i voti due ore dopo la frase, non al momento in cui gira il seme: e' lo
+// stesso inciampo dei like, degli scambi e della contestazione, e a questo
+// punto e' una regola: nel seme non si timbra mai "adesso".
+const FRASI = [
+	['Vito', 1, 10, 3, 'il bagnino mi ha guardato male perche’ ho portato la granita in acqua', [['Rosa', 'chic'], ['Nina', 'chic'], ['Turi', 'chic'], ['Ciccio', 'cheap']]],
+	['Rosa', 1, 20, 7, 'ho contato quattordici gatti nella stessa piazza. quattordici.', [['Vito', 'chic'], ['Nina', 'chic'], ['Lella', 'chic'], ['Ciccio', 'chic'], ['Turi', 'chic']]],
+	['Ciccio', 2, 14, 20, 'secondo me l’arancino si puo’ mangiare anche a colazione, e l’ho dimostrato', [['Vito', 'chic'], ['Rosa', 'cheap'], ['Nina', 'cheap'], ['Lella', 'chic']]],
+	['Nina', 3, 8, 17, 'sveglia alle sette per vedere l’alba, vista l’alba, tornata a letto', [['Rosa', 'chic'], ['Lella', 'chic'], ['Vito', 'chic'], ['Turi', 'cheap']]],
+	['Turi', 4, 23, 11, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale', [['Vito', 'cheap'], ['Rosa', 'cheap'], ['Nina', 'cheap'], ['Ciccio', 'cheap'], ['Lella', 'cheap']]],
+	['Lella', 5, 13, 22, 'ho chiesto indicazioni a un signore e mi ha raccontato tutta la sua vita, bellissimo', [['Rosa', 'chic'], ['Nina', 'chic'], ['Ciccio', 'chic']]],
+	['Ciccio', 6, 19, 13, 'ho perso le infradito in mare. una sola. l’altra la tengo per ricordo', [['Vito', 'chic'], ['Turi', 'chic'], ['Lella', 'cheap'], ['Nina', 'chic']]],
+	['Rosa', 7, 12, 1, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina', [['Turi', 'cheap'], ['Ciccio', 'cheap'], ['Vito', 'chic'], ['Lella', 'chic']]],
+	['Turi', 8, 17, 15, 'sto guardando due formiche che portano via una briciola piu’ grande di loro e mi commuovo', [['Nina', 'chic'], ['Lella', 'cheap'], ['Rosa', 'cheap']]],
+	['Vito', 9, 22, 23, 'oggi non ho fatto niente e mi sembra il mio capolavoro', [['Rosa', 'chic'], ['Nina', 'chic'], ['Ciccio', 'chic'], ['Lella', 'chic'], ['Turi', 'chic']]]
+];
+
+scrivi(`
+-- --- Fa' Oversharing --------------------------------------------------------
+-- Dieci frasi, con la loro formula gia' scelta: nel gioco vero si pesca a
+-- caso, qui e' fissa cosi' il seme viene sempre uguale.`);
+
+for (const [chi, giorniDopo, ora, formula, testo, voti] of FRASI) {
+	const quando = new Date(INIZIO.getTime() + giorniDopo * 86400000 + ora * 3600000);
+	const votati = new Date(quando.getTime() + 2 * 3600000);
+	scrivi(`
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, ${q(testo)}, (select id from formule where ordine = ${formula}),
+	       timestamptz ${q(quando.toISOString())}
+	from users u where u.nome = ${q(chi)}
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz ${q(votati.toISOString())}
+from o, (values ${voti.map(([n2, v]) => `(${q(n2)}, ${q(v)})`).join(', ')}) as v(nome, voto)
+join users u on u.nome = v.nome;`);
+}
+
 scrivi(`
 -- --- due scambi -------------------------------------------------------------
 -- Datati dentro la vacanza, non al momento in cui gira il seme: altrimenti

@@ -10,6 +10,8 @@
 	import CardCattura from '$lib/components/CardCattura.svelte';
 	import CardScambio from '$lib/components/CardScambio.svelte';
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
+	import CardOversharing from '$lib/components/CardOversharing.svelte';
+	import Compositore from '$lib/components/Compositore.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
 	import GiroGuidato, { TAPPE } from '$lib/components/GiroGuidato.svelte';
 	import { wrapped, type Wrapped } from '$lib/db/stagioni';
@@ -154,6 +156,11 @@
 		</a>
 	{/if}
 
+	<!-- Il compositore sta in cima e non dietro a un pulsante: una frase la si
+	     attacca mentre si aspetta il caffe', e se per scriverla bisogna aprire
+	     qualcosa non la si attacca piu'. -->
+	<Compositore onFatto={carica} />
+
 	{#if coda.inAttesa.length}
 		<div class="coda">
 			<p class="t-label">
@@ -210,6 +217,8 @@
 				<CardCattura {post} onContesta={(p) => ((daContestare = p), (motivo = ''))} />
 			{:else if post.tipo === 'scambio'}
 				<CardScambio {post} />
+			{:else if post.tipo === 'oversharing'}
+				<CardOversharing {post} onCambio={carica} />
 			{:else}
 				<CardContestazione {post} onCambio={carica} />
 			{/if}

@@ -1143,6 +1143,130 @@ join users u on u.id <> c.user_id
 where (extract(epoch from c.timestamp)::bigint + length(u.nome)) % 5 = 0
 on conflict do nothing;
 
+-- --- Fa' Oversharing --------------------------------------------------------
+-- Dieci frasi, con la loro formula gia' scelta: nel gioco vero si pesca a
+-- caso, qui e' fissa cosi' il seme viene sempre uguale.
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'il bagnino mi ha guardato male perche’ ho portato la granita in acqua', (select id from formule where ordine = 3),
+	       timestamptz '2026-09-01T17:00:00.000Z'
+	from users u where u.nome = 'Vito'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-01T19:00:00.000Z'
+from o, (values ('Rosa', 'chic'), ('Nina', 'chic'), ('Turi', 'chic'), ('Ciccio', 'cheap')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'ho contato quattordici gatti nella stessa piazza. quattordici.', (select id from formule where ordine = 7),
+	       timestamptz '2026-09-02T03:00:00.000Z'
+	from users u where u.nome = 'Rosa'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-02T05:00:00.000Z'
+from o, (values ('Vito', 'chic'), ('Nina', 'chic'), ('Lella', 'chic'), ('Ciccio', 'chic'), ('Turi', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'secondo me l’arancino si puo’ mangiare anche a colazione, e l’ho dimostrato', (select id from formule where ordine = 20),
+	       timestamptz '2026-09-02T21:00:00.000Z'
+	from users u where u.nome = 'Ciccio'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-02T23:00:00.000Z'
+from o, (values ('Vito', 'chic'), ('Rosa', 'cheap'), ('Nina', 'cheap'), ('Lella', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'sveglia alle sette per vedere l’alba, vista l’alba, tornata a letto', (select id from formule where ordine = 17),
+	       timestamptz '2026-09-03T15:00:00.000Z'
+	from users u where u.nome = 'Nina'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-03T17:00:00.000Z'
+from o, (values ('Rosa', 'chic'), ('Lella', 'chic'), ('Vito', 'chic'), ('Turi', 'cheap')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale', (select id from formule where ordine = 11),
+	       timestamptz '2026-09-05T06:00:00.000Z'
+	from users u where u.nome = 'Turi'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-05T08:00:00.000Z'
+from o, (values ('Vito', 'cheap'), ('Rosa', 'cheap'), ('Nina', 'cheap'), ('Ciccio', 'cheap'), ('Lella', 'cheap')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'ho chiesto indicazioni a un signore e mi ha raccontato tutta la sua vita, bellissimo', (select id from formule where ordine = 22),
+	       timestamptz '2026-09-05T20:00:00.000Z'
+	from users u where u.nome = 'Lella'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-05T22:00:00.000Z'
+from o, (values ('Rosa', 'chic'), ('Nina', 'chic'), ('Ciccio', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'ho perso le infradito in mare. una sola. l’altra la tengo per ricordo', (select id from formule where ordine = 13),
+	       timestamptz '2026-09-07T02:00:00.000Z'
+	from users u where u.nome = 'Ciccio'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-07T04:00:00.000Z'
+from o, (values ('Vito', 'chic'), ('Turi', 'chic'), ('Lella', 'cheap'), ('Nina', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina', (select id from formule where ordine = 1),
+	       timestamptz '2026-09-07T19:00:00.000Z'
+	from users u where u.nome = 'Rosa'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-07T21:00:00.000Z'
+from o, (values ('Turi', 'cheap'), ('Ciccio', 'cheap'), ('Vito', 'chic'), ('Lella', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'sto guardando due formiche che portano via una briciola piu’ grande di loro e mi commuovo', (select id from formule where ordine = 15),
+	       timestamptz '2026-09-09T00:00:00.000Z'
+	from users u where u.nome = 'Turi'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-09T02:00:00.000Z'
+from o, (values ('Nina', 'chic'), ('Lella', 'cheap'), ('Rosa', 'cheap')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
+with o as (
+	insert into oversharing (user_id, testo, formula_id, created_at)
+	select u.id, 'oggi non ho fatto niente e mi sembra il mio capolavoro', (select id from formule where ordine = 23),
+	       timestamptz '2026-09-10T05:00:00.000Z'
+	from users u where u.nome = 'Vito'
+	returning id
+)
+insert into oversharing_voti (oversharing_id, user_id, voto, created_at)
+select o.id, u.id, v.voto, timestamptz '2026-09-10T07:00:00.000Z'
+from o, (values ('Rosa', 'chic'), ('Nina', 'chic'), ('Ciccio', 'chic'), ('Lella', 'chic'), ('Turi', 'chic')) as v(nome, voto)
+join users u on u.nome = v.nome;
+
 -- --- due scambi -------------------------------------------------------------
 -- Datati dentro la vacanza, non al momento in cui gira il seme: altrimenti
 -- cadono fuori dalla stagione che li contiene e restano nel feed anche dopo
