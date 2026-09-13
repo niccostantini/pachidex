@@ -1132,8 +1132,12 @@ with c as (
 select id from c;
 
 -- --- like -------------------------------------------------------------------
-insert into reactions (capture_id, user_id)
-select c.id, u.id
+-- Il like si data poco dopo la foto, non al momento in cui gira il seme:
+-- altrimenti cade fuori dalla stagione e "La piaciona" non la vince nessuno.
+-- E' lo stesso inciampo degli scambi e della contestazione — la terza volta
+-- che il seme timbrava "adesso" qualcosa che era successo durante la vacanza.
+insert into reactions (capture_id, user_id, created_at)
+select c.id, u.id, c.timestamp + interval '3 hours'
 from captures c
 join users u on u.id <> c.user_id
 where (extract(epoch from c.timestamp)::bigint + length(u.nome)) % 5 = 0
