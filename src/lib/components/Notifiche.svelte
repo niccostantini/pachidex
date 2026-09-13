@@ -57,6 +57,7 @@
 			<ul class="elenco t-small">
 				<li>Quando qualcuno cattura qualcosa</li>
 				<li>Quando ti taggano in una foto</li>
+				<li>Quando qualcuno ti nomina in un oversharing</li>
 				<li>Quando ti contestano, e come va a finire</li>
 				<li>Quando c'e' da votare una contestazione</li>
 				<li>Quando ricevi Croquembouche</li>

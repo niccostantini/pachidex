@@ -1,7 +1,9 @@
 import { json, error } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { estraiTaggati } from '$lib/game/tag';
 import { croq, db, inviaA, pushPronto, tuttiIGiocatori, tuttiTranne } from '$lib/server/push';
+import type { User } from '$lib/types';
 import type { RequestHandler } from './$types';
 
 /**
@@ -48,7 +50,8 @@ type Evento =
 	| { tipo: 'cattura'; id: string }
 	| { tipo: 'contestazione_aperta'; id: string }
 	| { tipo: 'contestazione_chiusa'; id: string }
-	| { tipo: 'scambio'; id: string };
+	| { tipo: 'scambio'; id: string }
+	| { tipo: 'oversharing'; id: string };
 
 /* --- cattura pubblicata --------------------------------------------------- */
 async function cattura(captureId: string, richiedente: string) {
@@ -237,6 +240,52 @@ async function scambio(transferId: string, richiedente: string) {
 	});
 }
 
+/* --- oversharing ----------------------------------------------------------- */
+/**
+ * Una frase con dentro dei nomi.
+ *
+ * Taggare qualcuno qui non gli da' un Croquembouche e non gli sblocca
+ * niente: serve soltanto a fargli squillare il telefono, che poi e' l'unica
+ * ragione per cui si chiama qualcuno per nome.
+ *
+ * Avvisa solo i nominati, non tutti. Una notifica per ogni frase
+ * trasformerebbe in due giorni la campanella in una cosa da spegnere — e
+ * spenta non arriverebbero piu' nemmeno le contestazioni, che invece hanno
+ * ventiquattr'ore e una scadenza vera.
+ *
+ * I nomi si rileggono dal testo salvato, non dalla richiesta: chi pubblica
+ * dice solo "e' uscita la frase X", e chi ci sia dentro lo decide il server
+ * — come per tutto il resto qui dentro.
+ */
+async function oversharing(id: string, richiedente: string) {
+	const { data } = await db
+		.from('oversharing')
+		.select('id, user_id, testo, autore:users!oversharing_user_id_fkey(nome)')
+		.eq('id', id)
+		.single();
+	if (!data) return 0;
+
+	const o = data as unknown as { user_id: string; testo: string; autore: { nome: string } };
+	esigiDentro(o.user_id === richiedente);
+
+	const { data: utenti } = await db.from('users').select('*');
+	const nominati = estraiTaggati(o.testo, (utenti ?? []) as User[], o.user_id);
+	if (!nominati.length) return 0;
+
+	return inviaA(
+		nominati.map((u) => u.id),
+		{
+			titolo: `${o.autore.nome} ti ha nominata`,
+			// La frase per intero: e' corta per costruzione, e tagliata a meta'
+			// non si capirebbe perche' ti riguarda.
+			corpo: o.testo,
+			url: '/',
+			tag: `oversharing-${id}`,
+			insisti: true
+		}
+	);
+}
+
 /* --- sorpassi -------------------------------------------------------------- */
 /** Da chiamare dopo ogni evento che muove i saldi. */
 
@@ -281,6 +330,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		case 'scambio':
 			inviate = await scambio(evento.id, richiedente);
 			break;
+		case 'oversharing':
+			// Un oversharing non muove un Croquembouche: qui si esce senza
+			// passare dai sorpassi, che non hanno niente da trovare.
+			return json({ inviate: await oversharing(evento.id, richiedente) });
 		default:
 			error(400, 'tipo sconosciuto');
 	}

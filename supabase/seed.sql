@@ -1145,7 +1145,9 @@ on conflict do nothing;
 
 -- --- Fa' Oversharing --------------------------------------------------------
 -- Dieci frasi, con la loro formula gia' scelta: nel gioco vero si pesca a
--- caso, qui e' fissa cosi' il seme viene sempre uguale.
+-- caso, qui e' fissa cosi' il seme viene sempre uguale. Due hanno dentro una
+-- @menzione, che non vale Croquembouche e serve solo a far squillare un
+-- telefono.
 
 with o as (
 	insert into oversharing (user_id, testo, formula_id, created_at)
@@ -1197,7 +1199,7 @@ join users u on u.nome = v.nome;
 
 with o as (
 	insert into oversharing (user_id, testo, formula_id, created_at)
-	select u.id, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale', (select id from formule where ordine = 11),
+	select u.id, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale, @Nina vieni a sentire', (select id from formule where ordine = 11),
 	       timestamptz '2026-09-05T06:00:00.000Z'
 	from users u where u.nome = 'Turi'
 	returning id
@@ -1233,7 +1235,7 @@ join users u on u.nome = v.nome;
 
 with o as (
 	insert into oversharing (user_id, testo, formula_id, created_at)
-	select u.id, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina', (select id from formule where ordine = 1),
+	select u.id, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina, dico a te @Ciccio', (select id from formule where ordine = 1),
 	       timestamptz '2026-09-07T19:00:00.000Z'
 	from users u where u.nome = 'Rosa'
 	returning id

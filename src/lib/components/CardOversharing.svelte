@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tempoRelativo } from '$lib/game/rules';
 	import { butta, conIlNome, vota } from '$lib/db/oversharing';
+	import { spezzaMenzioni } from '$lib/game/tag';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import Avatar from './Avatar.svelte';
 	import Icona from './Icona.svelte';
@@ -73,7 +74,13 @@
 		<span class="t-small t-muted quando">{tempoRelativo(post.created_at)}</span>
 	</div>
 
-	<p class="detto">{post.testo}</p>
+	<p class="detto">
+		{#each spezzaMenzioni(post.testo, profilo.utenti) as pezzo, i (i)}
+			{#if pezzo.utente}
+				<a class="menzione" href="/profilo/{pezzo.utente.id}">{pezzo.testo}</a>
+			{:else}{pezzo.testo}{/if}
+		{/each}
+	</p>
 
 	<div class="os__azioni">
 		<button
@@ -167,6 +174,12 @@
 		padding: var(--space-2) var(--space-3);
 		white-space: pre-wrap;
 		overflow-wrap: anywhere;
+	}
+
+	.menzione {
+		font-weight: 700;
+		text-decoration: none;
+		color: var(--blue);
 	}
 
 	.os__azioni {

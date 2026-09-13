@@ -219,10 +219,10 @@ const FRASI = [
 	['Rosa', 1, 20, 7, 'ho contato quattordici gatti nella stessa piazza. quattordici.', [['Vito', 'chic'], ['Nina', 'chic'], ['Lella', 'chic'], ['Ciccio', 'chic'], ['Turi', 'chic']]],
 	['Ciccio', 2, 14, 20, 'secondo me l’arancino si puo’ mangiare anche a colazione, e l’ho dimostrato', [['Vito', 'chic'], ['Rosa', 'cheap'], ['Nina', 'cheap'], ['Lella', 'chic']]],
 	['Nina', 3, 8, 17, 'sveglia alle sette per vedere l’alba, vista l’alba, tornata a letto', [['Rosa', 'chic'], ['Lella', 'chic'], ['Vito', 'chic'], ['Turi', 'cheap']]],
-	['Turi', 4, 23, 11, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale', [['Vito', 'cheap'], ['Rosa', 'cheap'], ['Nina', 'cheap'], ['Ciccio', 'cheap'], ['Lella', 'cheap']]],
+	['Turi', 4, 23, 11, 'ragazzi il condizionatore fa un rumore che secondo me e’ un animale, @Nina vieni a sentire', [['Vito', 'cheap'], ['Rosa', 'cheap'], ['Nina', 'cheap'], ['Ciccio', 'cheap'], ['Lella', 'cheap']]],
 	['Lella', 5, 13, 22, 'ho chiesto indicazioni a un signore e mi ha raccontato tutta la sua vita, bellissimo', [['Rosa', 'chic'], ['Nina', 'chic'], ['Ciccio', 'chic']]],
 	['Ciccio', 6, 19, 13, 'ho perso le infradito in mare. una sola. l’altra la tengo per ricordo', [['Vito', 'chic'], ['Turi', 'chic'], ['Lella', 'cheap'], ['Nina', 'chic']]],
-	['Rosa', 7, 12, 1, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina', [['Turi', 'cheap'], ['Ciccio', 'cheap'], ['Vito', 'chic'], ['Lella', 'chic']]],
+	['Rosa', 7, 12, 1, 'propongo una tassa di dieci croquembouche per chi lascia la sabbia in macchina, dico a te @Ciccio', [['Turi', 'cheap'], ['Ciccio', 'cheap'], ['Vito', 'chic'], ['Lella', 'chic']]],
 	['Turi', 8, 17, 15, 'sto guardando due formiche che portano via una briciola piu’ grande di loro e mi commuovo', [['Nina', 'chic'], ['Lella', 'cheap'], ['Rosa', 'cheap']]],
 	['Vito', 9, 22, 23, 'oggi non ho fatto niente e mi sembra il mio capolavoro', [['Rosa', 'chic'], ['Nina', 'chic'], ['Ciccio', 'chic'], ['Lella', 'chic'], ['Turi', 'chic']]]
 ];
@@ -230,7 +230,9 @@ const FRASI = [
 scrivi(`
 -- --- Fa' Oversharing --------------------------------------------------------
 -- Dieci frasi, con la loro formula gia' scelta: nel gioco vero si pesca a
--- caso, qui e' fissa cosi' il seme viene sempre uguale.`);
+-- caso, qui e' fissa cosi' il seme viene sempre uguale. Due hanno dentro una
+-- @menzione, che non vale Croquembouche e serve solo a far squillare un
+-- telefono.`);
 
 for (const [chi, giorniDopo, ora, formula, testo, voti] of FRASI) {
 	const quando = new Date(INIZIO.getTime() + giorniDopo * 86400000 + ora * 3600000);

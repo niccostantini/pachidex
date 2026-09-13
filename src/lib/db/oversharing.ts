@@ -1,4 +1,5 @@
 import { supabase } from '$lib/supabase';
+import { notificaEvento } from '$lib/notifica';
 import type { Formula, PostOversharing, User } from '$lib/types';
 
 /**
@@ -100,6 +101,9 @@ export const LIMITE = 280;
 export async function pubblica(testo: string): Promise<string> {
 	const { data, error } = await supabase.rpc('pubblica_oversharing', { p_testo: testo });
 	if (error) throw error;
+	// Chi e' stato nominato lo scopre dal server, che rilegge la frase dal
+	// database: i nomi non li decide chi scrive la richiesta.
+	notificaEvento('oversharing', data as string);
 	return data as string;
 }
 

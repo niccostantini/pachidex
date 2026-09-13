@@ -14,7 +14,7 @@ import { supabase } from '$lib/supabase';
  * comunque gia' andata a buon fine: si perde la notifica, non il gesto.
  */
 export function notificaEvento(
-	tipo: 'cattura' | 'contestazione_aperta' | 'contestazione_chiusa' | 'scambio',
+	tipo: 'cattura' | 'contestazione_aperta' | 'contestazione_chiusa' | 'scambio' | 'oversharing',
 	id: string
 ): void {
 	void (async () => {
