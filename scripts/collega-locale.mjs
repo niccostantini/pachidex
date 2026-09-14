@@ -43,6 +43,11 @@ writeFileSync(
 # ============================================================================
 PUBLIC_SUPABASE_URL="${url}"
 PUBLIC_SUPABASE_ANON_KEY="${stato.ANON_KEY}"
+
+# Chiave di servizio: SOLO lato server, crea gli account. Non prefissarla PUBLIC_.
+# Va riscritta qui ogni volta: senza, SvelteKit ricade su quella di .env, che e'
+# di produzione, e non combacia con l'istanza locale a cui punta l'URL sopra.
+SUPABASE_SERVICE_ROLE_KEY="${stato.SERVICE_ROLE_KEY}"
 `
 );
 

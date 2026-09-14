@@ -4,6 +4,11 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
 	return {
+		// ngrok assegna un sottodominio casuale a ogni avvio e Vite rifiuta gli
+		// host che non conosce: senza questi, chi apre il link del tunnel si
+		// trova un "Blocked request" al posto dell'app.
+		server: { allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app'] },
+		preview: { allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app'] },
 		plugins: [
 			sveltekit(),
 			SvelteKitPWA({
