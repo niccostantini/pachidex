@@ -18,6 +18,7 @@
 		{ href: '/gestione-xk29/profili', label: 'Giocatori' },
 		{ href: '/gestione-xk29/notifiche', label: 'Notifiche' },
 		{ href: '/gestione-xk29/presenze', label: 'Presenze' },
+		{ href: '/gestione-xk29/blocchi', label: 'Blocchi ?' },
 		{ href: '/gestione-xk29/formule', label: 'Formule' },
 		{ href: '/gestione-xk29/stagioni', label: 'Stagioni' },
 		{ href: '/gestione-xk29/finale', label: 'Premiazione' }

@@ -12,6 +12,7 @@
 	import CardScambio from '$lib/components/CardScambio.svelte';
 	import CardContestazione from '$lib/components/CardContestazione.svelte';
 	import CardOversharing from '$lib/components/CardOversharing.svelte';
+	import CardBlocco from '$lib/components/CardBlocco.svelte';
 	import Compositore from '$lib/components/Compositore.svelte';
 	import Foglio from '$lib/components/Foglio.svelte';
 	import GiroGuidato, { TAPPE } from '$lib/components/GiroGuidato.svelte';
@@ -255,6 +256,8 @@
 				<CardScambio {post} />
 			{:else if post.tipo === 'oversharing'}
 				<CardOversharing {post} onCambio={carica} />
+			{:else if post.tipo === 'blocco'}
+				<CardBlocco {post} />
 			{:else}
 				<CardContestazione {post} onCambio={carica} />
 			{/if}

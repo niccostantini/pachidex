@@ -5,6 +5,7 @@ import type {
 	Contest,
 	PostCattura,
 	PostContestazione,
+	PostBlocco,
 	PostFeed,
 	PostScambio,
 	User,
@@ -85,6 +86,23 @@ export async function caricaScambi(limite = 40): Promise<PostScambio[]> {
 	}));
 }
 
+export async function caricaBlocchi(limite = 40): Promise<PostBlocco[]> {
+	const { data, error } = await supabase
+		.from('blocchi_aperti')
+		.select('*, autore:users(*)')
+		.order('created_at', { ascending: false })
+		.limit(limite);
+	if (error) throw error;
+	return ((data ?? []) as unknown as Omit<PostBlocco, 'tipo' | 'id' | 'at'>[]).map((b) => ({
+		...b,
+		tipo: 'blocco',
+		// La tabella non ha un id: la chiave e' (cella, fascia), e l'autore piu'
+		// l'istante bastano a non ripetersi.
+		id: `${b.user_id}:${b.created_at}`,
+		at: b.created_at
+	}));
+}
+
 export async function caricaContestazioni(
 	ioId: string | null,
 	limite = 30
@@ -141,13 +159,15 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	timeline: PostFeed[];
 }> {
 	return conCache(`feed:${ioId ?? 'anonimo'}`, async () => {
-	const [catture, scambi, contestazioni, frasi, primati] = await Promise.all([
+	const [catture, scambi, contestazioni, frasi, blocchi, primati] = await Promise.all([
 		caricaCatture(ioId),
 		caricaScambi(),
 		caricaContestazioni(ioId),
 		// Se Fa' Oversharing inciampa, il feed resta: sono chiacchiere, e non
 		// vale la pena perderci sopra la cronaca della vacanza.
 		caricaOversharing(ioId).catch(() => []),
+		// Stessa cosa per i blocchi: prima della migration 0056 la tabella non c'e'.
+		caricaBlocchi().catch(() => []),
 		idPrimati()
 	]);
 
@@ -157,7 +177,7 @@ export async function caricaFeed(ioId: string | null): Promise<{
 	const fissati = contestazioni.filter((c) => c.contest.stato === 'aperta');
 	const chiuse = contestazioni.filter((c) => c.contest.stato !== 'aperta');
 
-	const timeline = [...catture, ...scambi, ...chiuse, ...frasi].sort((a, b) =>
+	const timeline = [...catture, ...scambi, ...chiuse, ...frasi, ...blocchi].sort((a, b) =>
 		b.at.localeCompare(a.at)
 	);
 

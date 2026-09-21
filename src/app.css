@@ -32,6 +32,12 @@
 	--rarity-raro: var(--blue);
 	--rarity-leggendario: var(--yellow);
 
+	/* --- poste dei blocchi «?» ----------------------------------------- */
+	--posta-piccola: var(--blue);
+	--posta-media: var(--green);
+	--posta-grossa: var(--orange);
+	--posta-enorme: var(--yellow);
+
 	/* --- categorie ------------------------------------------------------ */
 	--cat-posto: var(--blue);
 	--cat-pietanza: var(--orange);

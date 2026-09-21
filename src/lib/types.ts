@@ -186,4 +186,21 @@ export interface PostOversharing {
 	at: string;
 }
 
-export type PostFeed = PostCattura | PostScambio | PostContestazione | PostOversharing;
+/** Un blocco «?» aperto sulla mappa: quello che e' uscito dal d20. */
+export interface PostBlocco {
+	tipo: 'blocco';
+	id: string;
+	user_id: string;
+	autore: User;
+	luogo_nome: string;
+	posta: string;
+	trappola: boolean;
+	cd: number;
+	tiro: number;
+	/** Con il segno: positivo se e' entrato, negativo se e' uscito. */
+	croquembouche: number;
+	created_at: string;
+	at: string;
+}
+
+export type PostFeed = PostCattura | PostScambio | PostContestazione | PostOversharing | PostBlocco;
