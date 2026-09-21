@@ -10,6 +10,7 @@
 		type Blocco,
 		type Esito
 	} from '$lib/db/blocchi';
+	import { lanciaDado } from '$lib/game/dado';
 	import { distanzaMetri, formattaDistanza, osservaPosizione, type Posizione } from '$lib/game/geo';
 	import { profilo } from '$lib/state/profilo.svelte';
 	import { RARITA } from '$lib/game/rules';
@@ -91,69 +92,16 @@
 		return p;
 	}
 
-	// --- il d20 -------------------------------------------------------------
-	// Variante B scelta da Niccolo': cade dall'alto, rimbalza a scatti e
-	// atterra sul numero che ha tirato il server. Il numero vero e' deciso
-	// prima che l'animazione parta: quelli che scorrono sono solo scena.
-	const DADO = [
-		'......##......',
-		'....##..##....',
-		'..##......##..',
-		'.#..........#.',
-		'#............#',
-		'#............#',
-		'#............#',
-		'#............#',
-		'#............#',
-		'.#..........#.',
-		'..##......##..',
-		'....##..##....',
-		'......##......'
-	];
-
-	function disegnaDado(svg: SVGSVGElement, numero: number | string, colore: string) {
-		let s = '';
-		DADO.forEach((riga, y) => {
-			const da = riga.indexOf('#');
-			const a = riga.lastIndexOf('#');
-			[...riga].forEach((c, x) => {
-				const fill = c === '#' ? 'var(--navy)' : x > da && x < a ? colore : '';
-				if (fill) s += `<rect x="${x + 3}" y="${y + 3.5}" width="1" height="1" style="fill:${fill}"/>`;
-			});
-		});
-		s += `<text x="10" y="12.4" text-anchor="middle">${Number(numero) || '?'}</text>`;
-		svg.innerHTML = s;
-	}
-
+	// Il d20 vive in $lib/game/dado: qui solo il posto dove cade.
 	function dadoAnimato(e: Esito, fine: () => void): HTMLElement {
 		const scena = document.createElement('div');
 		scena.className = 'dado-scena';
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('viewBox', '0 0 20 20');
-		svg.setAttribute('shape-rendering', 'crispEdges');
-		svg.classList.add('dado');
-		scena.append(svg);
-
-		const finale = e.riuscito ? 'var(--green)' : 'var(--red)';
-		const fermo = matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (fermo) {
-			disegnaDado(svg, e.tiro, finale);
-			queueMicrotask(fine);
-			return scena;
-		}
-
-		svg.classList.add('dado--lancio');
-		let giri = 0;
-		disegnaDado(svg, 1 + Math.floor(Math.random() * 20), 'var(--orange)');
-		const scorre = setInterval(() => {
-			if (++giri < 10) {
-				disegnaDado(svg, 1 + Math.floor(Math.random() * 20), 'var(--orange)');
-				return;
-			}
-			clearInterval(scorre);
-			disegnaDado(svg, e.tiro, finale);
-			fine();
-		}, 110);
+		const tela = document.createElement('canvas');
+		tela.className = 'dado';
+		tela.setAttribute('role', 'img');
+		tela.setAttribute('aria-label', `d20: ${e.tiro}`);
+		scena.append(tela);
+		lanciaDado(tela, e.tiro, e.riuscito, fine);
 		return scena;
 	}
 
@@ -524,47 +472,16 @@
 	}
 
 	:global(.fumetto-blocco .dado-scena) {
-		height: 96px;
 		display: flex;
-		align-items: flex-end;
 		justify-content: center;
-		overflow: hidden;
 		margin-top: var(--space-2);
 	}
 
+	/* 96 pixel del canvas a 96 px CSS: su schermo retina ogni pixel resta netto. */
 	:global(.fumetto-blocco .dado) {
-		width: 72px;
-		height: 72px;
-	}
-
-	:global(.fumetto-blocco .dado text) {
-		font: 700 6px var(--font-ui);
-		fill: var(--paper);
-	}
-
-	:global(.dado--lancio) {
-		animation: dado-lancio 1.1s steps(14) forwards;
-	}
-
-	@keyframes -global-dado-lancio {
-		0% {
-			transform: translateY(-110px) rotate(0);
-		}
-		45% {
-			transform: translateY(0) rotate(270deg);
-		}
-		60% {
-			transform: translateY(-28px) rotate(330deg);
-		}
-		75% {
-			transform: translateY(0) rotate(360deg);
-		}
-		87% {
-			transform: translateY(-8px) rotate(360deg);
-		}
-		100% {
-			transform: translateY(0) rotate(360deg);
-		}
+		width: 96px;
+		height: 96px;
+		image-rendering: pixelated;
 	}
 
 	:global(.fumetto-blocco .esito__dado) {
