@@ -49,7 +49,7 @@
 
 	.coccarda__che {
 		font-weight: 700;
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 	}
@@ -81,6 +81,6 @@
 	}
 
 	.coccarde--compatte .coccarda__che {
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 	}
 </style>

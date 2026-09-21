@@ -109,7 +109,7 @@
 	}
 
 	.carta__nome {
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		line-height: 1.15;
 		/* Il nome si vede sempre, anche da bloccato: il Dex e' la lista delle
@@ -123,7 +123,7 @@
 	}
 
 	.carta__rarita {
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -169,7 +169,7 @@
 		background: var(--orange);
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		padding: 0 4px;
 	}
@@ -181,7 +181,7 @@
 		background: var(--blue);
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 		line-height: 1.2;
 		padding: 0 3px;
 	}

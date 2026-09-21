@@ -287,7 +287,7 @@
 	}
 
 	.titolo__chi {
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 	}
 
 	.scatto {

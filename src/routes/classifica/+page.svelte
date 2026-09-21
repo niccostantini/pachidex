@@ -177,7 +177,7 @@
 		padding: 9px;
 		background: var(--paper);
 		border: var(--border) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -225,7 +225,7 @@
 
 	.nome {
 		font-weight: 700;
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 	}
 
 	.barra {
@@ -252,13 +252,13 @@
 	}
 
 	.grande {
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		line-height: 1;
 	}
 
 	.tabella {
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 	}
 
 	.th,
@@ -271,7 +271,7 @@
 	.th {
 		font-weight: 700;
 		text-transform: uppercase;
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 		letter-spacing: 0.06em;
 		border-bottom: var(--border-thin) solid var(--navy);
 	}

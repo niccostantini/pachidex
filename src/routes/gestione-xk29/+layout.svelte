@@ -98,7 +98,7 @@
 	}
 
 	.vietato__titolo {
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 	}
 
@@ -145,7 +145,7 @@
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
 		border-bottom: 0;
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

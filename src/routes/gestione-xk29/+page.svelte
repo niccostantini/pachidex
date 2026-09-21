@@ -240,7 +240,7 @@
 	}
 
 	.n__v {
-		font-size: 2rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		line-height: 1;
 	}

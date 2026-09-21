@@ -366,7 +366,7 @@
 	.conta {
 		margin-left: auto;
 		font-weight: 700;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 	}
 
 	.mappa {
@@ -391,7 +391,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-3);
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		font-weight: 700;
@@ -503,7 +503,7 @@
 		all: unset;
 		cursor: pointer;
 		margin-top: var(--space-2);
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		text-decoration: underline;
 		color: var(--navy-soft);
 	}
@@ -529,12 +529,12 @@
 
 	.mappa :global(.leaflet-popup-content) {
 		margin: var(--space-3);
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		line-height: 1.4;
 	}
 
 	.mappa :global(.leaflet-popup-content strong) {
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 	}

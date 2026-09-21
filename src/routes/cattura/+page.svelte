@@ -511,7 +511,7 @@
 	}
 
 	.rito__titolo {
-		font-size: 1.0625rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		margin-bottom: 4px;
 	}
@@ -585,7 +585,7 @@
 	}
 
 	.scatta__icona {
-		font-size: 2.5rem;
+		font-size: var(--fs-display);
 		line-height: 1;
 	}
 
@@ -600,7 +600,7 @@
 	}
 
 	.scelta__nome {
-		font-size: 1.125rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 	}
 
@@ -649,7 +649,7 @@
 		border: var(--border-thin) solid var(--navy);
 		text-align: left;
 		cursor: pointer;
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 	}
 
 	.risultato:disabled {
@@ -668,7 +668,7 @@
 		place-items: center;
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		flex-shrink: 0;
 	}
 
@@ -677,7 +677,7 @@
 	   niente invece che essere l'unica cosa da premere. */
 	.cambia {
 		padding: 7px 13px;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		flex-shrink: 0;
 	}
 
@@ -695,7 +695,7 @@
 		padding: 5px var(--space-2);
 		background: var(--cream);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 	}
 
 	.vicino--dentro {

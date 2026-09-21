@@ -192,13 +192,13 @@
 	}
 
 	.nome {
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		line-height: 1.15;
 	}
 
 	.rarita {
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
@@ -217,7 +217,7 @@
 	}
 
 	.valore {
-		font-size: 2rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		color: var(--orange-dark);
 		line-height: 1.1;

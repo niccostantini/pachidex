@@ -224,7 +224,7 @@
 		color: var(--navy);
 		border: var(--border) solid var(--navy);
 		box-shadow: 3px 3px 0 rgba(22, 27, 61, 0.5);
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		line-height: 1.2;
 		text-transform: uppercase;
@@ -234,7 +234,7 @@
 	}
 
 	.post__nota {
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 	}
 
 	/* I nomi portano al profilo di chi li porta: restano scritti come prima,
@@ -271,7 +271,7 @@
 		padding: 2px 5px 2px 2px;
 		background: var(--cream);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 	}
 
@@ -283,7 +283,7 @@
 	}
 	
 	.t-num {
-		font-size: 1.1rem;
+		font-size: var(--fs-testo);
 	}
 
 	.azione {
@@ -293,7 +293,7 @@
 		padding: 4px 9px;
 		background: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

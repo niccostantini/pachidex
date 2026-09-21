@@ -201,7 +201,7 @@
 	}
 
 	.countdown {
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		background: var(--yellow);
 		color: var(--navy);

@@ -246,7 +246,7 @@
 	}
 
 	.pastiglia {
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

@@ -268,7 +268,7 @@
 
 	.passo {
 		margin-left: auto;
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		background: var(--navy);
 		color: var(--paper);
@@ -278,7 +278,7 @@
 	}
 
 	.testo {
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 		margin-bottom: var(--space-3);
 	}
 
@@ -287,7 +287,7 @@
 		flex-direction: column;
 		gap: 5px;
 		margin-bottom: var(--space-3);
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 	}
 
 	.dettagli li {

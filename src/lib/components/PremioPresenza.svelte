@@ -76,13 +76,13 @@
 	}
 
 	.giorni {
-		font-size: 3rem;
+		font-size: var(--fs-display);
 		line-height: 1;
 		color: var(--navy);
 	}
 
 	.vinti {
-		font-size: 1.5rem;
+		font-size: var(--fs-titolo);
 		color: var(--green);
 		margin-top: var(--space-2);
 	}

@@ -141,7 +141,7 @@
 		background: var(--cream);
 		border-left: var(--border) solid var(--navy);
 		padding: var(--space-2);
-		font-size: 0.9375rem;
+		font-size: var(--fs-testo);
 	}
 
 	.scopritori {

@@ -324,7 +324,7 @@
 
 	.ai-set__conta {
 		font-weight: 700;
-		font-size: 1.0625rem;
+		font-size: var(--fs-testo);
 		color: var(--yellow);
 	}
 
@@ -359,7 +359,7 @@
 		background: var(--paper);
 		border: var(--border-thin) solid var(--navy);
 		cursor: pointer;
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		-webkit-tap-highlight-color: transparent;
 	}
 
@@ -373,7 +373,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		font-size: 0.5625rem;
+		font-size: var(--fs-testo);
 	}
 
 	.tab__conta {
@@ -416,7 +416,7 @@
 		background: var(--orange);
 		color: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 	}
 
 	.attivi {
@@ -433,7 +433,7 @@
 		padding: 2px 6px;
 		background: var(--yellow);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -450,7 +450,7 @@
 		padding: 7px var(--space-3);
 		background: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		cursor: pointer;
 	}
@@ -466,7 +466,7 @@
 		display: flex;
 		gap: var(--space-2);
 		align-items: flex-start;
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 	}
 
 	.check input {

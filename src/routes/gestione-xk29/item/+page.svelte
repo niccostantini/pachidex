@@ -417,13 +417,13 @@
 	.tab {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 	}
 
 	.tab th {
 		text-align: left;
 		text-transform: uppercase;
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 		letter-spacing: 0.08em;
 		padding: 5px;
 		background: var(--navy);
@@ -499,14 +499,14 @@
 	code {
 		background: var(--cream);
 		padding: 1px 4px;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 	}
 
 	.check {
 		display: flex;
 		gap: var(--space-2);
 		align-items: flex-start;
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 	}
 
 	.check input {

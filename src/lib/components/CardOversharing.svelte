@@ -167,7 +167,7 @@
 	 * sinistra come una citazione. Tutto il resto della card e' cornice.
 	 */
 	.detto {
-		font-size: 1.05rem;
+		font-size: var(--fs-testo);
 		line-height: 1.35;
 		background: var(--cream);
 		border-left: var(--border) solid var(--orange);
@@ -195,7 +195,7 @@
 		padding: 4px 9px;
 		background: var(--paper);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -226,7 +226,7 @@
 
 	.voto--fine {
 		margin-left: auto;
-		font-size: 0.7rem;
+		font-size: var(--fs-testo);
 		color: var(--navy-soft);
 	}
 
@@ -242,7 +242,7 @@
 	}
 
 	.t-num {
-		font-size: 1.05rem;
+		font-size: var(--fs-testo);
 	}
 
 	.errore {

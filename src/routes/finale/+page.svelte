@@ -319,7 +319,7 @@
 
 	.punti {
 		font-weight: 700;
-		font-size: 1.0625rem;
+		font-size: var(--fs-testo);
 	}
 
 	.delta {
@@ -335,7 +335,7 @@
 	}
 
 	.domanda {
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		line-height: 1.2;
 		text-transform: uppercase;
@@ -431,7 +431,7 @@
 	}
 
 	.vincitore__nome {
-		font-size: 1.5rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		line-height: 1.1;
 	}

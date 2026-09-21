@@ -169,7 +169,7 @@
 	}
 
 	.saldo__n {
-		font-size: 1.5rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 	}
 
@@ -205,7 +205,7 @@
 
 	.importo .field {
 		text-align: center;
-		font-size: 1.25rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 	}
 

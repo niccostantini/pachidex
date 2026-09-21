@@ -84,7 +84,7 @@
 	}
 
 	.coda {
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		background: var(--navy);
 		color: var(--paper);

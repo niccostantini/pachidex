@@ -173,7 +173,7 @@
 	}
 
 	h1 {
-		font-size: 1.375rem;
+		font-size: var(--fs-titolo);
 		line-height: 1.1;
 	}
 
@@ -192,7 +192,7 @@
 	}
 
 	.grande {
-		font-size: 1.5rem;
+		font-size: var(--fs-titolo);
 		font-weight: 700;
 		color: var(--yellow);
 		line-height: 1.1;
@@ -235,7 +235,7 @@
 		padding: var(--space-2);
 		background: var(--cream);
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

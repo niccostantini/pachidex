@@ -58,6 +58,11 @@
 	   non esistevano nel font precedente: cadono sul font di sistema. */
 	--font-ui: 'Ithaca', 'Courier New', monospace;
 
+	/* --- dimensioni del testo: tre gradini --------------------------- */
+	--fs-testo: 17px;
+	--fs-titolo: 33px;
+	--fs-display: 65px;
+
 	--space-1: 4px;
 	--space-2: 8px;
 	--space-3: 12px;
@@ -78,9 +83,11 @@
 }
 
 html {
-	/* Un filo piu' grande del solito: Ithaca ha un'altezza-x contenuta
-	   e a 16px si leggeva stretta al sole. */
-	font-size: 18px;
+	/* Tre gradini soli, partiti da 16/32/64 e alzati di un pixel dopo la
+	   prova sul telefono: 17 e' il minimo per leggere al sole.
+	   --fs-testo per testo, etichette e microcopy; --fs-titolo per titoli e
+	   bottoni principali; --fs-display per i numeroni delle feste. */
+	font-size: 17px;
 	-webkit-text-size-adjust: 100%;
 }
 
@@ -133,24 +140,24 @@ h3 {
 }
 
 h1 {
-	font-size: 1.75rem;
+	font-size: var(--fs-titolo);
 }
 h2 {
-	font-size: 1.25rem;
+	font-size: var(--fs-titolo);
 }
 h3 {
-	font-size: 1rem;
+	font-size: var(--fs-testo);
 }
 
 .t-label {
-	font-size: 0.75rem;
+	font-size: var(--fs-testo);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 }
 
 .t-small {
-	font-size: 0.8125rem;
+	font-size: var(--fs-testo);
 }
 
 .t-muted {
@@ -194,7 +201,7 @@ h3 {
 }
 
 .win__title {
-	font-size: 0.75rem;
+	font-size: var(--fs-testo);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
@@ -217,7 +224,7 @@ h3 {
 	border: var(--border-thin) solid var(--navy);
 	display: grid;
 	place-items: center;
-	font-size: 9px;
+	font-size: 10px;
 	line-height: 1;
 	font-weight: 700;
 	color: var(--navy);
@@ -252,7 +259,7 @@ h3 {
 	border: var(--border) solid var(--navy);
 	box-shadow: var(--shadow-sm);
 	font-weight: 700;
-	font-size: 0.9375rem;
+	font-size: var(--fs-testo);
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
 	cursor: pointer;
@@ -304,12 +311,12 @@ h3 {
 
 .btn--lg {
 	padding: var(--space-4);
-	font-size: 1.0625rem;
+	font-size: var(--fs-titolo);
 }
 
 .btn--sm {
 	padding: 5px 10px;
-	font-size: 0.75rem;
+	font-size: var(--fs-testo);
 	box-shadow: 2px 2px 0 var(--navy);
 	border-width: var(--border-thin);
 }
@@ -326,7 +333,7 @@ h3 {
 	background: var(--paper);
 	border: var(--border) solid var(--navy);
 	box-shadow: inset 2px 2px 0 rgba(22, 27, 61, 0.12);
-	font-size: 1rem;
+	font-size: var(--fs-testo);
 	outline: none;
 }
 
@@ -340,7 +347,7 @@ h3 {
 .field-label {
 	display: block;
 	margin-bottom: var(--space-1);
-	font-size: 0.75rem;
+	font-size: var(--fs-testo);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
@@ -373,7 +380,7 @@ select.field {
 	padding: 2px 6px;
 	border: var(--border-thin) solid var(--navy);
 	background: var(--paper);
-	font-size: 0.6875rem;
+	font-size: var(--fs-testo);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
@@ -456,7 +463,7 @@ select.field {
 }
 
 .qblock__mark {
-	font-size: clamp(1.75rem, 12vw, 2.75rem);
+	font-size: var(--fs-titolo);
 	font-weight: 700;
 	color: var(--paper);
 	text-shadow: 3px 3px 0 rgba(22, 27, 61, 0.55);
@@ -523,7 +530,7 @@ select.field {
 .avatar--initials {
 	display: grid;
 	place-items: center;
-	font-size: 0.8rem;
+	font-size: var(--fs-testo);
 	font-weight: 700;
 	letter-spacing: 0.04em;
 	color: var(--paper);

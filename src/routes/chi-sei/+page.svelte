@@ -94,7 +94,7 @@
 	}
 
 	h1 {
-		font-size: 1.375rem;
+		font-size: var(--fs-titolo);
 	}
 
 	.campo {

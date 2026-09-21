@@ -154,18 +154,18 @@
 	}
 
 	.chip__n {
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 	}
 
 	/* Sotto gli 8px la scritta non si legge piu': e' il limite, non una scelta. */
 	.chip__che {
-		font-size: 0.5rem;
+		font-size: var(--fs-testo);
 		letter-spacing: 0.04em;
 		opacity: 0.8;
 	}
 
 	.attesa {
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		background: var(--yellow);
 		color: var(--navy);

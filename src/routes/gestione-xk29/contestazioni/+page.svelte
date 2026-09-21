@@ -196,7 +196,7 @@
 		background: var(--yellow);
 		border: var(--border-thin) solid var(--navy);
 		padding: 1px 5px;
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 	}
 
@@ -211,7 +211,7 @@
 	}
 
 	.esito {
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;

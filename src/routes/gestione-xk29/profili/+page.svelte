@@ -435,7 +435,7 @@
 		display: flex;
 		gap: var(--space-2);
 		align-items: center;
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 	}
 
 	.check input {

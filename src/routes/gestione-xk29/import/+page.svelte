@@ -261,14 +261,14 @@
 	}
 
 	.zona__icona {
-		font-size: 2rem;
+		font-size: var(--fs-titolo);
 		line-height: 1;
 	}
 
 	code {
 		background: var(--cream);
 		padding: 1px 4px;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		word-break: break-word;
 	}
 
@@ -281,7 +281,7 @@
 	.pill {
 		padding: 3px 9px;
 		border: var(--border-thin) solid var(--navy);
-		font-size: 0.75rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		text-transform: uppercase;
 	}
@@ -329,14 +329,14 @@
 	.tab {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 0.8125rem;
+		font-size: var(--fs-testo);
 		margin-bottom: var(--space-3);
 	}
 
 	.tab th {
 		text-align: left;
 		text-transform: uppercase;
-		font-size: 0.625rem;
+		font-size: var(--fs-testo);
 		letter-spacing: 0.08em;
 		padding: 5px;
 		background: var(--navy);

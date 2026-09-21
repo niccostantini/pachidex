@@ -182,7 +182,7 @@
 
 	.pista__conta {
 		position: relative;
-		font-size: 0.6875rem;
+		font-size: var(--fs-testo);
 		font-weight: 700;
 		padding-right: 6px;
 		color: var(--navy);
@@ -198,7 +198,7 @@
 		display: flex;
 		align-items: baseline;
 		gap: 7px;
-		font-size: 0.875rem;
+		font-size: var(--fs-testo);
 		color: var(--navy);
 		opacity: 0.55;
 	}
