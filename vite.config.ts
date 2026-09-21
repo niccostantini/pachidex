@@ -7,7 +7,19 @@ export default defineConfig(() => {
 		// ngrok assegna un sottodominio casuale a ogni avvio e Vite rifiuta gli
 		// host che non conosce: senza questi, chi apre il link del tunnel si
 		// trova un "Blocked request" al posto dell'app.
-		server: { allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app'] },
+		server: {
+			allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app'],
+			// Supabase dallo stesso indirizzo della pagina. Serve al tunnel per
+			// l'iPhone: la pagina e' in https, il Supabase in Docker in http, e
+			// Safari blocca le chiamate da una all'altro. Passando da qui escono
+			// entrambe dallo stesso https. In produzione non c'e' Vite davanti.
+			proxy: Object.fromEntries(
+				['/rest/v1', '/auth/v1', '/storage/v1', '/functions/v1', '/realtime/v1'].map((p) => [
+					p,
+					{ target: 'http://127.0.0.1:54321', changeOrigin: true, ws: p === '/realtime/v1' }
+				])
+			)
+		},
 		preview: { allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app'] },
 		plugins: [
 			sveltekit(),

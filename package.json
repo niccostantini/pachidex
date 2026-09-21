@@ -21,7 +21,8 @@
 		"db:studio": "open http://127.0.0.1:54323",
 		"db:collega": "node scripts/collega-locale.mjs",
 		"preview:lan": "vite preview --host 0.0.0.0",
-		"tunnel": "ngrok http 4173"
+		"tunnel": "ngrok http 4173",
+		"tunnel:dev": "ngrok http 5173"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^6.3.4",

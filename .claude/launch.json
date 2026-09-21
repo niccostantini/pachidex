@@ -20,6 +20,18 @@
 			],
 			"port": 4173,
 			"autoPort": true
+		},
+		{
+			"name": "pachidex-lan",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": [
+				"run",
+				"dev",
+				"--",
+				"--host",
+				"0.0.0.0"
+			],
+			"port": 5173
 		}
 	]
 }
